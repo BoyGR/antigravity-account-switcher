@@ -1,0 +1,2535 @@
+:root {
+    --ag-radius-lg: 14px;
+    --ag-radius-md: 10px;
+    --ag-radius-sm: 7px;
+
+    --ag-border:
+        color-mix(
+            in srgb,
+            var(--vscode-panel-border) 72%,
+            transparent
+        );
+
+    --ag-card:
+        color-mix(
+            in srgb,
+            var(--vscode-sideBar-background) 82%,
+            var(--vscode-editor-background)
+        );
+
+    --ag-card-hover:
+        color-mix(
+            in srgb,
+            var(--vscode-list-hoverBackground) 70%,
+            var(--ag-card)
+        );
+
+    --ag-accent: var(--vscode-focusBorder);
+    --ag-success: #3ddc97;
+    --ag-warning: #f2c94c;
+    --ag-danger: var(--vscode-errorForeground);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    min-width: 0;
+}
+
+body {
+    padding: 10px 9px 16px;
+    color: var(--vscode-foreground);
+    background: var(--vscode-sideBar-background);
+    font-family: var(--vscode-font-family);
+    font-size: var(--vscode-font-size);
+    line-height: 1.45;
+}
+
+button {
+    font: inherit;
+}
+
+button:focus-visible {
+    outline: 1px solid var(--vscode-focusBorder);
+    outline-offset: 2px;
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* --------------------------------------------------------- */
+/* HEADER                                                    */
+/* --------------------------------------------------------- */
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 1px 2px 3px;
+}
+
+.brand-mark {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+}
+
+.brand-a {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+
+    font-size: 23px;
+    line-height: 1;
+    font-weight: 800;
+
+    color: var(--vscode-textLink-foreground);
+}
+
+.brand-orbit {
+    position: absolute;
+    left: 1px;
+    top: 13px;
+    width: 32px;
+    height: 9px;
+
+    border: 1.5px solid var(--vscode-focusBorder);
+    border-radius: 50%;
+
+    transform: rotate(-16deg);
+    opacity: .9;
+}
+
+.brand-orbit::after {
+    content: "";
+    position: absolute;
+    right: 1px;
+    top: 1px;
+
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+
+    background: var(--vscode-textLink-foreground);
+    box-shadow: 0 0 7px var(--vscode-focusBorder);
+}
+
+.brand-copy {
+    min-width: 0;
+}
+
+.brand-title {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.2;
+    font-weight: 750;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+}
+
+.brand-subtitle {
+    margin-top: 2px;
+    color: var(--vscode-descriptionForeground);
+    font-size: 11px;
+}
+
+/* --------------------------------------------------------- */
+/* SECTION                                                   */
+/* --------------------------------------------------------- */
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+
+    padding: 0 2px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    margin: 0;
+
+    color: var(--vscode-descriptionForeground);
+    font-size: 10px;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 19px;
+    height: 19px;
+    padding: 0 6px;
+
+    border-radius: 999px;
+
+    color: var(--vscode-badge-foreground);
+    background: var(--vscode-badge-background);
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+/* --------------------------------------------------------- */
+/* CURRENT ACCOUNT                                           */
+/* --------------------------------------------------------- */
+
+.hero-card {
+    position: relative;
+    overflow: hidden;
+
+    padding: 12px;
+
+    border: 1px solid var(--ag-border);
+    border-radius: var(--ag-radius-lg);
+
+    background:
+        radial-gradient(
+            circle at 105% 110%,
+            color-mix(
+                in srgb,
+                var(--vscode-focusBorder) 20%,
+                transparent
+            ),
+            transparent 45%
+        ),
+        var(--ag-card);
+}
+
+.hero-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            125deg,
+            color-mix(
+                in srgb,
+                var(--vscode-textLink-foreground) 6%,
+                transparent
+            ),
+            transparent 45%
+        );
+}
+
+.hero-status-row,
+.account-main,
+.hero-actions {
+    position: relative;
+}
+
+.hero-status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 10px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    min-height: 23px;
+    padding: 3px 8px;
+
+    border: 1px solid var(--ag-border);
+    border-radius: 999px;
+
+    font-size: 10px;
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: .055em;
+    text-transform: uppercase;
+}
+
+.badge.success {
+    color: var(--ag-success);
+
+    border-color:
+        color-mix(
+            in srgb,
+            var(--ag-success) 45%,
+            transparent
+        );
+
+    background:
+        color-mix(
+            in srgb,
+            var(--ag-success) 9%,
+            transparent
+        );
+}
+
+.badge.subtle {
+    color: var(--vscode-descriptionForeground);
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+
+    border-radius: 50%;
+    background: currentColor;
+
+    box-shadow: 0 0 8px currentColor;
+}
+
+.ready-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    color: var(--vscode-descriptionForeground);
+    font-size: 10px;
+}
+
+.account-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.avatar {
+    display: grid;
+    place-items: center;
+    flex: 0 0 46px;
+
+    width: 46px;
+    height: 46px;
+
+    border-radius: 50%;
+
+    border:
+        1px solid
+        color-mix(
+            in srgb,
+            var(--vscode-focusBorder) 65%,
+            transparent
+        );
+
+    background:
+        linear-gradient(
+            145deg,
+            color-mix(
+                in srgb,
+                var(--vscode-textLink-foreground) 80%,
+                #7c4dff
+            ),
+            #7c4dff
+        );
+
+    color: #fff;
+    font-weight: 750;
+    font-size: 15px;
+
+    box-shadow:
+        0 0 18px
+        color-mix(
+            in srgb,
+            var(--vscode-focusBorder) 18%,
+            transparent
+        );
+}
+
+.avatar.small {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+    font-size: 11px;
+}
+
+.identity {
+    min-width: 0;
+    flex: 1;
+}
+
+.identity-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    font-weight: 650;
+}
+
+.identity-email {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    margin-top: 2px;
+
+    color: var(--vscode-descriptionForeground);
+    font-size: 11px;
+}
+
+.identity-label {
+    display: inline-flex;
+
+    margin-top: 6px;
+    padding: 2px 7px;
+
+    border-radius: 999px;
+
+    color: var(--vscode-textLink-foreground);
+    background:
+        color-mix(
+            in srgb,
+            var(--vscode-textLink-foreground) 10%,
+            transparent
+        );
+
+    font-size: 10px;
+}
+
+.hero-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+
+    margin-top: 11px;
+}
+
+/* --------------------------------------------------------- */
+/* BUTTONS                                                   */
+/* --------------------------------------------------------- */
+
+.btn {
+    appearance: none;
+
+    min-height: 28px;
+    padding: 5px 8px;
+
+    border:
+        1px solid
+        color-mix(
+            in srgb,
+            var(--vscode-button-border, transparent) 80%,
+            var(--ag-border)
+        );
+
+    border-radius: var(--ag-radius-sm);
+
+    color: var(--vscode-button-foreground);
+    background: var(--vscode-button-background);
+
+    cursor: pointer;
+
+    transition:
+        background-color 120ms ease,
+        border-color 120ms ease,
+        transform 80ms ease;
+}
+
+.btn:hover {
+    background: var(--vscode-button-hoverBackground);
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn.secondary {
+    color: var(--vscode-foreground);
+    background: transparent;
+    border-color: var(--ag-border);
+}
+
+.btn.secondary:hover {
+    background: var(--vscode-toolbar-hoverBackground);
+}
+
+.btn.danger {
+    color: var(--vscode-errorForeground);
+
+    background:
+        color-mix(
+            in srgb,
+            var(--vscode-errorForeground) 7%,
+            transparent
+        );
+
+    border-color:
+        color-mix(
+            in srgb,
+            var(--vscode-errorForeground) 38%,
+            transparent
+        );
+}
+
+.btn.block {
+    width: 100%;
+}
+
+/* --------------------------------------------------------- */
+/* SAVED ACCOUNT                                             */
+/* --------------------------------------------------------- */
+
+.account-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.account-card {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    min-width: 0;
+    padding: 9px;
+
+    border: 1px solid var(--ag-border);
+    border-radius: var(--ag-radius-md);
+
+    background: var(--ag-card);
+
+    transition:
+        background-color 120ms ease,
+        border-color 120ms ease;
+}
+
+.account-card:hover {
+    background: var(--ag-card-hover);
+}
+
+.account-card.active {
+    border-color:
+        color-mix(
+            in srgb,
+            var(--ag-success) 60%,
+            var(--ag-border)
+        );
+
+    box-shadow:
+        inset 2px 0 0
+        color-mix(
+            in srgb,
+            var(--ag-success) 85%,
+            transparent
+        );
+}
+
+.account-card .identity {
+    min-width: 0;
+}
+
+.account-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    margin-left: auto;
+}
+
+.switch-btn {
+    min-height: 27px;
+    padding: 4px 8px;
+    font-size: 10px;
+}
+
+.icon-btn {
+    appearance: none;
+
+    display: grid;
+    place-items: center;
+
+    width: 28px;
+    height: 28px;
+
+    border: 0;
+    border-radius: 6px;
+
+    color: var(--vscode-icon-foreground);
+    background: transparent;
+
+    cursor: pointer;
+}
+
+.icon-btn:hover {
+    background: var(--vscode-toolbar-hoverBackground);
+}
+
+.more {
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+/* --------------------------------------------------------- */
+/* ADD ACCOUNT                                               */
+/* --------------------------------------------------------- */
+
+.add-card {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 9px 10px;
+
+    border:
+        1px dashed
+        color-mix(
+            in srgb,
+            var(--vscode-focusBorder) 70%,
+            var(--ag-border)
+        );
+
+    border-radius: var(--ag-radius-md);
+
+    color: var(--vscode-textLink-foreground);
+
+    background:
+        color-mix(
+            in srgb,
+            var(--vscode-textLink-foreground) 4%,
+            transparent
+        );
+
+    cursor: pointer;
+    text-align: left;
+}
+
+.add-card:hover {
+    background:
+        color-mix(
+            in srgb,
+            var(--vscode-textLink-foreground) 9%,
+            transparent
+        );
+}
+
+.add-icon {
+    display: grid;
+    place-items: center;
+
+    width: 27px;
+    height: 27px;
+    flex: 0 0 27px;
+
+    border-radius: 50%;
+
+    color: var(--vscode-button-foreground);
+    background: var(--vscode-button-background);
+
+    font-size: 17px;
+}
+
+.add-title {
+    display: block;
+    font-weight: 650;
+}
+
+.add-subtitle {
+    display: block;
+    margin-top: 1px;
+
+    color: var(--vscode-descriptionForeground);
+    font-size: 10px;
+}
+
+/* --------------------------------------------------------- */
+/* RUNTIME                                                   */
+/* --------------------------------------------------------- */
+
+.runtime-card {
+    overflow: hidden;
+
+    border: 1px solid var(--ag-border);
+    border-radius: var(--ag-radius-md);
+
+    background: var(--ag-card);
+}
+
+.runtime-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 7px 9px;
+}
+
+.runtime-row + .runtime-row {
+    border-top: 1px solid var(--ag-border);
+}
+
+.runtime-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 25px;
+
+    width: 23px;
+    height: 23px;
+
+    border-radius: 6px;
+
+    background:
+        color-mix(
+            in srgb,
+            var(--vscode-textLink-foreground) 9%,
+            transparent
+        );
+}
+
+.runtime-copy {
+    min-width: 0;
+    flex: 1;
+}
+
+.runtime-name {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.runtime-detail {
+    margin-top: 1px;
+
+    color: var(--vscode-descriptionForeground);
+    font-size: 9px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.runtime-state {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    color: var(--ag-success);
+    font-size: 9px;
+    white-space: nowrap;
+}
+
+.runtime-state.error {
+    color: var(--ag-danger);
+}
+
+.health-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+
+    padding: 9px;
+
+    border:
+        1px solid
+        color-mix(
+            in srgb,
+            var(--ag-success) 42%,
+            var(--ag-border)
+        );
+
+    border-radius: var(--ag-radius-md);
+
+    background:
+        color-mix(
+            in srgb,
+            var(--ag-success) 6%,
+            transparent
+        );
+}
+
+.health-symbol {
+    color: var(--ag-success);
+    font-size: 15px;
+}
+
+.health-title {
+    color: var(--ag-success);
+    font-size: 10px;
+    font-weight: 650;
+}
+
+.health-copy {
+    margin-top: 1px;
+    color: var(--vscode-descriptionForeground);
+    font-size: 9px;
+}
+
+/* --------------------------------------------------------- */
+/* LOADING / EMPTY / ERROR                                   */
+/* --------------------------------------------------------- */
+
+.loading-card,
+.empty-card,
+.error-card {
+    padding: 13px;
+
+    border: 1px solid var(--ag-border);
+    border-radius: var(--ag-radius-md);
+
+    background: var(--ag-card);
+}
+
+.loading-line {
+    height: 8px;
+    margin: 7px 0;
+
+    border-radius: 999px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--vscode-editorWidget-background),
+            var(--vscode-toolbar-hoverBackground),
+            var(--vscode-editorWidget-background)
+        );
+
+    background-size: 200% 100%;
+
+    animation: shimmer 1.4s linear infinite;
+}
+
+.loading-line.short {
+    width: 56%;
+}
+
+@keyframes shimmer {
+    from {
+        background-position: 200% 0;
+    }
+
+    to {
+        background-position: -200% 0;
+    }
+}
+
+.muted {
+    color: var(--vscode-descriptionForeground);
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* --------------------------------------------------------- */
+/* SMALL WIDTH                                               */
+/* --------------------------------------------------------- */
+
+@media (max-width: 195px) {
+    .hero-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .ready-label {
+        display: none;
+    }
+
+    .account-card {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .account-actions {
+        width: 100%;
+        margin-left: 43px;
+    }
+}
+
+/* --------------------------------------------------------- */
+/* v0.3 compact polish                                       */
+/* --------------------------------------------------------- */
+
+.hero-card {
+    box-shadow:
+        0 8px 24px
+        color-mix(
+            in srgb,
+            #000 12%,
+            transparent
+        );
+}
+
+.hero-actions .btn {
+    white-space: nowrap;
+    font-size: 10px;
+}
+
+.account-card {
+    min-height: 64px;
+}
+
+.account-card.active {
+    background:
+        linear-gradient(
+            90deg,
+            color-mix(
+                in srgb,
+                var(--ag-success) 5%,
+                transparent
+            ),
+            var(--ag-card) 38%
+        );
+}
+
+.identity-name {
+    font-size: 11px;
+}
+
+.identity-email {
+    font-size: 9px;
+}
+
+.add-card {
+    min-height: 54px;
+}
+
+.add-title {
+    font-size: 11px;
+}
+
+.runtime-card {
+    box-shadow:
+        0 5px 18px
+        color-mix(
+            in srgb,
+            #000 8%,
+            transparent
+        );
+}
+
+.section-title {
+    font-size: 9px;
+}
+
+.badge {
+    min-height: 20px;
+    padding: 2px 7px;
+    font-size: 9px;
+}
+
+.ready-label {
+    font-size: 9px;
+}
+
+/* ========================================================= */
+/* v0.3.0 polish pass 2                                      */
+/* ========================================================= */
+
+button:disabled {
+    cursor: default;
+    opacity: .48;
+    pointer-events: none;
+}
+
+.operation-banner,
+.feedback-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    min-height: 34px;
+    padding: 7px 9px;
+
+    border: 1px solid var(--ag-border);
+    border-radius: var(--ag-radius-md);
+
+    background:
+        color-mix(
+            in srgb,
+            var(--vscode-editorWidget-background) 82%,
+            var(--vscode-sideBar-background)
+        );
+
+    color: var(--vscode-foreground);
+    font-size: 10px;
+
+    animation: ag-enter 140ms ease-out;
+}
+
+.operation-banner {
+    border-color:
+        color-mix(
+            in srgb,
+            var(--vscode-focusBorder) 50%,
+            var(--ag-border)
+        );
+}
+
+.feedback-banner.success {
+    color: var(--ag-success);
+
+    border-color:
+        color-mix(
+            in srgb,
+            var(--ag-success) 38%,
+            var(--ag-border)
+        );
+
+    background:
+        color-mix(
+            in srgb,
+            var(--ag-success) 6%,
+            var(--vscode-sideBar-background)
+        );
+}
+
+.feedback-banner.error {
+    color: var(--ag-danger);
+
+    border-color:
+        color-mix(
+            in srgb,
+            var(--ag-danger) 38%,
+            var(--ag-border)
+        );
+}
+
+.feedback-symbol {
+    display: grid;
+    place-items: center;
+
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+
+    border-radius: 50%;
+
+    background:
+        color-mix(
+            in srgb,
+            currentColor 13%,
+            transparent
+        );
+
+    font-weight: 800;
+}
+
+.operation-spinner {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 15px;
+
+    border: 2px solid
+        color-mix(
+            in srgb,
+            var(--vscode-focusBorder) 25%,
+            transparent
+        );
+
+    border-top-color:
+        var(--vscode-focusBorder);
+
+    border-radius: 50%;
+
+    animation: ag-spin .72s linear infinite;
+}
+
+@keyframes ag-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes ag-enter {
+    from {
+        opacity: 0;
+        transform: translateY(-3px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* More room for account labels. */
+
+.account-card {
+    gap: 8px;
+}
+
+.account-card .identity {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.account-actions {
+    flex: 0 0 auto;
+    gap: 3px;
+}
+
+.switch-btn {
+    min-width: 52px;
+    padding-left: 7px;
+    padding-right: 7px;
+    font-size: 9px;
+}
+
+
+/* Make overflow button visibly interactive. */
+
+.icon-btn.more {
+    width: 25px;
+    height: 25px;
+
+    border: 1px solid transparent;
+
+    color: var(--vscode-descriptionForeground);
+}
+
+.icon-btn.more:hover {
+    color: var(--vscode-foreground);
+
+    border-color: var(--ag-border);
+
+    background:
+        var(--vscode-toolbar-hoverBackground);
+}
+
+
+/* Smooth interactive cards. */
+
+.account-card,
+.hero-card,
+.add-card,
+.runtime-card {
+    transition:
+        border-color 120ms ease,
+        background-color 120ms ease,
+        box-shadow 120ms ease,
+        transform 100ms ease;
+}
+
+.account-card:hover {
+    border-color:
+        color-mix(
+            in srgb,
+            var(--vscode-focusBorder) 32%,
+            var(--ag-border)
+        );
+}
+
+.add-card:not(:disabled):hover {
+    transform: translateY(-1px);
+}
+
+.btn:not(:disabled):hover {
+    transform: translateY(-1px);
+}
+
+
+/* Make active badge slightly quieter. */
+
+.account-card .badge.success {
+    box-shadow: none;
+}
+
+.account-card .status-dot {
+    box-shadow:
+        0 0 5px currentColor;
+}
+
+
+/* Runtime visual simplification. */
+
+.runtime-detail {
+    max-width: 110px;
+}
+
+.runtime-state {
+    font-weight: 550;
+}
+
+
+/* Sidebar-width refinements. */
+
+@media (max-width: 230px) {
+    .switch-btn {
+        min-width: 29px;
+        width: 29px;
+        overflow: hidden;
+        white-space: nowrap;
+        color: transparent;
+        position: relative;
+    }
+
+    .switch-btn::after {
+        content: "⇄";
+        position: absolute;
+        inset: 0;
+
+        display: grid;
+        place-items: center;
+
+        color: var(--vscode-button-foreground);
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 205px) {
+    .brand-subtitle {
+        display: none;
+    }
+
+    .runtime-detail {
+        display: none;
+    }
+}
+
+/* ========================================================= */
+/* v0.3.0 polish pass 3 - responsive account layout          */
+/* ========================================================= */
+
+
+/* --------------------------------------------------------- */
+/* Current account identity                                  */
+/* --------------------------------------------------------- */
+
+/*
+ * The current account is the primary identity.
+ * Allow a long display name to use two lines instead of
+ * truncating too aggressively.
+ */
+
+.hero-card .identity-name {
+    white-space: normal;
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    line-height: 1.3;
+}
+
+.hero-card .identity-email {
+    max-width: 100%;
+}
+
+
+/* --------------------------------------------------------- */
+/* Saved account identity                                    */
+/* --------------------------------------------------------- */
+
+.account-card .identity-name,
+.account-card .identity-email {
+    max-width: 100%;
+}
+
+
+/*
+ * Normal sidebar:
+ * avatar | identity | actions
+ */
+
+.account-card {
+    display: grid;
+
+    grid-template-columns:
+        auto
+        minmax(0, 1fr)
+        auto;
+
+    grid-template-rows:
+        auto;
+
+    align-items: center;
+
+    column-gap: 8px;
+    row-gap: 4px;
+}
+
+.account-card > .avatar {
+    grid-column: 1;
+    grid-row: 1;
+
+    align-self: center;
+}
+
+.account-card > .identity {
+    grid-column: 2;
+    grid-row: 1;
+
+    width: 100%;
+    min-width: 0;
+}
+
+.account-card > .account-actions {
+    grid-column: 3;
+    grid-row: 1;
+
+    width: auto;
+    margin-left: 0;
+
+    justify-content: flex-end;
+}
+
+
+/* --------------------------------------------------------- */
+/* Medium / narrow VS Code sidebar                           */
+/* --------------------------------------------------------- */
+
+/*
+ * At common narrow VS Code sidebar widths, the action controls
+ * move to a second row. This gives the account label and email
+ * almost the entire first row.
+ */
+
+@media (max-width: 320px) {
+    .account-card {
+        grid-template-columns:
+            auto
+            minmax(0, 1fr);
+
+        grid-template-rows:
+            auto
+            auto;
+
+        padding-top: 9px;
+        padding-bottom: 8px;
+    }
+
+    .account-card > .avatar {
+        grid-column: 1;
+        grid-row: 1 / span 2;
+
+        align-self: start;
+
+        margin-top: 1px;
+    }
+
+    .account-card > .identity {
+        grid-column: 2;
+        grid-row: 1;
+
+        padding-right: 2px;
+    }
+
+    .account-card > .account-actions {
+        grid-column: 2;
+        grid-row: 2;
+
+        width: 100%;
+        min-width: 0;
+
+        margin-top: 2px;
+
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+
+        gap: 5px;
+    }
+
+    .account-card .identity-name {
+        font-size: 11px;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .account-card .identity-email {
+        font-size: 9px;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /*
+     * Button can now keep its text because it no longer competes
+     * with the account name on the first row.
+     */
+    .switch-btn {
+        width: auto;
+        min-width: 57px;
+
+        padding-left: 8px;
+        padding-right: 8px;
+
+        color: var(--vscode-button-foreground);
+    }
+
+    .switch-btn::after {
+        content: none;
+    }
+
+    .icon-btn.more {
+        flex: 0 0 25px;
+    }
+
+    /*
+     * Active badge stays visually secondary and aligned
+     * with the overflow action.
+     */
+    .account-card .badge.success {
+        margin-left: auto;
+    }
+}
+
+
+/* --------------------------------------------------------- */
+/* Very narrow sidebar                                       */
+/* --------------------------------------------------------- */
+
+@media (max-width: 225px) {
+    /*
+     * Only at genuinely tiny widths do we collapse the Switch
+     * text into an icon-only control.
+     */
+
+    .switch-btn {
+        position: relative;
+
+        width: 30px;
+        min-width: 30px;
+
+        overflow: hidden;
+
+        padding-left: 0;
+        padding-right: 0;
+
+        white-space: nowrap;
+
+        color: transparent;
+    }
+
+    .switch-btn::after {
+        content: "⇄";
+
+        position: absolute;
+        inset: 0;
+
+        display: grid;
+        place-items: center;
+
+        color: var(--vscode-button-foreground);
+
+        font-size: 12px;
+    }
+
+    .account-actions {
+        justify-content: flex-start;
+    }
+
+    .account-card .badge.success {
+        margin-left: 0;
+    }
+}
+
+
+/* --------------------------------------------------------- */
+/* Extremely narrow sidebar                                  */
+/* --------------------------------------------------------- */
+
+@media (max-width: 190px) {
+    .account-card {
+        grid-template-columns:
+            30px
+            minmax(0, 1fr);
+
+        column-gap: 6px;
+    }
+
+    .avatar.small {
+        width: 30px;
+        height: 30px;
+        flex-basis: 30px;
+
+        font-size: 10px;
+    }
+
+    .account-card .identity-name {
+        font-size: 10px;
+    }
+
+    .account-card .identity-email {
+        font-size: 8px;
+    }
+
+    .badge {
+        padding-left: 5px;
+        padding-right: 5px;
+
+        font-size: 8px;
+    }
+}
+
+
+/* --------------------------------------------------------- */
+/* Saved account hover emphasis                              */
+/* --------------------------------------------------------- */
+
+.account-card:not(.active):hover {
+    box-shadow:
+        inset 2px 0 0
+        color-mix(
+            in srgb,
+            var(--vscode-focusBorder) 46%,
+            transparent
+        );
+}
+
+
+/* --------------------------------------------------------- */
+/* Active saved account                                      */
+/* --------------------------------------------------------- */
+
+.account-card.active {
+    box-shadow:
+        inset 2px 0 0
+        color-mix(
+            in srgb,
+            var(--ag-success) 85%,
+            transparent
+        ),
+        0 4px 14px
+        color-mix(
+            in srgb,
+            var(--ag-success) 5%,
+            transparent
+        );
+}
+
+
+/* --------------------------------------------------------- */
+/* Add account card                                          */
+/* --------------------------------------------------------- */
+
+.add-card > span:last-child {
+    min-width: 0;
+}
+
+.add-title,
+.add-subtitle {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 230px) {
+    .add-card {
+        gap: 8px;
+    }
+
+    .add-subtitle {
+        white-space: nowrap;
+    }
+}
+
+
+/* --------------------------------------------------------- */
+/* Runtime rows                                              */
+/* --------------------------------------------------------- */
+
+.runtime-row {
+    min-width: 0;
+}
+
+.runtime-copy {
+    overflow: hidden;
+}
+
+.runtime-state {
+    flex: 0 0 auto;
+}
+
+@media (max-width: 235px) {
+    .runtime-name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .runtime-state {
+        font-size: 8px;
+    }
+}
+
+/* ========================================================= */
+/* v0.3.0 U11 accessibility polish                           */
+/* ========================================================= */
+
+
+/* --------------------------------------------------------- */
+/* Keyboard focus                                            */
+/* --------------------------------------------------------- */
+
+.btn:focus-visible,
+.icon-btn:focus-visible,
+.add-card:focus-visible {
+    outline:
+        2px solid
+        var(--vscode-focusBorder);
+
+    outline-offset: 2px;
+}
+
+.account-card:focus-within {
+    border-color:
+        var(--vscode-focusBorder);
+}
+
+
+/* --------------------------------------------------------- */
+/* Current semantic state                                    */
+/* --------------------------------------------------------- */
+
+.account-card[aria-current="true"] {
+    border-color:
+        color-mix(
+            in srgb,
+            var(--ag-success) 72%,
+            var(--vscode-focusBorder)
+        );
+}
+
+
+/* --------------------------------------------------------- */
+/* Reduced motion                                            */
+/* --------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+
+        transition-duration: 0.01ms !important;
+    }
+
+    .operation-spinner {
+        animation: none;
+
+        border-color:
+            var(--vscode-focusBorder);
+
+        opacity: .7;
+    }
+
+    .btn:not(:disabled):hover,
+    .add-card:not(:disabled):hover {
+        transform: none;
+    }
+}
+
+
+/* --------------------------------------------------------- */
+/* High Contrast / Forced Colors                             */
+/* --------------------------------------------------------- */
+
+@media (forced-colors: active) {
+    .hero-card,
+    .account-card,
+    .runtime-card,
+    .add-card,
+    .operation-banner,
+    .feedback-banner {
+        border:
+            1px solid
+            CanvasText;
+
+        background:
+            Canvas;
+
+        box-shadow:
+            none;
+    }
+
+    .account-card.active,
+    .account-card[aria-current="true"] {
+        border:
+            2px solid
+            Highlight;
+
+        box-shadow:
+            none;
+    }
+
+    .btn,
+    .icon-btn,
+    .add-card {
+        forced-color-adjust: auto;
+    }
+
+    .status-dot {
+        box-shadow:
+            none;
+    }
+
+    .avatar {
+        border:
+            1px solid
+            CanvasText;
+
+        background:
+            Canvas;
+
+        color:
+            CanvasText;
+
+        box-shadow:
+            none;
+    }
+
+    .badge.success,
+    .runtime-state {
+        color:
+            CanvasText;
+    }
+}
+
+
+/* --------------------------------------------------------- */
+/* Better disabled distinction                               */
+/* --------------------------------------------------------- */
+
+button:disabled {
+    filter:
+        saturate(.45);
+}
+
+
+/* --------------------------------------------------------- */
+/* Text selection                                            */
+/* --------------------------------------------------------- */
+
+.identity-name,
+.identity-email,
+.runtime-detail {
+    user-select: text;
+}
+
+
+/* --------------------------------------------------------- */
+/* Prevent accidental layout overflow                        */
+/* --------------------------------------------------------- */
+
+.brand-copy,
+.identity,
+.runtime-copy {
+    min-width: 0;
+}
+
+/* ========================================================= */
+/* v0.3.0 U12 final visual polish                            */
+/* ========================================================= */
+
+
+/* --------------------------------------------------------- */
+/* Global visual rhythm                                      */
+/* --------------------------------------------------------- */
+
+body {
+    padding:
+        9px
+        9px
+        15px;
+}
+
+.app {
+    gap: 13px;
+}
+
+.section {
+    gap: 6px;
+}
+
+.section-header {
+    min-height: 23px;
+
+    padding-left: 1px;
+    padding-right: 1px;
+}
+
+.section-title {
+    font-size: 9px;
+    font-weight: 720;
+
+    letter-spacing: .105em;
+}
+
+
+/* --------------------------------------------------------- */
+/* Brand                                                     */
+/* --------------------------------------------------------- */
+
+.brand {
+    gap: 8px;
+
+    padding:
+        0
+        2px
+        2px;
+}
+
+.brand-mark {
+    width: 32px;
+    height: 32px;
+
+    flex-basis: 32px;
+}
+
+.brand-a {
+    font-size: 22px;
+    font-weight: 820;
+
+    color:
+        var(--vscode-textLink-foreground);
+
+    text-shadow:
+        0 0 12px
+        color-mix(
+            in srgb,
+            var(--vscode-focusBorder) 18%,
+            transparent
+        );
+}
+
+.brand-orbit {
+    left: 1px;
+    top: 12px;
+
+    width: 30px;
+    height: 8px;
+
+    opacity: .82;
+}
+
+.brand-title {
+    font-size: 12px;
+    font-weight: 760;
+
+    letter-spacing: .08em;
+}
+
+.brand-subtitle {
+    margin-top: 1px;
+
+    font-size: 10px;
+}
+
+
+/* --------------------------------------------------------- */
+/* Current account hero                                      */
+/* --------------------------------------------------------- */
+
+.hero-card {
+    position: relative;
+
+    padding: 11px;
+
+    border-color:
+        color-mix(
+            in srgb,
+            var(--vscode-focusBorder) 30%,
+            var(--ag-border)
+        );
+
+    background:
+        radial-gradient(
+            circle at 108% 115%,
+            color-mix(
+                in srgb,
+                var(--vscode-focusBorder) 16%,
+                transparent
+            ),
+            transparent 47%
+        ),
+        linear-gradient(
+            135deg,
+            color-mix(
+                in srgb,
+                var(--vscode-textLink-foreground) 4%,
+                transparent
+            ),
+            transparent 52%
+        ),
+        var(--ag-card);
+
+    box-shadow:
+        0 6px 20px
+        color-mix(
+            in srgb,
+            #000 10%,
+            transparent
+        );
+}
+
+.hero-card::after {
+    content: "";
+
+    position: absolute;
+
+    left: 12px;
+    right: 12px;
+    top: 0;
+
+    height: 1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            color-mix(
+                in srgb,
+                var(--vscode-focusBorder) 55%,
+                transparent
+            ),
+            transparent
+        );
+
+    pointer-events: none;
+}
+
+.hero-status-row {
+    margin-bottom: 9px;
+}
+
+.hero-card .badge.success {
+    min-height: 19px;
+
+    padding:
+        2px
+        7px;
+
+    font-size: 8px;
+
+    letter-spacing: .07em;
+
+    box-shadow: none;
+}
+
+.hero-card .status-dot {
+    width: 6px;
+    height: 6px;
+
+    flex-basis: 6px;
+
+    box-shadow:
+        0 0 5px
+        currentColor;
+}
+
+.hero-card .avatar {
+    width: 40px;
+    height: 40px;
+
+    flex-basis: 40px;
+
+    font-size: 14px;
+}
+
+.hero-card .identity-name {
+    font-size: 11px;
+    font-weight: 680;
+}
+
+.hero-card .identity-email {
+    margin-top: 1px;
+
+    font-size: 9px;
+}
+
+.identity-label {
+    margin-top: 5px;
+
+    padding:
+        2px
+        6px;
+
+    font-size: 9px;
+
+    background:
+        color-mix(
+            in srgb,
+            var(--vscode-textLink-foreground) 8%,
+            transparent
+        );
+}
+
+.hero-actions {
+    gap: 6px;
+
+    margin-top: 10px;
+}
+
+.hero-actions .btn {
+    min-height: 27px;
+
+    font-size: 9px;
+}
+
+
+/* --------------------------------------------------------- */
+/* Buttons                                                   */
+/* --------------------------------------------------------- */
+
+.btn {
+    border-radius: 6px;
+
+    box-shadow: none;
+}
+
+.btn.secondary {
+    border-color:
+        color-mix(
+            in srgb,
+            var(--vscode-foreground) 15%,
+            var(--ag-border)
+        );
+}
+
+.btn.danger {
+    background:
+        color-mix(
+            in srgb,
+            var(--vscode-errorForeground) 5%,
+            transparent
+        );
+
+    border-color:
+        color-mix(
+            in srgb,
+            var(--vscode-errorForeground) 26%,
+            var(--ag-border)
+        );
+}
+
+.btn:not(:disabled):active,
+.add-card:not(:disabled):active,
+.icon-btn:not(:disabled):active {
+    transform: translateY(1px);
+}
+
+
+/* --------------------------------------------------------- */
+/* Saved account cards                                       */
+/* --------------------------------------------------------- */
+
+.account-list {
+    gap: 6px;
+}
+
+.account-card {
+    padding:
+        8px
+        9px;
+
+    min-height: 59px;
+
+    border-radius: 9px;
+
+    border-color:
+        color-mix(
+            in srgb,
+            var(--vscode-foreground) 9%,
+            var(--ag-border)
+        );
+
+    background:
+        color-mix(
+            in srgb,
+            var(--ag-card) 96%,
+            var(--vscode-editor-background)
+        );
+}
+
+.account-card:hover {
+    border-color:
+        color-mix(
+            in srgb,
+            var(--vscode-focusBorder) 42%,
+            var(--ag-border)
+        );
+}
+
+.account-card.active {
+    border-color:
+        color-mix(
+            in srgb,
+            var(--ag-success) 42%,
+            var(--ag-border)
+        );
+
+    background:
+        linear-gradient(
+            90deg,
+            color-mix(
+                in srgb,
+                var(--ag-success) 6%,
+                transparent
+            ),
+            transparent 72%
+        ),
+        var(--ag-card);
+
+    box-shadow:
+        inset 2px 0 0
+        color-mix(
+            in srgb,
+            var(--ag-success) 72%,
+            transparent
+        );
+}
+
+.avatar.small {
+    width: 33px;
+    height: 33px;
+
+    flex-basis: 33px;
+
+    font-size: 10px;
+}
+
+.account-card .identity-name {
+    font-size: 10px;
+    font-weight: 650;
+}
+
+.account-card .identity-email {
+    margin-top: 1px;
+
+    font-size: 8px;
+}
+
+.account-card .badge.success {
+    min-height: 18px;
+
+    padding:
+        2px
+        6px;
+
+    font-size: 8px;
+
+    letter-spacing: .05em;
+
+    background:
+        color-mix(
+            in srgb,
+            var(--ag-success) 6%,
+            transparent
+        );
+}
+
+.account-card .status-dot {
+    width: 5px;
+    height: 5px;
+
+    flex-basis: 5px;
+}
+
+
+/* --------------------------------------------------------- */
+/* Switch action                                             */
+/* --------------------------------------------------------- */
+
+.switch-btn {
+    min-height: 25px;
+
+    min-width: 54px;
+
+    padding:
+        4px
+        7px;
+
+    color:
+        var(--vscode-textLink-foreground);
+
+    background:
+        color-mix(
+            in srgb,
+            var(--vscode-textLink-foreground) 6%,
+            transparent
+        );
+
+    border-color:
+        color-mix(
+            in srgb,
+            var(--vscode-textLink-foreground) 22%,
+            var(--ag-border)
+        );
+
+    font-size: 8px;
+    font-weight: 600;
+}
+
+.switch-btn:hover:not(:disabled) {
+    color:
+        var(--vscode-button-foreground);
+
+    background:
+        var(--vscode-button-background);
+
+    border-color:
+        var(--vscode-button-background);
+}
+
+
+/* --------------------------------------------------------- */
+/* Overflow menu                                             */
+/* --------------------------------------------------------- */
+
+.icon-btn.more {
+    width: 24px;
+    height: 24px;
+
+    border-radius: 6px;
+
+    font-size: 14px;
+}
+
+.icon-btn.more:hover {
+    border-color:
+        color-mix(
+            in srgb,
+            var(--vscode-focusBorder) 30%,
+            var(--ag-border)
+        );
+}
+
+
+/* --------------------------------------------------------- */
+/* Add Account                                               */
+/* --------------------------------------------------------- */
+
+.add-card {
+    min-height: 49px;
+
+    padding:
+        8px
+        9px;
+
+    border-radius: 9px;
+
+    border-color:
+        color-mix(
+            in srgb,
+            var(--vscode-focusBorder) 38%,
+            var(--ag-border)
+        );
+
+    background:
+        color-mix(
+            in srgb,
+            var(--vscode-textLink-foreground) 2.5%,
+            transparent
+        );
+}
+
+.add-card:not(:disabled):hover {
+    border-color:
+        color-mix(
+            in srgb,
+            var(--vscode-focusBorder) 68%,
+            var(--ag-border)
+        );
+
+    background:
+        color-mix(
+            in srgb,
+            var(--vscode-textLink-foreground) 6%,
+            transparent
+        );
+}
+
+.add-icon {
+    width: 25px;
+    height: 25px;
+
+    flex-basis: 25px;
+
+    font-size: 15px;
+}
+
+.add-title {
+    font-size: 10px;
+}
+
+.add-subtitle {
+    font-size: 8px;
+}
+
+
+/* --------------------------------------------------------- */
+/* Saved account count                                       */
+/* --------------------------------------------------------- */
+
+.count {
+    min-width: 18px;
+    height: 18px;
+
+    padding:
+        0
+        5px;
+
+    font-size: 9px;
+
+    opacity: .9;
+}
+
+
+/* --------------------------------------------------------- */
+/* Runtime status panel                                      */
+/* --------------------------------------------------------- */
+
+.runtime-card {
+    border-radius: 9px;
+
+    border-color:
+        color-mix(
+            in srgb,
+            var(--vscode-foreground) 8%,
+            var(--ag-border)
+        );
+
+    box-shadow:
+        0 4px 14px
+        color-mix(
+            in srgb,
+            #000 6%,
+            transparent
+        );
+}
+
+.runtime-row {
+    gap: 7px;
+
+    min-height: 39px;
+
+    padding:
+        6px
+        8px;
+}
+
+.runtime-icon {
+    width: 22px;
+    height: 22px;
+
+    flex-basis: 22px;
+
+    border-radius: 6px;
+
+    font-size: 9px;
+    font-weight: 700;
+
+    background:
+        color-mix(
+            in srgb,
+            var(--vscode-textLink-foreground) 7%,
+            transparent
+        );
+}
+
+.runtime-name {
+    font-size: 10px;
+    font-weight: 620;
+}
+
+.runtime-detail {
+    margin-top: 0;
+
+    font-size: 8px;
+
+    opacity: .9;
+}
+
+.runtime-state {
+    gap: 4px;
+
+    font-size: 8px;
+}
+
+.runtime-state .status-dot {
+    width: 5px;
+    height: 5px;
+
+    flex-basis: 5px;
+
+    box-shadow:
+        0 0 4px
+        currentColor;
+}
+
+
+/* --------------------------------------------------------- */
+/* Runtime Ready indicator                                   */
+/* --------------------------------------------------------- */
+
+.section-header .runtime-state {
+    min-height: 19px;
+
+    padding:
+        2px
+        5px;
+
+    border-radius: 999px;
+
+    background:
+        color-mix(
+            in srgb,
+            var(--ag-success) 5%,
+            transparent
+        );
+}
+
+
+/* --------------------------------------------------------- */
+/* Busy / feedback                                           */
+/* --------------------------------------------------------- */
+
+.operation-banner,
+.feedback-banner {
+    min-height: 31px;
+
+    padding:
+        6px
+        8px;
+
+    border-radius: 8px;
+
+    font-size: 9px;
+}
+
+.operation-spinner {
+    width: 13px;
+    height: 13px;
+
+    flex-basis: 13px;
+
+    border-width: 1.5px;
+}
+
+.feedback-symbol {
+    width: 17px;
+    height: 17px;
+
+    flex-basis: 17px;
+
+    font-size: 9px;
+}
+
+
+/* --------------------------------------------------------- */
+/* Medium sidebar final refinement                           */
+/* --------------------------------------------------------- */
+
+@media (max-width: 320px) {
+    .account-card {
+        min-height: 67px;
+
+        padding:
+            8px
+            9px;
+    }
+
+    .account-card > .account-actions {
+        margin-top: 1px;
+    }
+
+    .switch-btn {
+        min-width: 55px;
+    }
+}
+
+
+/* --------------------------------------------------------- */
+/* Narrow sidebar final refinement                           */
+/* --------------------------------------------------------- */
+
+@media (max-width: 225px) {
+    .account-card {
+        min-height: 65px;
+    }
+
+    .switch-btn {
+        width: 29px;
+        min-width: 29px;
+    }
+
+    .icon-btn.more {
+        width: 23px;
+        height: 23px;
+    }
+}
+
+
+/* --------------------------------------------------------- */
+/* High contrast final overrides                             */
+/* --------------------------------------------------------- */
+
+@media (forced-colors: active) {
+    .hero-card::after {
+        display: none;
+    }
+
+    .switch-btn,
+    .btn,
+    .add-card {
+        border:
+            1px solid
+            ButtonText;
+    }
+
+    .switch-btn {
+        color:
+            ButtonText;
+
+        background:
+            ButtonFace;
+    }
+
+    .account-card.active {
+        background:
+            Canvas;
+    }
+}
+
+
+/* --------------------------------------------------------- */
+/* Reduced-motion final overrides                            */
+/* --------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-card,
+    .account-card,
+    .runtime-card,
+    .add-card,
+    .btn,
+    .icon-btn {
+        transform: none !important;
+    }
+}

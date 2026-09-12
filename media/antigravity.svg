@@ -1,15 +1,45 @@
-<svg width="24" height="24" viewBox="0 0 24 24"
-     xmlns="http://www.w3.org/2000/svg">
-  <g fill="none"
-     stroke="currentColor"
-     stroke-width="1.6"
-     stroke-linecap="round"
-     stroke-linejoin="round">
-    <circle cx="8" cy="8" r="3"/>
-    <path d="M3.5 17c.7-3 2.4-4.5 4.5-4.5 1.4 0 2.6.6 3.5 1.7"/>
-    <path d="M14 7h6"/>
-    <path d="M18 5l2 2-2 2"/>
-    <path d="M20 17h-6"/>
-    <path d="M16 15l-2 2 2 2"/>
-  </g>
+<svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+>
+    <!-- Antigravity A -->
+    <path
+        d="M12 3.2L5.55 19.8H8.55L10.02 15.75H13.98L15.48 19.8H18.5L12 3.2ZM12 9.45L13.05 12.55H10.95L12 9.45Z"
+        fill="currentColor"
+    />
+
+    <!-- Upper switching orbit -->
+    <path
+        d="M3.45 10.2C4.55 6.95 8.05 4.75 12.1 4.75C15.45 4.75 18.25 6.15 19.65 8.35"
+        stroke="currentColor"
+        stroke-width="1.45"
+        stroke-linecap="round"
+    />
+
+    <path
+        d="M18.05 8.25L19.95 8.75L20.35 6.8"
+        stroke="currentColor"
+        stroke-width="1.45"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
+
+    <!-- Lower switching orbit -->
+    <path
+        d="M20.55 13.8C19.45 17.05 15.95 19.25 11.9 19.25C8.55 19.25 5.75 17.85 4.35 15.65"
+        stroke="currentColor"
+        stroke-width="1.45"
+        stroke-linecap="round"
+    />
+
+    <path
+        d="M5.95 15.75L4.05 15.25L3.65 17.2"
+        stroke="currentColor"
+        stroke-width="1.45"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
 </svg>

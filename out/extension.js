@@ -49,7 +49,7 @@ const sign_in_1 = require("./commands/sign-in");
 const sign_out_1 = require("./commands/sign-out");
 const status_1 = require("./commands/status");
 const switch_account_1 = require("./commands/switch-account");
-const account_tree_provider_1 = require("./views/account-tree-provider");
+const account_webview_provider_1 = require("./views/account-webview-provider");
 function activate(context) {
     (0, add_account_1.registerAddAccountCommand)(context);
     (0, account_context_1.registerAccountContextCommands)(context);
@@ -64,15 +64,11 @@ function activate(context) {
     (0, status_1.registerStatusCommand)(context);
     (0, switch_account_1.registerSwitchAccountCommand)(context);
     const diagnoseCommand = vscode.commands.registerCommand("boygr.antigravityAccountSwitcher.diagnose", diagnose_1.diagnoseAntigravity);
-    const treeProvider = new account_tree_provider_1.AntigravityAccountsTreeProvider(context);
-    const treeView = vscode.window.createTreeView("boygr.antigravityAccountSwitcher.accountsView", {
-        treeDataProvider: treeProvider,
-        showCollapseAll: false,
-    });
+    const accountWebview = (0, account_webview_provider_1.registerAntigravityAccountWebview)(context);
     const refreshCommand = vscode.commands.registerCommand("boygr.antigravityAccountSwitcher.refreshAccountsView", async () => {
-        await treeProvider.refresh();
+        await accountWebview.refresh();
     });
-    context.subscriptions.push(diagnoseCommand, treeProvider, treeView, refreshCommand);
+    context.subscriptions.push(refreshCommand);
 }
 function deactivate() {
     // Nothing else to clean up.

@@ -2,7 +2,7 @@
   "name": "boygr-antigravity-account-switcher",
   "displayName": "Antigravity Account Switcher",
   "description": "Manage and switch Google accounts used by Google Antigravity in Visual Studio Code through Antigravity's existing authentication flow.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "boygr",
   "engines": {
     "vscode": "^1.95.0"
@@ -112,7 +112,8 @@
       "antigravityAccounts": [
         {
           "id": "boygr.antigravityAccountSwitcher.accountsView",
-          "name": "Accounts"
+          "name": "Accounts",
+          "type": "webview"
         }
       ]
     },

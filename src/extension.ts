@@ -14,7 +14,7 @@ import { registerSignInCommand } from "./commands/sign-in";
 import { registerSignOutCommand } from "./commands/sign-out";
 import { registerStatusCommand } from "./commands/status";
 import { registerSwitchAccountCommand } from "./commands/switch-account";
-import { AntigravityAccountsTreeProvider } from "./views/account-tree-provider";
+import { registerAntigravityAccountWebview } from "./views/account-webview-provider";
 
 export function activate(
     context: vscode.ExtensionContext,
@@ -38,30 +38,20 @@ export function activate(
             diagnoseAntigravity,
         );
 
-    const treeProvider =
-        new AntigravityAccountsTreeProvider(context);
-
-    const treeView =
-        vscode.window.createTreeView(
-            "boygr.antigravityAccountSwitcher.accountsView",
-            {
-                treeDataProvider: treeProvider,
-                showCollapseAll: false,
-            },
+    const accountWebview =
+        registerAntigravityAccountWebview(
+            context,
         );
 
     const refreshCommand =
         vscode.commands.registerCommand(
             "boygr.antigravityAccountSwitcher.refreshAccountsView",
             async () => {
-                await treeProvider.refresh();
+                await accountWebview.refresh();
             },
         );
 
     context.subscriptions.push(
-        diagnoseCommand,
-        treeProvider,
-        treeView,
         refreshCommand,
     );
 }

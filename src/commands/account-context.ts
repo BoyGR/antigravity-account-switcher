@@ -16,10 +16,30 @@ interface AccountTreeCommandArgument {
     account?: ManagedAntigravityAccount;
 }
 
+type AccountCommandArgument =
+    | AccountTreeCommandArgument
+    | ManagedAntigravityAccount;
+
 function getAccount(
-    argument?: AccountTreeCommandArgument,
+    argument?: AccountCommandArgument,
 ): ManagedAntigravityAccount {
-    const account = argument?.account;
+    /*
+     * v0.2 Tree View commands receive:
+     *
+     *     { account: ManagedAntigravityAccount }
+     *
+     * v0.3 Webview commands receive:
+     *
+     *     ManagedAntigravityAccount
+     *
+     * Accept both forms so command handlers remain independent
+     * from a particular VS Code view implementation.
+     */
+    const account =
+        argument &&
+        "email" in argument
+            ? argument
+            : argument?.account;
 
     if (!account?.email?.trim()) {
         throw new Error(
@@ -37,7 +57,7 @@ export function registerAccountContextCommands(
         vscode.commands.registerCommand(
             EDIT_ACCOUNT_LABEL_COMMAND_ID,
             async (
-                argument?: AccountTreeCommandArgument,
+                argument?: AccountCommandArgument,
             ) => {
                 try {
                     const account =
@@ -94,7 +114,7 @@ export function registerAccountContextCommands(
         vscode.commands.registerCommand(
             REMOVE_SAVED_ACCOUNT_COMMAND_ID,
             async (
-                argument?: AccountTreeCommandArgument,
+                argument?: AccountCommandArgument,
             ) => {
                 try {
                     const account =

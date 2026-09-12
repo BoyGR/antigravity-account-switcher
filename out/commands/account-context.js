@@ -40,7 +40,22 @@ const account_registry_1 = require("../antigravity/account-registry");
 exports.EDIT_ACCOUNT_LABEL_COMMAND_ID = "boygr.antigravityAccountSwitcher.editAccountLabel";
 exports.REMOVE_SAVED_ACCOUNT_COMMAND_ID = "boygr.antigravityAccountSwitcher.removeSavedAccount";
 function getAccount(argument) {
-    const account = argument?.account;
+    /*
+     * v0.2 Tree View commands receive:
+     *
+     *     { account: ManagedAntigravityAccount }
+     *
+     * v0.3 Webview commands receive:
+     *
+     *     ManagedAntigravityAccount
+     *
+     * Accept both forms so command handlers remain independent
+     * from a particular VS Code view implementation.
+     */
+    const account = argument &&
+        "email" in argument
+        ? argument
+        : argument?.account;
     if (!account?.email?.trim()) {
         throw new Error("No saved Antigravity account was provided.");
     }
