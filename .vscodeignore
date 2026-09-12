@@ -1,0 +1,40 @@
+# Development sources
+src/**
+tsconfig.json
+
+# Development configuration
+.vscode/**
+.git/**
+.gitignore
+
+# Local investigation / reverse-engineering artifacts
+.runtime/**
+.diagnostics/**
+diagnostics/**
+
+# Dependencies are development-only for this extension.
+# Runtime output uses Node/VS Code built-ins.
+node_modules/**
+
+# TypeScript/source-map development artifacts
+out/**/*.map
+**/*.tsbuildinfo
+
+# Local package/release artifacts
+*.tgz
+*.vsix
+release/**
+coverage/**
+.nyc_output/**
+
+# Logs / temporary files
+*.log
+*.tmp
+*.bak
+*.backup
+
+# Environment / secrets - defensive exclusions
+.env
+.env.*
+**/.env
+**/.env.*

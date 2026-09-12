@@ -1,0 +1,13 @@
+node_modules/
+.runtime/
+.diagnostics/
+diagnostics/
+release/
+*.vsix
+*.tgz
+*.log
+.env
+.env.*
+
+# Generated source maps
+out/**/*.map
