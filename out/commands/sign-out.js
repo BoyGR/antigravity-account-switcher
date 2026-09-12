@@ -37,14 +37,14 @@ exports.registerSignOutCommand = registerSignOutCommand;
 const vscode = __importStar(require("vscode"));
 const hub_auth_client_1 = require("../antigravity/hub-auth-client");
 const COMMAND_ID = "boygr.antigravityAccountSwitcher.signOut";
-const OUTPUT_CHANNEL = "BoyGR Antigravity Sign Out";
+const OUTPUT_CHANNEL = "Antigravity Sign Out";
 function registerSignOutCommand(context) {
     const disposable = vscode.commands.registerCommand(COMMAND_ID, async () => {
         const output = vscode.window.createOutputChannel(OUTPUT_CHANNEL);
         context.subscriptions.push(output);
         output.clear();
         output.show(true);
-        output.appendLine("=== BoyGR Antigravity Sign Out ===");
+        output.appendLine("=== Antigravity Sign Out ===");
         output.appendLine("");
         try {
             // ================================================
@@ -137,7 +137,7 @@ function registerSignOutCommand(context) {
             output.appendLine("## Error");
             output.appendLine("");
             output.appendLine(message);
-            vscode.window.showErrorMessage(`BoyGR Antigravity Sign Out failed: ${message}`);
+            vscode.window.showErrorMessage(`Antigravity Sign Out failed: ${message}`);
         }
     });
     context.subscriptions.push(disposable);

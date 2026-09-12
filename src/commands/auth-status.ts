@@ -7,7 +7,7 @@ const COMMAND_ID =
     "boygr.antigravityAccountSwitcher.authStatus";
 
 const OUTPUT_CHANNEL =
-    "BoyGR Antigravity Auth Status";
+    "Antigravity Auth Status";
 
 export function registerAuthStatusCommand(
     context: vscode.ExtensionContext
@@ -27,7 +27,7 @@ export function registerAuthStatusCommand(
                 output.show(true);
 
                 output.appendLine(
-                    "=== BoyGR Antigravity Auth Status ==="
+                    "=== Antigravity Auth Status ==="
                 );
                 output.appendLine("");
 
@@ -154,7 +154,7 @@ export function registerAuthStatusCommand(
                     output.appendLine(message);
 
                     vscode.window.showErrorMessage(
-                        `BoyGR Antigravity Auth Status failed: ${message}`
+                        `Antigravity Auth Status failed: ${message}`
                     );
                 }
             }

@@ -33,6 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.addOrSwitchGoogleAccount = addOrSwitchGoogleAccount;
 exports.registerManageAccountsCommand = registerManageAccountsCommand;
 const vscode = __importStar(require("vscode"));
 const hub_auth_client_1 = require("../antigravity/hub-auth-client");
@@ -58,7 +59,7 @@ async function saveDetectedAccount(context, email, displayName) {
     }
     const save = await vscode.window.showInformationMessage(`Antigravity is now authenticated as ${email}. Save this account?`, {
         modal: true,
-        detail: "BoyGR AG stores only non-secret account metadata. " +
+        detail: "Antigravity Account Switcher stores only non-secret account metadata. " +
             "Google credentials, tokens, cookies and CSRF values are not stored.",
     }, "Save Account", "Not Now");
     if (save !== "Save Account") {
@@ -89,7 +90,7 @@ async function addOrSwitchGoogleAccount(context) {
         detail: `Current account: ${current.email}\n\n` +
             "Antigravity will open its existing Google authentication flow. " +
             "Choose the account you want Antigravity to use.\n\n" +
-            "After authentication, BoyGR AG will verify the active account " +
+            "After authentication, Antigravity Account Switcher will verify the active account " +
             "using GetUserStatus.",
     }, "Open Google Chooser");
     if (confirmation !==
@@ -217,7 +218,7 @@ async function chooseAccountAction(context, account, currentEmail) {
         "remove") {
         const confirmation = await vscode.window.showWarningMessage(`Remove saved metadata for ${account.email}?`, {
             modal: true,
-            detail: "This removes only BoyGR AG local metadata. " +
+            detail: "This removes only Antigravity Account Switcher local metadata. " +
                 "It does not sign out or delete Google credentials.",
         }, "Remove Metadata");
         if (confirmation !==
@@ -280,7 +281,7 @@ async function showAccountManager(context) {
             description: "Read current Antigravity identity again",
         });
         const selected = await vscode.window.showQuickPick(items, {
-            title: "BoyGR Antigravity Account Manager",
+            title: "Antigravity Account Manager",
             placeHolder: `Current: ${current.email}`,
             matchOnDescription: true,
             matchOnDetail: true,
@@ -330,12 +331,13 @@ function registerManageAccountsCommand(context) {
     const disposable = vscode.commands.registerCommand(COMMAND_ID, async () => {
         try {
             await showAccountManager(context);
+            await vscode.commands.executeCommand("boygr.antigravityAccountSwitcher.refreshAccountsView");
         }
         catch (error) {
             const message = error instanceof Error
                 ? error.message
                 : String(error);
-            vscode.window.showErrorMessage(`BoyGR AG: ${message}`);
+            vscode.window.showErrorMessage(`Antigravity Account Switcher: ${message}`);
         }
     });
     context.subscriptions.push(disposable);

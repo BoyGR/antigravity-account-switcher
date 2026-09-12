@@ -9,7 +9,7 @@ const COMMAND_ID =
     "boygr.antigravityAccountSwitcher.signOut";
 
 const OUTPUT_CHANNEL =
-    "BoyGR Antigravity Sign Out";
+    "Antigravity Sign Out";
 
 export function registerSignOutCommand(
     context: vscode.ExtensionContext
@@ -29,7 +29,7 @@ export function registerSignOutCommand(
                 output.show(true);
 
                 output.appendLine(
-                    "=== BoyGR Antigravity Sign Out ==="
+                    "=== Antigravity Sign Out ==="
                 );
 
                 output.appendLine("");
@@ -236,7 +236,7 @@ export function registerSignOutCommand(
                     output.appendLine(message);
 
                     vscode.window.showErrorMessage(
-                        `BoyGR Antigravity Sign Out failed: ${message}`
+                        `Antigravity Sign Out failed: ${message}`
                     );
                 }
             }

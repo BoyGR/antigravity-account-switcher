@@ -61,6 +61,10 @@ export function registerSaveCurrentAccountCommand(
                     vscode.window.showInformationMessage(
                         `Saved Antigravity account: ${display}`,
                     );
+
+                    await vscode.commands.executeCommand(
+                        "boygr.antigravityAccountSwitcher.refreshAccountsView",
+                    );
                 } catch (error) {
                     const message =
                         error instanceof Error
@@ -68,7 +72,7 @@ export function registerSaveCurrentAccountCommand(
                             : String(error);
 
                     vscode.window.showErrorMessage(
-                        `BoyGR AG save account failed: ${message}`,
+                        `Antigravity Account Switcher save account failed: ${message}`,
                     );
                 }
             },

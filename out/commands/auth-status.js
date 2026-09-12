@@ -37,14 +37,14 @@ exports.registerAuthStatusCommand = registerAuthStatusCommand;
 const vscode = __importStar(require("vscode"));
 const hub_auth_client_1 = require("../antigravity/hub-auth-client");
 const COMMAND_ID = "boygr.antigravityAccountSwitcher.authStatus";
-const OUTPUT_CHANNEL = "BoyGR Antigravity Auth Status";
+const OUTPUT_CHANNEL = "Antigravity Auth Status";
 function registerAuthStatusCommand(context) {
     const disposable = vscode.commands.registerCommand(COMMAND_ID, async () => {
         const output = vscode.window.createOutputChannel(OUTPUT_CHANNEL);
         context.subscriptions.push(output);
         output.clear();
         output.show(true);
-        output.appendLine("=== BoyGR Antigravity Auth Status ===");
+        output.appendLine("=== Antigravity Auth Status ===");
         output.appendLine("");
         try {
             const status = await vscode.window.withProgress({
@@ -104,7 +104,7 @@ function registerAuthStatusCommand(context) {
             output.appendLine("## Error");
             output.appendLine("");
             output.appendLine(message);
-            vscode.window.showErrorMessage(`BoyGR Antigravity Auth Status failed: ${message}`);
+            vscode.window.showErrorMessage(`Antigravity Auth Status failed: ${message}`);
         }
     });
     context.subscriptions.push(disposable);

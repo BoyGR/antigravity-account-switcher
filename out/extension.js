@@ -35,18 +35,24 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 exports.deactivate = deactivate;
-const manage_accounts_1 = require("./commands/manage-accounts");
-const current_account_1 = require("./commands/current-account");
-const save_current_account_1 = require("./commands/save-current-account");
-const sign_out_1 = require("./commands/sign-out");
-const re_auth_1 = require("./commands/re-auth");
-const sign_in_1 = require("./commands/sign-in");
-const auth_status_1 = require("./commands/auth-status");
-const inspect_bridge_1 = require("./commands/inspect-bridge");
-const status_1 = require("./commands/status");
 const vscode = __importStar(require("vscode"));
+const account_context_1 = require("./commands/account-context");
+const add_account_1 = require("./commands/add-account");
 const diagnose_1 = require("./commands/diagnose");
+const auth_status_1 = require("./commands/auth-status");
+const current_account_1 = require("./commands/current-account");
+const inspect_bridge_1 = require("./commands/inspect-bridge");
+const manage_accounts_1 = require("./commands/manage-accounts");
+const re_auth_1 = require("./commands/re-auth");
+const save_current_account_1 = require("./commands/save-current-account");
+const sign_in_1 = require("./commands/sign-in");
+const sign_out_1 = require("./commands/sign-out");
+const status_1 = require("./commands/status");
+const switch_account_1 = require("./commands/switch-account");
+const account_tree_provider_1 = require("./views/account-tree-provider");
 function activate(context) {
+    (0, add_account_1.registerAddAccountCommand)(context);
+    (0, account_context_1.registerAccountContextCommands)(context);
     (0, manage_accounts_1.registerManageAccountsCommand)(context);
     (0, current_account_1.registerCurrentAccountCommand)(context);
     (0, save_current_account_1.registerSaveCurrentAccountCommand)(context);
@@ -56,10 +62,19 @@ function activate(context) {
     (0, sign_out_1.registerSignOutCommand)(context);
     (0, inspect_bridge_1.registerInspectBridgeCommand)(context);
     (0, status_1.registerStatusCommand)(context);
-    const diagnoseCommand = vscode.commands.registerCommand("boygrAg.diagnose", diagnose_1.diagnoseAntigravity);
-    context.subscriptions.push(diagnoseCommand);
+    (0, switch_account_1.registerSwitchAccountCommand)(context);
+    const diagnoseCommand = vscode.commands.registerCommand("boygr.antigravityAccountSwitcher.diagnose", diagnose_1.diagnoseAntigravity);
+    const treeProvider = new account_tree_provider_1.AntigravityAccountsTreeProvider(context);
+    const treeView = vscode.window.createTreeView("boygr.antigravityAccountSwitcher.accountsView", {
+        treeDataProvider: treeProvider,
+        showCollapseAll: false,
+    });
+    const refreshCommand = vscode.commands.registerCommand("boygr.antigravityAccountSwitcher.refreshAccountsView", async () => {
+        await treeProvider.refresh();
+    });
+    context.subscriptions.push(diagnoseCommand, treeProvider, treeView, refreshCommand);
 }
 function deactivate() {
-    // Nothing to clean up yet.
+    // Nothing else to clean up.
 }
 //# sourceMappingURL=extension.js.map

@@ -33,33 +33,25 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.registerCurrentAccountCommand = registerCurrentAccountCommand;
+exports.ADD_ACCOUNT_COMMAND_ID = void 0;
+exports.registerAddAccountCommand = registerAddAccountCommand;
 const vscode = __importStar(require("vscode"));
-const hub_auth_client_1 = require("../antigravity/hub-auth-client");
-const account_registry_1 = require("../antigravity/account-registry");
-const COMMAND_ID = "boygr.antigravityAccountSwitcher.currentAccount";
-function registerCurrentAccountCommand(context) {
-    const disposable = vscode.commands.registerCommand(COMMAND_ID, async () => {
+const manage_accounts_1 = require("./manage-accounts");
+exports.ADD_ACCOUNT_COMMAND_ID = "boygr.antigravityAccountSwitcher.addAccount";
+function registerAddAccountCommand(context) {
+    const disposable = vscode.commands.registerCommand(exports.ADD_ACCOUNT_COMMAND_ID, async () => {
         try {
-            const current = await (0, hub_auth_client_1.getAntigravityCurrentAccount)();
-            const managed = (0, account_registry_1.findManagedAccount)(context, current.email);
-            const label = managed?.label || "Not saved";
-            const lines = [
-                `Account: ${current.email}`,
-                `Label: ${label}`,
-            ];
-            if (current.displayName) {
-                lines.push(`Name: ${current.displayName}`);
-            }
-            await vscode.window.showInformationMessage(lines.join(" | "));
+            await (0, manage_accounts_1.addOrSwitchGoogleAccount)(context);
+            await vscode.commands.executeCommand("boygr.antigravityAccountSwitcher.refreshAccountsView");
         }
         catch (error) {
             const message = error instanceof Error
                 ? error.message
                 : String(error);
-            vscode.window.showErrorMessage(`Antigravity Account Switcher current account failed: ${message}`);
+            vscode.window.showErrorMessage(`Antigravity Account Switcher: ${message}`);
+            await vscode.commands.executeCommand("boygr.antigravityAccountSwitcher.refreshAccountsView");
         }
     });
     context.subscriptions.push(disposable);
 }
-//# sourceMappingURL=current-account.js.map
+//# sourceMappingURL=add-account.js.map

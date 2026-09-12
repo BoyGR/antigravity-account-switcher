@@ -52,7 +52,7 @@ export function registerCurrentAccountCommand(
                             : String(error);
 
                     vscode.window.showErrorMessage(
-                        `BoyGR AG current account failed: ${message}`,
+                        `Antigravity Account Switcher current account failed: ${message}`,
                     );
                 }
             },

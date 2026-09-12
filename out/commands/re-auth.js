@@ -37,14 +37,14 @@ exports.registerReAuthCommand = registerReAuthCommand;
 const vscode = __importStar(require("vscode"));
 const hub_auth_client_1 = require("../antigravity/hub-auth-client");
 const COMMAND_ID = "boygr.antigravityAccountSwitcher.reAuth";
-const OUTPUT_CHANNEL = "BoyGR Antigravity Re-auth";
+const OUTPUT_CHANNEL = "Antigravity Re-auth";
 function registerReAuthCommand(context) {
     const disposable = vscode.commands.registerCommand(COMMAND_ID, async () => {
         const output = vscode.window.createOutputChannel(OUTPUT_CHANNEL);
         context.subscriptions.push(output);
         output.clear();
         output.show(true);
-        output.appendLine("=== BoyGR Antigravity Re-auth ===");
+        output.appendLine("=== Antigravity Re-auth ===");
         output.appendLine("");
         try {
             // ================================================
@@ -67,7 +67,7 @@ function registerReAuthCommand(context) {
                 output.appendLine("Re-auth was NOT started.");
                 output.appendLine("Reason: there is no currently valid Antigravity session.");
                 output.appendLine("");
-                output.appendLine("Use BoyGR AG: Sign In instead.");
+                output.appendLine("Use Antigravity Account Switcher: Sign In instead.");
                 vscode.window.showInformationMessage("Antigravity is not currently signed in with valid authentication.");
                 return;
             }
@@ -78,7 +78,7 @@ function registerReAuthCommand(context) {
                 "Antigravity may open your browser or Google account chooser, " +
                 "and the active Antigravity account may change.", {
                 modal: true,
-                detail: "No credentials will be copied or stored by BoyGR AG. " +
+                detail: "No credentials will be copied or stored by Antigravity Account Switcher. " +
                     "This uses Antigravity's own Login backend."
             }, "Start Re-auth");
             if (confirmation !==
@@ -151,7 +151,7 @@ function registerReAuthCommand(context) {
             output.appendLine("## Error");
             output.appendLine("");
             output.appendLine(message);
-            vscode.window.showErrorMessage(`BoyGR Antigravity Re-auth failed: ${message}`);
+            vscode.window.showErrorMessage(`Antigravity Re-auth failed: ${message}`);
         }
     });
     context.subscriptions.push(disposable);

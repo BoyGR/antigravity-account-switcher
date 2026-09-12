@@ -4,14 +4,14 @@ import { getCandidateStoragePaths } from "../antigravity/storage-inspector";
 
 export async function diagnoseAntigravity(): Promise<void> {
   const output = vscode.window.createOutputChannel(
-    "BoyGR Antigravity Diagnostics"
+    "Antigravity Diagnostics"
   );
 
   output.clear();
   output.show(true);
 
   output.appendLine("==================================================");
-  output.appendLine("BoyGR Antigravity Diagnostics");
+  output.appendLine("Antigravity Diagnostics");
   output.appendLine("READ-ONLY MODE");
   output.appendLine("==================================================");
   output.appendLine("");

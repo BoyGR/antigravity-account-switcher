@@ -38,11 +38,11 @@ const vscode = __importStar(require("vscode"));
 const detector_1 = require("../antigravity/detector");
 const storage_inspector_1 = require("../antigravity/storage-inspector");
 async function diagnoseAntigravity() {
-    const output = vscode.window.createOutputChannel("BoyGR Antigravity Diagnostics");
+    const output = vscode.window.createOutputChannel("Antigravity Diagnostics");
     output.clear();
     output.show(true);
     output.appendLine("==================================================");
-    output.appendLine("BoyGR Antigravity Diagnostics");
+    output.appendLine("Antigravity Diagnostics");
     output.appendLine("READ-ONLY MODE");
     output.appendLine("==================================================");
     output.appendLine("");

@@ -1,4 +1,4 @@
-# BoyGR Antigravity Account Switcher
+# Antigravity Account Switcher
 
 A private Visual Studio Code extension for managing and switching the Google account used by Google Antigravity.
 
@@ -32,7 +32,7 @@ This extension is currently intended for private/internal use.
 
 Open the Visual Studio Code Command Palette and run:
 
-    BoyGR AG: Manage Accounts
+    Antigravity Account Switcher: Manage Accounts
 
 The Account Manager shows:
 
@@ -52,10 +52,10 @@ A switch is considered successful only when the returned email matches the selec
 
 ## Main Commands
 
-- `BoyGR AG: Manage Accounts`
-- `BoyGR AG: Current Account`
-- `BoyGR AG: Status`
-- `BoyGR AG: Auth Status`
+- `Antigravity Account Switcher: Manage Accounts`
+- `Antigravity Account Switcher: Current Account`
+- `Antigravity Account Switcher: Status`
+- `Antigravity Account Switcher: Auth Status`
 
 Additional diagnostic and authentication commands are currently retained for development and troubleshooting.
 
@@ -168,7 +168,7 @@ Install the generated VSIX using Visual Studio Code:
 
 Or from the command line:
 
-    code --install-extension boygr-antigravity-account-switcher-0.1.0.vsix
+    code --install-extension boygr-antigravity-account-switcher-0.2.0.vsix
 
 ## Development
 
@@ -186,6 +186,6 @@ Package:
 
 ## Project
 
-BoyGR Antigravity Account Switcher
+Antigravity Account Switcher
 
 Private/internal tooling by BoyGR.

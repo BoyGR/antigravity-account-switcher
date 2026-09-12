@@ -9,7 +9,7 @@ const COMMAND_ID =
     "boygr.antigravityAccountSwitcher.reAuth";
 
 const OUTPUT_CHANNEL =
-    "BoyGR Antigravity Re-auth";
+    "Antigravity Re-auth";
 
 export function registerReAuthCommand(
     context: vscode.ExtensionContext
@@ -29,7 +29,7 @@ export function registerReAuthCommand(
                 output.show(true);
 
                 output.appendLine(
-                    "=== BoyGR Antigravity Re-auth ==="
+                    "=== Antigravity Re-auth ==="
                 );
 
                 output.appendLine("");
@@ -81,7 +81,7 @@ export function registerReAuthCommand(
 
                         output.appendLine("");
                         output.appendLine(
-                            "Use BoyGR AG: Sign In instead."
+                            "Use Antigravity Account Switcher: Sign In instead."
                         );
 
                         vscode.window.showInformationMessage(
@@ -103,7 +103,7 @@ export function registerReAuthCommand(
                             {
                                 modal: true,
                                 detail:
-                                    "No credentials will be copied or stored by BoyGR AG. " +
+                                    "No credentials will be copied or stored by Antigravity Account Switcher. " +
                                     "This uses Antigravity's own Login backend."
                             },
                             "Start Re-auth"
@@ -271,7 +271,7 @@ export function registerReAuthCommand(
                     output.appendLine(message);
 
                     vscode.window.showErrorMessage(
-                        `BoyGR Antigravity Re-auth failed: ${message}`
+                        `Antigravity Re-auth failed: ${message}`
                     );
                 }
             }

@@ -42,7 +42,7 @@ let outputChannel;
 function getOutputChannel() {
     if (!outputChannel) {
         outputChannel =
-            vscode.window.createOutputChannel('BoyGR Antigravity Bridge Inspector');
+            vscode.window.createOutputChannel('Antigravity Bridge Inspector');
     }
     return outputChannel;
 }
@@ -53,7 +53,7 @@ function registerInspectBridgeCommand(context) {
     const disposable = vscode.commands.registerCommand(exports.INSPECT_BRIDGE_COMMAND_ID, async () => {
         const output = getOutputChannel();
         output.clear();
-        output.appendLine('=== BoyGR Antigravity Bridge Inspector ===');
+        output.appendLine('=== Antigravity Bridge Inspector ===');
         output.appendLine('READ-ONLY MODE');
         output.appendLine('');
         try {

@@ -90,7 +90,7 @@ async function saveDetectedAccount(
                     true,
 
                 detail:
-                    "BoyGR AG stores only non-secret account metadata. " +
+                    "Antigravity Account Switcher stores only non-secret account metadata. " +
                     "Google credentials, tokens, cookies and CSRF values are not stored.",
             },
             "Save Account",
@@ -139,7 +139,7 @@ async function saveDetectedAccount(
     return true;
 }
 
-async function addOrSwitchGoogleAccount(
+export async function addOrSwitchGoogleAccount(
     context: vscode.ExtensionContext,
 ): Promise<void> {
     const current =
@@ -156,7 +156,7 @@ async function addOrSwitchGoogleAccount(
                     `Current account: ${current.email}\n\n` +
                     "Antigravity will open its existing Google authentication flow. " +
                     "Choose the account you want Antigravity to use.\n\n" +
-                    "After authentication, BoyGR AG will verify the active account " +
+                    "After authentication, Antigravity Account Switcher will verify the active account " +
                     "using GetUserStatus.",
             },
             "Open Google Chooser",
@@ -462,7 +462,7 @@ async function chooseAccountAction(
                         true,
 
                     detail:
-                        "This removes only BoyGR AG local metadata. " +
+                        "This removes only Antigravity Account Switcher local metadata. " +
                         "It does not sign out or delete Google credentials.",
                 },
                 "Remove Metadata",
@@ -595,7 +595,7 @@ async function showAccountManager(
                 items,
                 {
                     title:
-                        "BoyGR Antigravity Account Manager",
+                        "Antigravity Account Manager",
 
                     placeHolder:
                         `Current: ${current.email}`,
@@ -704,6 +704,10 @@ export function registerManageAccountsCommand(
                     await showAccountManager(
                         context,
                     );
+
+                    await vscode.commands.executeCommand(
+                        "boygr.antigravityAccountSwitcher.refreshAccountsView",
+                    );
                 } catch (error) {
                     const message =
                         error instanceof Error
@@ -711,7 +715,7 @@ export function registerManageAccountsCommand(
                             : String(error);
 
                     vscode.window.showErrorMessage(
-                        `BoyGR AG: ${message}`,
+                        `Antigravity Account Switcher: ${message}`,
                     );
                 }
             },

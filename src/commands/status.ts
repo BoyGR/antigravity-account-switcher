@@ -12,7 +12,7 @@ let outputChannel: vscode.OutputChannel | undefined;
 function getOutputChannel(): vscode.OutputChannel {
     if (!outputChannel) {
         outputChannel = vscode.window.createOutputChannel(
-            'BoyGR Antigravity Account Switcher',
+            'Antigravity Account Switcher',
         );
     }
 
@@ -28,7 +28,7 @@ function formatStatus(
 ): string[] {
     const lines: string[] = [];
 
-    lines.push('=== BoyGR Antigravity Account Switcher ===');
+    lines.push('=== Antigravity Account Switcher ===');
     lines.push('');
     lines.push('Official Extension');
     lines.push('------------------');
@@ -112,7 +112,7 @@ function formatStatus(
     lines.push('Auth');
     lines.push('----');
     lines.push(
-        'Status    : Use "BoyGR AG: Auth Status" for detailed read-only authentication status',
+        'Status    : Use "Antigravity Account Switcher: Auth Status" for detailed read-only authentication status',
     );
 
     return lines;
@@ -180,7 +180,7 @@ export function registerStatusCommand(
                 channel.show(true);
 
                 void vscode.window.showErrorMessage(
-                    `BoyGR AG status failed: ${message}`,
+                    `Antigravity Account Switcher status failed: ${message}`,
                 );
             }
         },
@@ -196,4 +196,3 @@ export function registerStatusCommand(
         },
     );
 }
-
