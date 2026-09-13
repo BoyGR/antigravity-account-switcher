@@ -614,13 +614,9 @@ a {
 /* ========================================================= */
 
 .label-editor {
-    display: grid;
-    grid-template-columns:
-        minmax(0, 1fr)
-        auto
-        auto;
-    align-items: center;
-    gap: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
     width: 100%;
 }
 
@@ -5407,11 +5403,21 @@ body {
     width: 100%;
 }
 
+.label-editor-input-row .label-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 26px;
+}
+
+.label-editor-input-row .icon-btn {
+    flex: 0 0 auto;
+}
+
 .label-editor-colors {
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-top: 5px;
+    margin-top: 2px;
     padding-left: 2px;
 }
 
