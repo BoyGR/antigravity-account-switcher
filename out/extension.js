@@ -68,7 +68,7 @@ function activate(context) {
     const refreshCommand = vscode.commands.registerCommand("boygr.antigravityAccountSwitcher.refreshAccountsView", async () => {
         await accountWebview.refresh();
     });
-    context.subscriptions.push(refreshCommand);
+    context.subscriptions.push(diagnoseCommand, refreshCommand);
 }
 function deactivate() {
     // Nothing else to clean up.

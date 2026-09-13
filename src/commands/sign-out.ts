@@ -4,6 +4,7 @@ import {
     getAntigravityAuthStatus,
     signOutFromAntigravity,
 } from "../antigravity/hub-auth-client";
+import { syncAntigravityUi } from "../antigravity/ui-sync";
 
 const COMMAND_ID =
     "boygr.antigravityAccountSwitcher.signOut";
@@ -221,6 +222,24 @@ export function registerSignOutCommand(
                             "Antigravity AuthLogout returned, but authentication is still present."
                         );
                     }
+
+                    try {
+                        const syncResult = await syncAntigravityUi();
+                        if (!syncResult.syncedOfficialPanel) {
+                            const choice = await vscode.window.showInformationMessage(
+                                "Antigravity sign-out completed. Reload window to update the official Antigravity panel?",
+                                "Reload Window",
+                                "Later",
+                            );
+                            if (choice === "Reload Window") {
+                                await vscode.commands.executeCommand(
+                                    "workbench.action.reloadWindow",
+                                );
+                            }
+                        }
+                    } catch {
+                        // Safely ignore sync failure
+                    }
                 } catch (error) {
                     const message =
                         error instanceof Error
@@ -238,6 +257,12 @@ export function registerSignOutCommand(
                     vscode.window.showErrorMessage(
                         `Antigravity Sign Out failed: ${message}`
                     );
+
+                    try {
+                        await syncAntigravityUi();
+                    } catch {
+                        // Safely ignore secondary sync error
+                    }
                 }
             }
         );

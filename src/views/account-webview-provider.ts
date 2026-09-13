@@ -3,17 +3,66 @@ import * as vscode from "vscode";
 import {
     getManagedAccounts,
     ManagedAntigravityAccount,
+    removeManagedAccount,
+    removeManagedAccountQuotaSnapshot,
+    updateManagedAccountLabel,
 } from "../antigravity/account-registry";
 
 import {
-    AntigravityCurrentAccount,
-    getAntigravityCurrentAccount,
-} from "../antigravity/hub-auth-client";
+    getManagedAccountUsageSnapshots,
+    ManagedAccountUsageSnapshot,
+    removeManagedAccountUsageSnapshot,
+    saveManagedAccountUsageSnapshot,
+} from "../antigravity/quota-summary-store";
 
+import {
+    AntigravityCurrentAccount,
+    AntigravityQuotaSummarySnapshot,
+    getAntigravityCurrentAccount,
+    getAntigravityQuotaSummary,
+} from "../antigravity/hub-auth-client";
 import {
     AntigravityHubStatus,
     inspectAntigravityHub,
 } from "../antigravity/hub-detector";
+import { QuotaMonitorService } from "../antigravity/quota-monitor-service";
+import { syncAntigravityUi } from "../antigravity/ui-sync";
+
+type ThemePreference =
+    | "vscode"
+    | "light"
+    | "dark"
+    | "system";
+
+type LanguagePreference =
+    | "auto"
+    | "en"
+    | "id";
+
+interface AccountSwitcherPreferences {
+    version: 1;
+
+    theme: ThemePreference;
+
+    language: LanguagePreference;
+
+    showCurrent: boolean;
+
+    showSaved: boolean;
+
+    showRuntime: boolean;
+
+    autoRefreshIntervalMinutes: number;
+
+    enableLowQuotaReminder: boolean;
+
+    lowQuotaThresholdPercent: number;
+}
+
+interface ResolvedAccountSwitcherPreferences
+    extends AccountSwitcherPreferences {
+    effectiveLanguage: "en" | "id";
+}
 
 type WebviewMessage =
     | { type: "ready" }
@@ -27,24 +76,82 @@ type WebviewMessage =
           account: ManagedAntigravityAccount;
       }
     | {
-          type: "accountMenu";
-          account: ManagedAntigravityAccount;
+          type: "removeAccount";
+          email: string;
+      }
+    | {
+          type: "openExternal";
+          url: string;
+      }
+    | {
+          type: "updateLabel";
+          email: string;
+          label: string;
+      }
+    | {
+          type: "saveSettings";
+          preferences: {
+              theme: ThemePreference;
+              language: LanguagePreference;
+              showCurrent: boolean;
+              showSaved: boolean;
+              showRuntime: boolean;
+              autoRefreshIntervalMinutes?: number;
+              enableLowQuotaReminder?: boolean;
+              lowQuotaThresholdPercent?: number;
+          };
       };
 
-interface AccountSwitcherViewState {
-    loading: boolean;
-
+interface AccountSwitcherSnapshot {
     current?: AntigravityCurrentAccount;
 
     accounts: ManagedAntigravityAccount[];
 
     runtime?: AntigravityHubStatus;
 
+    usage?: AntigravityQuotaSummarySnapshot;
+
+    usageSnapshots:
+        Record<
+            string,
+            ManagedAccountUsageSnapshot
+        >;
+
+    usageError?: string;
+
     error?: string;
+}
+interface AccountSwitcherViewState
+    extends AccountSwitcherSnapshot {
+    loading: boolean;
+
+    preferences: ResolvedAccountSwitcherPreferences;
+
+    meta: {
+        version: string;
+        developer: string;
+        website: string;
+        iconUri: string;
+    };
 }
 
 const VIEW_ID =
     "boygr.antigravityAccountSwitcher.accountsView";
+
+const PREFERENCES_KEY =
+    "boygr.antigravity.ui.v1";
+
+const DEFAULT_PREFERENCES: AccountSwitcherPreferences = {
+    version: 1,
+    theme: "vscode",
+    language: "auto",
+    showCurrent: true,
+    showSaved: true,
+    showRuntime: true,
+    autoRefreshIntervalMinutes: 5,
+    enableLowQuotaReminder: true,
+    lowQuotaThresholdPercent: 20,
+};
 
 export class AntigravityAccountWebviewProvider
     implements vscode.WebviewViewProvider, vscode.Disposable
@@ -54,6 +161,13 @@ export class AntigravityAccountWebviewProvider
     private retryTimer?: ReturnType<typeof setTimeout>;
 
     private retryIndex = 0;
+
+    private quotaMonitor?: QuotaMonitorService;
+
+    private snapshot: AccountSwitcherSnapshot = {
+        accounts: [],
+        usageSnapshots: {},
+    };
 
     private readonly retryDelaysMs = [
         1000,
@@ -66,10 +180,32 @@ export class AntigravityAccountWebviewProvider
 
     constructor(
         private readonly context: vscode.ExtensionContext,
-    ) {}
+    ) {
+        const prefs = this.getStoredPreferences();
+        this.quotaMonitor = new QuotaMonitorService(
+            this.context,
+            {
+                intervalMinutes: prefs.autoRefreshIntervalMinutes,
+                reminderEnabled: prefs.enableLowQuotaReminder,
+                thresholdPercent: prefs.lowQuotaThresholdPercent,
+            },
+            async usage => {
+                this.snapshot = {
+                    ...this.snapshot,
+                    usage,
+                };
+                if (this.view) {
+                    await this.postState(false);
+                }
+            },
+        );
+        this.context.subscriptions.push(this.quotaMonitor);
+    }
 
     dispose(): void {
         this.cancelRetry();
+        this.quotaMonitor?.dispose();
+        this.quotaMonitor = undefined;
     }
 
     resolveWebviewView(
@@ -82,8 +218,7 @@ export class AntigravityAccountWebviewProvider
             webviewView;
 
         webview.options = {
-            enableScripts:
-                true,
+            enableScripts: true,
 
             localResourceRoots: [
                 vscode.Uri.joinPath(
@@ -99,7 +234,20 @@ export class AntigravityAccountWebviewProvider
         const messageSubscription =
             webview.onDidReceiveMessage(
                 async (message: WebviewMessage) => {
-                    await this.handleMessage(message);
+                    try {
+                        await this.handleMessage(message);
+                    } catch (error) {
+                        const text =
+                            error instanceof Error
+                                ? error.message
+                                : String(error);
+
+                        vscode.window.showErrorMessage(
+                            `Antigravity Account Switcher: ${text}`,
+                        );
+
+                        await this.postState(false);
+                    }
                 },
             );
 
@@ -129,20 +277,40 @@ export class AntigravityAccountWebviewProvider
         );
     }
 
+    async openSettings(): Promise<void> {
+        if (!this.view) {
+            await vscode.commands.executeCommand(
+                `${VIEW_ID}.focus`,
+            );
+        }
+
+        if (!this.view) {
+            return;
+        }
+
+        await this.view.webview.postMessage({
+            type: "openSettings",
+        });
+    }
     async refresh(): Promise<void> {
         this.resetRetry();
+        this.quotaMonitor?.clearDeduplicationCache();
 
         await this.postState(true);
 
         const success =
-            await this.loadAndPostState();
+            await this.loadAndPostState(
+                true,
+            );
 
         if (!success) {
             this.scheduleRetry();
         }
     }
 
-    private async loadAndPostState(): Promise<boolean> {
+    private async loadAndPostState(
+        keepLoadingOnFailure = false,
+    ): Promise<boolean> {
         const accounts =
             getManagedAccounts(
                 this.context,
@@ -155,6 +323,19 @@ export class AntigravityAccountWebviewProvider
         let runtime:
             | AntigravityHubStatus
             | undefined;
+
+        let usage:
+            | AntigravityQuotaSummarySnapshot
+            | undefined;
+
+        let usageError:
+            | string
+            | undefined;
+
+        let usageSnapshots =
+            getManagedAccountUsageSnapshots(
+                this.context,
+            );
 
         let error:
             | string
@@ -183,45 +364,122 @@ export class AntigravityAccountWebviewProvider
                     : String(accountError);
         }
 
+        if (current) {
+            try {
+                /*
+                 * Official server-defined quota summary.
+                 *
+                 * No account switching is performed here.
+                 */
+                usage =
+                    await getAntigravityQuotaSummary(
+                        true,
+                    );
+
+                const normalizedCurrentEmail =
+                    current.email
+                        .trim()
+                        .toLowerCase();
+
+                const currentIsManaged =
+                    accounts.some(
+                        account =>
+                            account.email
+                                .trim()
+                                .toLowerCase() ===
+                            normalizedCurrentEmail,
+                    );
+
+                /*
+                 * Persist only last-known quota information for
+                 * accounts explicitly saved by the user.
+                 */
+                if (currentIsManaged) {
+                    await saveManagedAccountUsageSnapshot(
+                        this.context,
+                        current.email,
+                        usage,
+                    );
+
+                    usageSnapshots =
+                        getManagedAccountUsageSnapshots(
+                            this.context,
+                        );
+                }
+            } catch (usageReadError) {
+                usageError =
+                    usageReadError instanceof Error
+                        ? usageReadError.message
+                        : String(usageReadError);
+            }
+        }
+
+        this.snapshot = {
+            current,
+            accounts,
+            runtime,
+            usage,
+            usageSnapshots,
+            usageError,
+            error,
+        };
+
+        const success =
+            Boolean(current);
+
         await this.postState(
-            false,
-            {
-                current,
-                accounts,
-                runtime,
-                error,
-            },
+            keepLoadingOnFailure &&
+            !success,
         );
 
-        return Boolean(current);
+        return success;
     }
-
     private async postState(
         loading: boolean,
-        partial?: Partial<AccountSwitcherViewState>,
     ): Promise<void> {
         if (!this.view) {
             return;
         }
 
-        const state:
-            AccountSwitcherViewState = {
-                loading,
-                current:
-                    partial?.current,
+        const state: AccountSwitcherViewState = {
+            loading,
+            ...this.snapshot,
+            accounts:
+                this.snapshot.accounts.length > 0
+                    ? this.snapshot.accounts
+                    : getManagedAccounts(
+                          this.context,
+                      ),
+            preferences:
+                this.getResolvedPreferences(),
 
-                accounts:
-                    partial?.accounts ??
-                    getManagedAccounts(
-                        this.context,
+            meta: {
+                version:
+                    String(
+                        this.context.extension.packageJSON.version ??
+                        "0.4.0",
                     ),
 
-                runtime:
-                    partial?.runtime,
+                developer:
+                    "BoyGR",
 
-                error:
-                    partial?.error,
-            };
+                website:
+                    "https://boygr.com",
+
+                iconUri:
+                    this.view
+                        ? this.view.webview
+                              .asWebviewUri(
+                                  vscode.Uri.joinPath(
+                                      this.context.extensionUri,
+                                      "media",
+                                      "antigravity.svg",
+                                  ),
+                              )
+                              .toString()
+                        : "",
+            },
+        };
 
         await this.view.webview.postMessage({
             type: "state",
@@ -229,6 +487,25 @@ export class AntigravityAccountWebviewProvider
         });
     }
 
+    private async refreshLocalAccounts(): Promise<void> {
+        this.snapshot = {
+            ...this.snapshot,
+
+            accounts:
+                getManagedAccounts(
+                    this.context,
+                ),
+
+            usageSnapshots:
+                getManagedAccountUsageSnapshots(
+                    this.context,
+                ),
+        };
+
+        await this.postState(
+            false,
+        );
+    }
     private cancelRetry(): void {
         if (!this.retryTimer) {
             return;
@@ -278,8 +555,14 @@ export class AntigravityAccountWebviewProvider
     }
 
     private async retry(): Promise<void> {
+        const hasMoreRetries =
+            this.retryIndex <
+            this.retryDelaysMs.length;
+
         const success =
-            await this.loadAndPostState();
+            await this.loadAndPostState(
+                hasMoreRetries,
+            );
 
         if (success) {
             this.cancelRetry();
@@ -329,10 +612,68 @@ export class AntigravityAccountWebviewProvider
                 );
                 return;
 
-            case "accountMenu":
-                await this.showAccountMenu(
-                    message.account,
+            case "removeAccount":
+                await removeManagedAccount(
+                    this.context,
+                    message.email,
                 );
+
+                await removeManagedAccountUsageSnapshot(
+                    this.context,
+                    message.email,
+                );
+
+                /*
+                 * Remove the superseded M7.3A.1 per-model
+                 * snapshot too.
+                 */
+                await removeManagedAccountQuotaSnapshot(
+                    this.context,
+                    message.email,
+                );
+
+                await this.refreshLocalAccounts();
+                return;
+
+            case "openExternal": {
+                const uri =
+                    vscode.Uri.parse(
+                        message.url,
+                    );
+
+                if (
+                    uri.scheme !== "https" ||
+                    uri.authority.toLowerCase() !==
+                        "boygr.com"
+                ) {
+                    throw new Error(
+                        "External URL is not allowed.",
+                    );
+                }
+
+                await vscode.env.openExternal(
+                    uri,
+                );
+
+                return;
+            }
+
+            case "updateLabel":
+                await updateManagedAccountLabel(
+                    this.context,
+                    message.email,
+                    message.label,
+                );
+
+                await this.refreshLocalAccounts();
+                return;
+
+            case "saveSettings":
+                await this.savePreferences(
+                    message.preferences,
+                );
+
+                await this.postState(false);
                 return;
         }
     }
@@ -347,103 +688,16 @@ export class AntigravityAccountWebviewProvider
                 ...args,
             );
         } finally {
-            await this.refresh();
-        }
-    }
-
-    private async showAccountMenu(
-        account: ManagedAntigravityAccount,
-    ): Promise<void> {
-        const current =
-            await this.tryGetCurrentAccount();
-
-        const isCurrent =
-            current?.email
-                .trim()
-                .toLowerCase() ===
-            account.email
-                .trim()
-                .toLowerCase();
-
-        const options:
-            vscode.QuickPickItem[] = [
-                {
-                    label:
-                        "$(edit) Edit Label",
-                    description:
-                        "Change the local account label",
-                },
-            ];
-
-        if (!isCurrent) {
-            options.unshift({
-                label:
-                    "$(arrow-swap) Switch Account",
-                description:
-                    account.email,
-            });
-        }
-
-        options.push({
-            label:
-                "$(trash) Remove Saved Account",
-            description:
-                "Remove local metadata only",
-        });
-
-        const selected =
-            await vscode.window.showQuickPick(
-                options,
-                {
-                    title:
-                        account.label ||
-                        account.displayName ||
-                        account.email,
-
-                    placeHolder:
-                        "Choose an account action",
-                },
-            );
-
-        if (!selected) {
-            return;
-        }
-
-        if (
-            selected.label.includes(
-                "Switch Account",
-            )
-        ) {
-            await this.executeAndRefresh(
-                "boygr.antigravityAccountSwitcher.switchAccount",
-                account,
-            );
-
-            return;
-        }
-
-        if (
-            selected.label.includes(
-                "Edit Label",
-            )
-        ) {
-            await this.executeAndRefresh(
-                "boygr.antigravityAccountSwitcher.editAccountLabel",
-                account,
-            );
-
-            return;
-        }
-
-        if (
-            selected.label.includes(
-                "Remove Saved Account",
-            )
-        ) {
-            await this.executeAndRefresh(
-                "boygr.antigravityAccountSwitcher.removeSavedAccount",
-                account,
-            );
+            try {
+                await syncAntigravityUi();
+            } catch {
+                // Ignore sync failures
+            }
+            try {
+                await this.refresh();
+            } catch {
+                // Ignore refresh failures
+            }
         }
     }
 
@@ -458,6 +712,162 @@ export class AntigravityAccountWebviewProvider
         } catch {
             return undefined;
         }
+    }
+
+    private getStoredPreferences():
+        AccountSwitcherPreferences
+    {
+        const stored =
+            this.context.globalState.get<unknown>(
+                PREFERENCES_KEY,
+            );
+
+        return this.normalizePreferences(
+            stored,
+        );
+    }
+
+    private normalizePreferences(
+        value: unknown,
+    ): AccountSwitcherPreferences {
+        if (
+            !value ||
+            typeof value !== "object"
+        ) {
+            return {
+                ...DEFAULT_PREFERENCES,
+            };
+        }
+
+        const input =
+            value as Partial<AccountSwitcherPreferences>;
+
+        const allowedThemes:
+            ThemePreference[] = [
+                "vscode",
+                "light",
+                "dark",
+                "system",
+            ];
+
+        const allowedLanguages:
+            LanguagePreference[] = [
+                "auto",
+                "en",
+                "id",
+            ];
+
+        const theme =
+            allowedThemes.includes(
+                input.theme as ThemePreference,
+            )
+                ? input.theme as ThemePreference
+                : DEFAULT_PREFERENCES.theme;
+
+        const language =
+            allowedLanguages.includes(
+                input.language as LanguagePreference,
+            )
+                ? input.language as LanguagePreference
+                : DEFAULT_PREFERENCES.language;
+
+        const autoRefreshIntervalMinutes =
+            typeof input.autoRefreshIntervalMinutes === "number" &&
+            input.autoRefreshIntervalMinutes >= 0
+                ? input.autoRefreshIntervalMinutes
+                : DEFAULT_PREFERENCES.autoRefreshIntervalMinutes;
+
+        const enableLowQuotaReminder =
+            typeof input.enableLowQuotaReminder === "boolean"
+                ? input.enableLowQuotaReminder
+                : DEFAULT_PREFERENCES.enableLowQuotaReminder;
+
+        const lowQuotaThresholdPercent =
+            typeof input.lowQuotaThresholdPercent === "number" &&
+            input.lowQuotaThresholdPercent > 0
+                ? input.lowQuotaThresholdPercent
+                : DEFAULT_PREFERENCES.lowQuotaThresholdPercent;
+
+        return {
+            version: 1,
+            theme,
+            language,
+            showCurrent:
+                typeof input.showCurrent === "boolean"
+                    ? input.showCurrent
+                    : true,
+            showSaved:
+                typeof input.showSaved === "boolean"
+                    ? input.showSaved
+                    : true,
+            showRuntime:
+                typeof input.showRuntime === "boolean"
+                    ? input.showRuntime
+                    : true,
+            autoRefreshIntervalMinutes,
+            enableLowQuotaReminder,
+            lowQuotaThresholdPercent,
+        };
+    }
+
+    private getResolvedPreferences():
+        ResolvedAccountSwitcherPreferences
+    {
+        const preferences =
+            this.getStoredPreferences();
+
+        let effectiveLanguage:
+            "en" | "id";
+
+        if (preferences.language === "id") {
+            effectiveLanguage =
+                "id";
+        } else if (preferences.language === "en") {
+            effectiveLanguage =
+                "en";
+        } else {
+            effectiveLanguage =
+                vscode.env.language
+                    .toLowerCase()
+                    .startsWith("id")
+                    ? "id"
+                    : "en";
+        }
+
+        return {
+            ...preferences,
+            effectiveLanguage,
+        };
+    }
+
+    private async savePreferences(
+        input: {
+            theme: ThemePreference;
+            language: LanguagePreference;
+            showCurrent: boolean;
+            showSaved: boolean;
+            showRuntime: boolean;
+            autoRefreshIntervalMinutes?: number;
+            enableLowQuotaReminder?: boolean;
+            lowQuotaThresholdPercent?: number;
+        },
+    ): Promise<void> {
+        const preferences =
+            this.normalizePreferences({
+                version: 1,
+                ...input,
+            });
+
+        await this.context.globalState.update(
+            PREFERENCES_KEY,
+            preferences,
+        );
+
+        this.quotaMonitor?.updateConfig({
+            intervalMinutes: preferences.autoRefreshIntervalMinutes,
+            reminderEnabled: preferences.enableLowQuotaReminder,
+            thresholdPercent: preferences.lowQuotaThresholdPercent,
+        });
     }
 
     private getHtml(
@@ -498,6 +908,7 @@ export class AntigravityAccountWebviewProvider
         http-equiv="Content-Security-Policy"
         content="
             default-src 'none';
+            img-src ${webview.cspSource} https://googleusercontent.com https://*.googleusercontent.com;
             style-src ${webview.cspSource};
             script-src 'nonce-${nonce}';
         "
@@ -547,9 +958,18 @@ export function registerAntigravityAccountWebview(
             },
         );
 
+    const settingsCommand =
+        vscode.commands.registerCommand(
+            "boygr.antigravityAccountSwitcher.openSettings",
+            async () => {
+                await provider.openSettings();
+            },
+        );
+
     context.subscriptions.push(
         provider,
         registration,
+        settingsCommand,
     );
 
     return provider;

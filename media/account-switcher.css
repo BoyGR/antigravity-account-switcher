@@ -1,33 +1,68 @@
 :root {
-    --ag-radius-lg: 14px;
-    --ag-radius-md: 10px;
-    --ag-radius-sm: 7px;
+    --ag-bg: var(--vscode-sideBar-background);
+    --ag-surface: var(--vscode-sideBar-background);
+    --ag-raised: var(--vscode-editor-background);
+    --ag-hover: var(--vscode-list-hoverBackground);
+    --ag-active: var(--vscode-list-activeSelectionBackground);
+    --ag-fg: var(--vscode-foreground);
+    --ag-muted: var(--vscode-descriptionForeground);
+    --ag-border: var(--vscode-panel-border);
+    --ag-focus: var(--vscode-focusBorder);
+    --ag-link: var(--vscode-textLink-foreground);
+    --ag-button-bg: var(--vscode-button-background);
+    --ag-button-fg: var(--vscode-button-foreground);
+    --ag-button-hover: var(--vscode-button-hoverBackground);
+    --ag-input-bg: var(--vscode-input-background);
+    --ag-input-fg: var(--vscode-input-foreground);
+    --ag-input-border: var(--vscode-input-border);
+    --ag-error: var(--vscode-errorForeground);
+    --ag-success: var(--vscode-testing-iconPassed);
+    --ag-warning: var(--vscode-editorWarning-foreground);
+    --ag-radius: 5px;
+}
 
-    --ag-border:
-        color-mix(
-            in srgb,
-            var(--vscode-panel-border) 72%,
-            transparent
-        );
+:root[data-ag-theme="light"] {
+    --ag-bg: #f7f7f8;
+    --ag-surface: #f7f7f8;
+    --ag-raised: #ffffff;
+    --ag-hover: #eceef1;
+    --ag-active: #ddf4ff;
+    --ag-fg: #24292f;
+    --ag-muted: #656d76;
+    --ag-border: #d0d7de;
+    --ag-focus: #0969da;
+    --ag-link: #0969da;
+    --ag-button-bg: #0969da;
+    --ag-button-fg: #ffffff;
+    --ag-button-hover: #0860ca;
+    --ag-input-bg: #ffffff;
+    --ag-input-fg: #24292f;
+    --ag-input-border: #afb8c1;
+    --ag-error: #cf222e;
+    --ag-success: #1a7f37;
+    --ag-warning: #9a6700;
+}
 
-    --ag-card:
-        color-mix(
-            in srgb,
-            var(--vscode-sideBar-background) 82%,
-            var(--vscode-editor-background)
-        );
-
-    --ag-card-hover:
-        color-mix(
-            in srgb,
-            var(--vscode-list-hoverBackground) 70%,
-            var(--ag-card)
-        );
-
-    --ag-accent: var(--vscode-focusBorder);
-    --ag-success: #3ddc97;
-    --ag-warning: #f2c94c;
-    --ag-danger: var(--vscode-errorForeground);
+:root[data-ag-theme="dark"] {
+    --ag-bg: #181a1f;
+    --ag-surface: #181a1f;
+    --ag-raised: #20232a;
+    --ag-hover: #292d35;
+    --ag-active: #1f2f46;
+    --ag-fg: #e6edf3;
+    --ag-muted: #8b949e;
+    --ag-border: #30363d;
+    --ag-focus: #2f81f7;
+    --ag-link: #58a6ff;
+    --ag-button-bg: #1f6feb;
+    --ag-button-fg: #ffffff;
+    --ag-button-hover: #388bfd;
+    --ag-input-bg: #0d1117;
+    --ag-input-fg: #e6edf3;
+    --ag-input-border: #30363d;
+    --ag-error: #f85149;
+    --ag-success: #3fb950;
+    --ag-warning: #d29922;
 }
 
 * {
@@ -35,2501 +70,5106 @@
 }
 
 html,
-body {
-    padding: 0;
-    margin: 0;
+body,
+#app {
     width: 100%;
+    height: 100%;
     min-width: 0;
+    margin: 0;
+}
+
+html,
+body {
+    overflow: hidden;
 }
 
 body {
-    padding: 10px 9px 16px;
-    color: var(--vscode-foreground);
-    background: var(--vscode-sideBar-background);
+    color: var(--ag-fg);
+    background: var(--ag-bg);
     font-family: var(--vscode-font-family);
     font-size: var(--vscode-font-size);
-    line-height: 1.45;
+    line-height: 1.4;
 }
 
-button {
+button,
+input,
+select {
     font: inherit;
 }
 
-button:focus-visible {
-    outline: 1px solid var(--vscode-focusBorder);
-    outline-offset: 2px;
+button {
+    color: inherit;
 }
+
+button:disabled {
+    cursor: default;
+    opacity: .5;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+.account-list:focus-visible,
+a:focus-visible {
+    outline: 1px solid var(--ag-focus);
+    outline-offset: 1px;
+}
+
+a {
+    color: var(--ag-link);
+}
+
+
+/* ========================================================= */
+/* Application shell                                         */
+/* ========================================================= */
 
 .app {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0, 1fr)
+        auto;
+    gap: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding:
+        0
+        9px;
 }
 
-/* --------------------------------------------------------- */
-/* HEADER                                                    */
-/* --------------------------------------------------------- */
+.content-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 0;
+    overflow: hidden;
+    padding:
+        10px
+        0;
+}
 
-.brand {
+
+/* ========================================================= */
+/* Icons                                                     */
+/* ========================================================= */
+
+.ui-icon {
+    display: block;
+    width: 14px;
+    height: 14px;
+    flex: 0 0 auto;
+}
+
+.icon-btn.compact .ui-icon {
+    width: 13px;
+    height: 13px;
+}
+
+
+/* ========================================================= */
+/* Header                                                    */
+/* ========================================================= */
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 50px;
+    padding:
+        7px
+        1px
+        8px;
+    border-bottom: 1px solid var(--ag-border);
+}
+
+.topbar-identity {
     display: flex;
     align-items: center;
     gap: 9px;
-    padding: 1px 2px 3px;
-}
-
-.brand-mark {
-    position: relative;
-    width: 34px;
-    height: 34px;
-    flex: 0 0 34px;
-}
-
-.brand-a {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-
-    font-size: 23px;
-    line-height: 1;
-    font-weight: 800;
-
-    color: var(--vscode-textLink-foreground);
-}
-
-.brand-orbit {
-    position: absolute;
-    left: 1px;
-    top: 13px;
-    width: 32px;
-    height: 9px;
-
-    border: 1.5px solid var(--vscode-focusBorder);
-    border-radius: 50%;
-
-    transform: rotate(-16deg);
-    opacity: .9;
-}
-
-.brand-orbit::after {
-    content: "";
-    position: absolute;
-    right: 1px;
-    top: 1px;
-
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-
-    background: var(--vscode-textLink-foreground);
-    box-shadow: 0 0 7px var(--vscode-focusBorder);
-}
-
-.brand-copy {
     min-width: 0;
 }
 
-.brand-title {
+.product-icon-frame {
+    display: grid;
+    place-items: center;
+    width: 31px;
+    height: 31px;
+    flex: 0 0 31px;
+    color: var(--ag-fg);
+}
+
+.product-icon {
+    display: block;
+    width: 27px;
+    height: 27px;
+}
+
+.product-copy {
+    min-width: 0;
+}
+
+.product-title {
+    max-width: 195px;
     margin: 0;
-    font-size: 13px;
-    line-height: 1.2;
-    font-weight: 750;
-    letter-spacing: .09em;
-    text-transform: uppercase;
+    overflow: hidden;
+    color: var(--ag-fg);
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.brand-subtitle {
+.product-subtitle {
     margin-top: 2px;
-    color: var(--vscode-descriptionForeground);
-    font-size: 11px;
+    overflow: hidden;
+    color: var(--ag-muted);
+    font-size: 10px;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-/* --------------------------------------------------------- */
-/* SECTION                                                   */
-/* --------------------------------------------------------- */
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex: 0 0 auto;
+}
+
+.header-action {
+    width: 28px;
+    height: 28px;
+}
+
+
+/* ========================================================= */
+/* Sections                                                  */
+/* ========================================================= */
 
 .section {
     display: flex;
     flex-direction: column;
-    gap: 7px;
+    gap: 6px;
+    min-width: 0;
+    flex: 0 0 auto;
+}
+
+.saved-section {
+    flex:
+        1
+        1
+        auto;
+    min-height: 120px;
 }
 
 .section-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 6px;
+    min-height: 27px;
+}
 
-    padding: 0 2px;
+.section-toggle {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    padding:
+        4px
+        3px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.section-toggle:hover {
+    background: var(--ag-hover);
 }
 
 .section-title {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-
-    margin: 0;
-
-    color: var(--vscode-descriptionForeground);
-    font-size: 10px;
-    line-height: 1.2;
-    font-weight: 700;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-}
-
-.count {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    min-width: 19px;
-    height: 19px;
-    padding: 0 6px;
-
-    border-radius: 999px;
-
-    color: var(--vscode-badge-foreground);
-    background: var(--vscode-badge-background);
-
-    font-size: 10px;
-    font-weight: 700;
-}
-
-/* --------------------------------------------------------- */
-/* CURRENT ACCOUNT                                           */
-/* --------------------------------------------------------- */
-
-.hero-card {
-    position: relative;
     overflow: hidden;
-
-    padding: 12px;
-
-    border: 1px solid var(--ag-border);
-    border-radius: var(--ag-radius-lg);
-
-    background:
-        radial-gradient(
-            circle at 105% 110%,
-            color-mix(
-                in srgb,
-                var(--vscode-focusBorder) 20%,
-                transparent
-            ),
-            transparent 45%
-        ),
-        var(--ag-card);
+    color: var(--ag-fg);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.hero-card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-
-    pointer-events: none;
-
-    background:
-        linear-gradient(
-            125deg,
-            color-mix(
-                in srgb,
-                var(--vscode-textLink-foreground) 6%,
-                transparent
-            ),
-            transparent 45%
-        );
-}
-
-.hero-status-row,
-.account-main,
-.hero-actions {
-    position: relative;
-}
-
-.hero-status-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-
-    margin-bottom: 10px;
-}
-
-.badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-
-    min-height: 23px;
-    padding: 3px 8px;
-
-    border: 1px solid var(--ag-border);
-    border-radius: 999px;
-
-    font-size: 10px;
-    line-height: 1;
-    font-weight: 700;
-    letter-spacing: .055em;
-    text-transform: uppercase;
-}
-
-.badge.success {
-    color: var(--ag-success);
-
-    border-color:
-        color-mix(
-            in srgb,
-            var(--ag-success) 45%,
-            transparent
-        );
-
-    background:
-        color-mix(
-            in srgb,
-            var(--ag-success) 9%,
-            transparent
-        );
-}
-
-.badge.subtle {
-    color: var(--vscode-descriptionForeground);
-}
-
-.status-dot {
-    width: 7px;
-    height: 7px;
-    flex: 0 0 7px;
-
-    border-radius: 50%;
-    background: currentColor;
-
-    box-shadow: 0 0 8px currentColor;
-}
-
-.ready-label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-
-    color: var(--vscode-descriptionForeground);
-    font-size: 10px;
-}
-
-.account-main {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-width: 0;
-}
-
-.avatar {
+.chevron {
     display: grid;
     place-items: center;
-    flex: 0 0 46px;
-
-    width: 46px;
-    height: 46px;
-
-    border-radius: 50%;
-
-    border:
-        1px solid
-        color-mix(
-            in srgb,
-            var(--vscode-focusBorder) 65%,
-            transparent
-        );
-
-    background:
-        linear-gradient(
-            145deg,
-            color-mix(
-                in srgb,
-                var(--vscode-textLink-foreground) 80%,
-                #7c4dff
-            ),
-            #7c4dff
-        );
-
-    color: #fff;
-    font-weight: 750;
-    font-size: 15px;
-
-    box-shadow:
-        0 0 18px
-        color-mix(
-            in srgb,
-            var(--vscode-focusBorder) 18%,
-            transparent
-        );
+    width: 13px;
+    height: 16px;
+    flex: 0 0 13px;
+    color: var(--ag-muted);
 }
 
-.avatar.small {
-    width: 34px;
-    height: 34px;
-    flex-basis: 34px;
-    font-size: 11px;
+.chevron .ui-icon {
+    width: 12px;
+    height: 12px;
 }
 
-.identity {
-    min-width: 0;
-    flex: 1;
+.section-tools {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex: 0 0 auto;
 }
 
-.identity-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 
-    font-weight: 650;
+/* ========================================================= */
+/* Controls                                                  */
+/* ========================================================= */
+
+.icon-btn {
+    display: inline-grid;
+    place-items: center;
+    width: 27px;
+    height: 27px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    color: var(--ag-muted);
+    background: transparent;
+    cursor: pointer;
 }
 
-.identity-email {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    margin-top: 2px;
-
-    color: var(--vscode-descriptionForeground);
-    font-size: 11px;
+.icon-btn:hover:not(:disabled) {
+    color: var(--ag-fg);
+    border-color: var(--ag-border);
+    background: var(--ag-hover);
 }
 
-.identity-label {
-    display: inline-flex;
-
-    margin-top: 6px;
-    padding: 2px 7px;
-
-    border-radius: 999px;
-
-    color: var(--vscode-textLink-foreground);
-    background:
-        color-mix(
-            in srgb,
-            var(--vscode-textLink-foreground) 10%,
-            transparent
-        );
-
-    font-size: 10px;
+.icon-btn.compact {
+    width: 25px;
+    height: 25px;
 }
 
-.hero-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 7px;
-
-    margin-top: 11px;
+.icon-btn.confirm {
+    color: var(--ag-success);
 }
-
-/* --------------------------------------------------------- */
-/* BUTTONS                                                   */
-/* --------------------------------------------------------- */
 
 .btn {
-    appearance: none;
-
-    min-height: 28px;
-    padding: 5px 8px;
-
-    border:
-        1px solid
-        color-mix(
-            in srgb,
-            var(--vscode-button-border, transparent) 80%,
-            var(--ag-border)
-        );
-
-    border-radius: var(--ag-radius-sm);
-
-    color: var(--vscode-button-foreground);
-    background: var(--vscode-button-background);
-
+    min-height: 29px;
+    padding:
+        5px
+        10px;
+    border: 1px solid var(--ag-border);
+    border-radius: 5px;
+    color: var(--ag-fg);
+    background: var(--ag-raised);
+    font-size: 10px;
     cursor: pointer;
-
-    transition:
-        background-color 120ms ease,
-        border-color 120ms ease,
-        transform 80ms ease;
 }
 
-.btn:hover {
-    background: var(--vscode-button-hoverBackground);
+.btn:hover:not(:disabled) {
+    background: var(--ag-hover);
 }
 
-.btn:active {
-    transform: translateY(1px);
+.btn.primary {
+    color: var(--ag-button-fg);
+    border-color: var(--ag-button-bg);
+    background: var(--ag-button-bg);
 }
 
-.btn.secondary {
-    color: var(--vscode-foreground);
-    background: transparent;
-    border-color: var(--ag-border);
+.btn.primary:hover:not(:disabled) {
+    background: var(--ag-button-hover);
 }
 
-.btn.secondary:hover {
-    background: var(--vscode-toolbar-hoverBackground);
-}
-
-.btn.danger {
-    color: var(--vscode-errorForeground);
-
-    background:
-        color-mix(
-            in srgb,
-            var(--vscode-errorForeground) 7%,
-            transparent
-        );
-
-    border-color:
-        color-mix(
-            in srgb,
-            var(--vscode-errorForeground) 38%,
-            transparent
-        );
+.btn.compact {
+    min-height: 26px;
+    padding:
+        4px
+        8px;
+    font-size: 9.5px;
 }
 
 .btn.block {
     width: 100%;
 }
 
-/* --------------------------------------------------------- */
-/* SAVED ACCOUNT                                             */
-/* --------------------------------------------------------- */
-
-.account-list {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
+.btn.subtle-danger {
+    color: var(--ag-error);
 }
 
-.account-card {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-
-    min-width: 0;
-    padding: 9px;
-
-    border: 1px solid var(--ag-border);
-    border-radius: var(--ag-radius-md);
-
-    background: var(--ag-card);
-
-    transition:
-        background-color 120ms ease,
-        border-color 120ms ease;
-}
-
-.account-card:hover {
-    background: var(--ag-card-hover);
-}
-
-.account-card.active {
-    border-color:
-        color-mix(
-            in srgb,
-            var(--ag-success) 60%,
-            var(--ag-border)
-        );
-
-    box-shadow:
-        inset 2px 0 0
-        color-mix(
-            in srgb,
-            var(--ag-success) 85%,
-            transparent
-        );
-}
-
-.account-card .identity {
-    min-width: 0;
-}
-
-.account-actions {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-
-    margin-left: auto;
-}
-
-.switch-btn {
-    min-height: 27px;
-    padding: 4px 8px;
-    font-size: 10px;
-}
-
-.icon-btn {
-    appearance: none;
-
-    display: grid;
+.edit-icon {
+    display: inline-grid;
     place-items: center;
-
-    width: 28px;
-    height: 28px;
-
+    width: 22px;
+    height: 22px;
+    flex: 0 0 22px;
+    padding: 0;
     border: 0;
-    border-radius: 6px;
-
-    color: var(--vscode-icon-foreground);
+    border-radius: 4px;
+    color: var(--ag-muted);
     background: transparent;
-
     cursor: pointer;
+    opacity: .72;
 }
 
-.icon-btn:hover {
-    background: var(--vscode-toolbar-hoverBackground);
+.edit-icon:hover:not(:disabled),
+.edit-icon:focus-visible {
+    color: var(--ag-fg);
+    background: var(--ag-hover);
+    opacity: 1;
 }
 
-.more {
-    font-weight: 800;
-    letter-spacing: 1px;
-}
 
-/* --------------------------------------------------------- */
-/* ADD ACCOUNT                                               */
-/* --------------------------------------------------------- */
+/* ========================================================= */
+/* Status / feedback                                         */
+/* ========================================================= */
 
-.add-card {
-    width: 100%;
-
-    display: flex;
-    align-items: center;
-    gap: 10px;
-
-    padding: 9px 10px;
-
-    border:
-        1px dashed
-        color-mix(
-            in srgb,
-            var(--vscode-focusBorder) 70%,
-            var(--ag-border)
-        );
-
-    border-radius: var(--ag-radius-md);
-
-    color: var(--vscode-textLink-foreground);
-
-    background:
-        color-mix(
-            in srgb,
-            var(--vscode-textLink-foreground) 4%,
-            transparent
-        );
-
-    cursor: pointer;
-    text-align: left;
-}
-
-.add-card:hover {
-    background:
-        color-mix(
-            in srgb,
-            var(--vscode-textLink-foreground) 9%,
-            transparent
-        );
-}
-
-.add-icon {
-    display: grid;
-    place-items: center;
-
-    width: 27px;
-    height: 27px;
-    flex: 0 0 27px;
-
+.status-dot {
+    width: 6px;
+    height: 6px;
+    flex: 0 0 6px;
     border-radius: 50%;
-
-    color: var(--vscode-button-foreground);
-    background: var(--vscode-button-background);
-
-    font-size: 17px;
+    background: currentColor;
 }
 
-.add-title {
-    display: block;
-    font-weight: 650;
-}
-
-.add-subtitle {
-    display: block;
-    margin-top: 1px;
-
-    color: var(--vscode-descriptionForeground);
-    font-size: 10px;
-}
-
-/* --------------------------------------------------------- */
-/* RUNTIME                                                   */
-/* --------------------------------------------------------- */
-
-.runtime-card {
-    overflow: hidden;
-
-    border: 1px solid var(--ag-border);
-    border-radius: var(--ag-radius-md);
-
-    background: var(--ag-card);
-}
-
-.runtime-row {
+.notice {
     display: flex;
     align-items: center;
-    gap: 8px;
-
-    padding: 7px 9px;
-}
-
-.runtime-row + .runtime-row {
-    border-top: 1px solid var(--ag-border);
-}
-
-.runtime-icon {
-    display: grid;
-    place-items: center;
-    flex: 0 0 25px;
-
-    width: 23px;
-    height: 23px;
-
-    border-radius: 6px;
-
-    background:
-        color-mix(
-            in srgb,
-            var(--vscode-textLink-foreground) 9%,
-            transparent
-        );
-}
-
-.runtime-copy {
-    min-width: 0;
-    flex: 1;
-}
-
-.runtime-name {
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.runtime-detail {
-    margin-top: 1px;
-
-    color: var(--vscode-descriptionForeground);
-    font-size: 9px;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.runtime-state {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-
-    color: var(--ag-success);
-    font-size: 9px;
-    white-space: nowrap;
-}
-
-.runtime-state.error {
-    color: var(--ag-danger);
-}
-
-.health-banner {
-    display: flex;
-    align-items: flex-start;
-    gap: 9px;
-
-    padding: 9px;
-
-    border:
-        1px solid
-        color-mix(
-            in srgb,
-            var(--ag-success) 42%,
-            var(--ag-border)
-        );
-
-    border-radius: var(--ag-radius-md);
-
-    background:
-        color-mix(
-            in srgb,
-            var(--ag-success) 6%,
-            transparent
-        );
-}
-
-.health-symbol {
-    color: var(--ag-success);
-    font-size: 15px;
-}
-
-.health-title {
-    color: var(--ag-success);
-    font-size: 10px;
-    font-weight: 650;
-}
-
-.health-copy {
-    margin-top: 1px;
-    color: var(--vscode-descriptionForeground);
-    font-size: 9px;
-}
-
-/* --------------------------------------------------------- */
-/* LOADING / EMPTY / ERROR                                   */
-/* --------------------------------------------------------- */
-
-.loading-card,
-.empty-card,
-.error-card {
-    padding: 13px;
-
+    gap: 7px;
+    min-height: 32px;
+    padding:
+        6px
+        8px;
     border: 1px solid var(--ag-border);
-    border-radius: var(--ag-radius-md);
-
-    background: var(--ag-card);
-}
-
-.loading-line {
-    height: 8px;
-    margin: 7px 0;
-
-    border-radius: 999px;
-
-    background:
-        linear-gradient(
-            90deg,
-            var(--vscode-editorWidget-background),
-            var(--vscode-toolbar-hoverBackground),
-            var(--vscode-editorWidget-background)
-        );
-
-    background-size: 200% 100%;
-
-    animation: shimmer 1.4s linear infinite;
-}
-
-.loading-line.short {
-    width: 56%;
-}
-
-@keyframes shimmer {
-    from {
-        background-position: 200% 0;
-    }
-
-    to {
-        background-position: -200% 0;
-    }
-}
-
-.muted {
-    color: var(--vscode-descriptionForeground);
-}
-
-.hidden {
-    display: none !important;
-}
-
-/* --------------------------------------------------------- */
-/* SMALL WIDTH                                               */
-/* --------------------------------------------------------- */
-
-@media (max-width: 195px) {
-    .hero-actions {
-        grid-template-columns: 1fr;
-    }
-
-    .ready-label {
-        display: none;
-    }
-
-    .account-card {
-        align-items: flex-start;
-        flex-wrap: wrap;
-    }
-
-    .account-actions {
-        width: 100%;
-        margin-left: 43px;
-    }
-}
-
-/* --------------------------------------------------------- */
-/* v0.3 compact polish                                       */
-/* --------------------------------------------------------- */
-
-.hero-card {
-    box-shadow:
-        0 8px 24px
-        color-mix(
-            in srgb,
-            #000 12%,
-            transparent
-        );
-}
-
-.hero-actions .btn {
-    white-space: nowrap;
+    border-radius: 5px;
+    background: var(--ag-raised);
     font-size: 10px;
 }
 
-.account-card {
-    min-height: 64px;
-}
-
-.account-card.active {
-    background:
-        linear-gradient(
-            90deg,
-            color-mix(
-                in srgb,
-                var(--ag-success) 5%,
-                transparent
-            ),
-            var(--ag-card) 38%
-        );
-}
-
-.identity-name {
-    font-size: 11px;
-}
-
-.identity-email {
-    font-size: 9px;
-}
-
-.add-card {
-    min-height: 54px;
-}
-
-.add-title {
-    font-size: 11px;
-}
-
-.runtime-card {
-    box-shadow:
-        0 5px 18px
-        color-mix(
-            in srgb,
-            #000 8%,
-            transparent
-        );
-}
-
-.section-title {
-    font-size: 9px;
-}
-
-.badge {
-    min-height: 20px;
-    padding: 2px 7px;
-    font-size: 9px;
-}
-
-.ready-label {
-    font-size: 9px;
-}
-
-/* ========================================================= */
-/* v0.3.0 polish pass 2                                      */
-/* ========================================================= */
-
-button:disabled {
-    cursor: default;
-    opacity: .48;
-    pointer-events: none;
-}
-
-.operation-banner,
-.feedback-banner {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    min-height: 34px;
-    padding: 7px 9px;
-
-    border: 1px solid var(--ag-border);
-    border-radius: var(--ag-radius-md);
-
-    background:
-        color-mix(
-            in srgb,
-            var(--vscode-editorWidget-background) 82%,
-            var(--vscode-sideBar-background)
-        );
-
-    color: var(--vscode-foreground);
-    font-size: 10px;
-
-    animation: ag-enter 140ms ease-out;
-}
-
-.operation-banner {
-    border-color:
-        color-mix(
-            in srgb,
-            var(--vscode-focusBorder) 50%,
-            var(--ag-border)
-        );
-}
-
-.feedback-banner.success {
-    color: var(--ag-success);
-
+.notice.success {
     border-color:
         color-mix(
             in srgb,
             var(--ag-success) 38%,
             var(--ag-border)
         );
-
-    background:
-        color-mix(
-            in srgb,
-            var(--ag-success) 6%,
-            var(--vscode-sideBar-background)
-        );
 }
 
-.feedback-banner.error {
-    color: var(--ag-danger);
-
+.notice.error {
     border-color:
         color-mix(
             in srgb,
-            var(--ag-danger) 38%,
+            var(--ag-error) 48%,
             var(--ag-border)
         );
 }
 
-.feedback-symbol {
-    display: grid;
-    place-items: center;
-
-    width: 18px;
-    height: 18px;
-    flex: 0 0 18px;
-
-    border-radius: 50%;
-
-    background:
-        color-mix(
-            in srgb,
-            currentColor 13%,
-            transparent
-        );
-
-    font-weight: 800;
+.notice-symbol {
+    color: var(--ag-success);
 }
 
-.operation-spinner {
-    width: 15px;
-    height: 15px;
-    flex: 0 0 15px;
-
-    border: 2px solid
-        color-mix(
-            in srgb,
-            var(--vscode-focusBorder) 25%,
-            transparent
-        );
-
-    border-top-color:
-        var(--vscode-focusBorder);
-
-    border-radius: 50%;
-
-    animation: ag-spin .72s linear infinite;
+.notice.error .notice-symbol {
+    color: var(--ag-error);
 }
 
-@keyframes ag-spin {
+.spinner {
+    width: 13px;
+    height: 13px;
+    flex: 0 0 13px;
+    border:
+        1.5px solid
+        var(--ag-border);
+    border-top-color: var(--ag-focus);
+    border-radius: 50%;
+    animation: spin .75s linear infinite;
+}
+
+@keyframes spin {
     to {
         transform: rotate(360deg);
     }
 }
 
-@keyframes ag-enter {
-    from {
-        opacity: 0;
-        transform: translateY(-3px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-
-/* More room for account labels. */
-
-.account-card {
-    gap: 8px;
-}
-
-.account-card .identity {
-    flex: 1 1 auto;
-    min-width: 0;
-}
-
-.account-actions {
-    flex: 0 0 auto;
-    gap: 3px;
-}
-
-.switch-btn {
-    min-width: 52px;
-    padding-left: 7px;
-    padding-right: 7px;
-    font-size: 9px;
-}
-
-
-/* Make overflow button visibly interactive. */
-
-.icon-btn.more {
-    width: 25px;
-    height: 25px;
-
-    border: 1px solid transparent;
-
-    color: var(--vscode-descriptionForeground);
-}
-
-.icon-btn.more:hover {
-    color: var(--vscode-foreground);
-
-    border-color: var(--ag-border);
-
-    background:
-        var(--vscode-toolbar-hoverBackground);
-}
-
-
-/* Smooth interactive cards. */
-
-.account-card,
-.hero-card,
-.add-card,
-.runtime-card {
-    transition:
-        border-color 120ms ease,
-        background-color 120ms ease,
-        box-shadow 120ms ease,
-        transform 100ms ease;
-}
-
-.account-card:hover {
-    border-color:
-        color-mix(
-            in srgb,
-            var(--vscode-focusBorder) 32%,
-            var(--ag-border)
-        );
-}
-
-.add-card:not(:disabled):hover {
-    transform: translateY(-1px);
-}
-
-.btn:not(:disabled):hover {
-    transform: translateY(-1px);
-}
-
-
-/* Make active badge slightly quieter. */
-
-.account-card .badge.success {
-    box-shadow: none;
-}
-
-.account-card .status-dot {
-    box-shadow:
-        0 0 5px currentColor;
-}
-
-
-/* Runtime visual simplification. */
-
-.runtime-detail {
-    max-width: 110px;
-}
-
-.runtime-state {
-    font-weight: 550;
-}
-
-
-/* Sidebar-width refinements. */
-
-@media (max-width: 230px) {
-    .switch-btn {
-        min-width: 29px;
-        width: 29px;
-        overflow: hidden;
-        white-space: nowrap;
-        color: transparent;
-        position: relative;
-    }
-
-    .switch-btn::after {
-        content: "⇄";
-        position: absolute;
-        inset: 0;
-
-        display: grid;
-        place-items: center;
-
-        color: var(--vscode-button-foreground);
-        font-size: 12px;
-    }
-}
-
-@media (max-width: 205px) {
-    .brand-subtitle {
-        display: none;
-    }
-
-    .runtime-detail {
-        display: none;
-    }
-}
 
 /* ========================================================= */
-/* v0.3.0 polish pass 3 - responsive account layout          */
+/* Current Account                                           */
 /* ========================================================= */
 
-
-/* --------------------------------------------------------- */
-/* Current account identity                                  */
-/* --------------------------------------------------------- */
-
-/*
- * The current account is the primary identity.
- * Allow a long display name to use two lines instead of
- * truncating too aggressively.
- */
-
-.hero-card .identity-name {
-    white-space: normal;
-
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    line-height: 1.3;
+.current-panel {
+    padding:
+        4px
+        3px
+        2px;
 }
 
-.hero-card .identity-email {
-    max-width: 100%;
-}
-
-
-/* --------------------------------------------------------- */
-/* Saved account identity                                    */
-/* --------------------------------------------------------- */
-
-.account-card .identity-name,
-.account-card .identity-email {
-    max-width: 100%;
-}
-
-
-/*
- * Normal sidebar:
- * avatar | identity | actions
- */
-
-.account-card {
+.current-identity-row {
     display: grid;
-
     grid-template-columns:
         auto
         minmax(0, 1fr)
         auto;
+    align-items: start;
+    gap: 10px;
+}
 
-    grid-template-rows:
-        auto;
+.avatar {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    border: 1px solid var(--ag-border);
+    border-radius: 50%;
+    color: var(--ag-link);
+    background: var(--ag-raised);
+    font-size: 11px;
+    font-weight: 650;
+    user-select: none;
+}
 
+.current-avatar {
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+}
+
+.identity {
+    min-width: 0;
+}
+
+.identity-heading {
+    display: flex;
     align-items: center;
-
-    column-gap: 8px;
-    row-gap: 4px;
+    gap: 4px;
+    min-width: 0;
 }
 
-.account-card > .avatar {
-    grid-column: 1;
-    grid-row: 1;
-
-    align-self: center;
+.identity-name {
+    overflow: hidden;
+    color: var(--ag-fg);
+    font-size: 10.5px;
+    font-weight: 620;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.account-card > .identity {
-    grid-column: 2;
-    grid-row: 1;
+.current-name {
+    font-size: 11.5px;
+    font-weight: 650;
+}
 
+.identity-email {
+    overflow: hidden;
+    margin-top: 2px;
+    color: var(--ag-muted);
+    font-size: 9.5px;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    user-select: text;
+}
+
+.label-row {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    margin-top: 5px;
+}
+
+.account-label {
+    overflow: hidden;
+    color: var(--ag-muted);
+    font-size: 9.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.connection-state {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 2px;
+    color: var(--ag-success);
+    font-size: 9px;
+    white-space: nowrap;
+}
+
+.action-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    padding-left: 50px;
+}
+
+.current-label-editor {
+    margin-top: 6px;
+}
+
+
+/* ========================================================= */
+/* Inline label editing                                      */
+/* ========================================================= */
+
+.label-editor {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto
+        auto;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+}
+
+.label-input,
+.search-input,
+.field select {
     width: 100%;
     min-width: 0;
+    color: var(--ag-input-fg);
+    border: 1px solid var(--ag-input-border);
+    border-radius: 5px;
+    background: var(--ag-input-bg);
 }
 
-.account-card > .account-actions {
-    grid-column: 3;
-    grid-row: 1;
+.label-input {
+    height: 28px;
+    padding:
+        4px
+        7px;
+    font-size: 10px;
+}
 
-    width: auto;
-    margin-left: 0;
 
+/* ========================================================= */
+/* Saved Account controls                                    */
+/* ========================================================= */
+
+.saved-body {
+    display: flex;
+    flex:
+        1
+        1
+        auto;
+    flex-direction: column;
+    gap: 7px;
+    min-height: 0;
+}
+
+.saved-controls {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.search-wrap {
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    display: grid;
+    place-items: center;
+    color: var(--ag-muted);
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.search-icon .ui-icon {
+    width: 14px;
+    height: 14px;
+}
+
+.search-input {
+    height: 31px;
+    padding:
+        5px
+        8px
+        5px
+        29px;
+    font-size: 10px;
+}
+
+.count {
+    min-width: 19px;
+    padding:
+        1px
+        5px;
+    color: var(--ag-muted);
+    font-size: 9px;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+}
+
+.add-account {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 42px;
+    padding:
+        6px
+        7px;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    color: var(--ag-fg);
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+}
+
+.add-account:hover:not(:disabled),
+.add-account:focus-visible {
+    border-color: var(--ag-border);
+    background: var(--ag-hover);
+}
+
+.add-symbol {
+    display: grid;
+    place-items: center;
+    width: 25px;
+    height: 25px;
+    flex: 0 0 25px;
+    border: 1px solid var(--ag-border);
+    border-radius: 5px;
+    color: var(--ag-link);
+    background: var(--ag-raised);
+}
+
+.add-symbol .ui-icon {
+    width: 14px;
+    height: 14px;
+}
+
+.add-copy {
+    min-width: 0;
+}
+
+.add-account strong {
+    display: block;
+    font-size: 10.5px;
+    font-weight: 600;
+}
+
+.add-account small {
+    display: block;
+    margin-top: 1px;
+    color: var(--ag-muted);
+    font-size: 9px;
+}
+
+
+/* ========================================================= */
+/* Saved Account list                                        */
+/* ========================================================= */
+
+.account-list {
+    flex:
+        1
+        1
+        auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-top: 1px solid var(--ag-border);
+    border-bottom: 1px solid var(--ag-border);
+    scrollbar-width: thin;
+}
+
+.account-row {
+    position: relative;
+    display: grid;
+    grid-template-columns:
+        auto
+        minmax(0, 1fr)
+        auto;
+    align-items: center;
+    gap: 9px;
+    min-height: 55px;
+    padding:
+        8px
+        4px
+        8px
+        7px;
+    border: 0;
+    border-bottom: 1px solid var(--ag-border);
+    background: transparent;
+}
+
+.account-row:last-child {
+    border-bottom: 0;
+}
+
+.account-row:hover {
+    background: var(--ag-hover);
+}
+
+.account-row.active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 7px;
+    bottom: 7px;
+    width: 2px;
+    border-radius: 2px;
+    background: var(--ag-success);
+}
+
+.avatar.small {
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
+    font-size: 9.5px;
+}
+
+.account-actions {
+    display: flex;
+    align-items: center;
     justify-content: flex-end;
+    gap: 3px;
 }
 
-
-/* --------------------------------------------------------- */
-/* Medium / narrow VS Code sidebar                           */
-/* --------------------------------------------------------- */
-
-/*
- * At common narrow VS Code sidebar widths, the action controls
- * move to a second row. This gives the account label and email
- * almost the entire first row.
- */
-
-@media (max-width: 320px) {
-    .account-card {
-        grid-template-columns:
-            auto
-            minmax(0, 1fr);
-
-        grid-template-rows:
-            auto
-            auto;
-
-        padding-top: 9px;
-        padding-bottom: 8px;
-    }
-
-    .account-card > .avatar {
-        grid-column: 1;
-        grid-row: 1 / span 2;
-
-        align-self: start;
-
-        margin-top: 1px;
-    }
-
-    .account-card > .identity {
-        grid-column: 2;
-        grid-row: 1;
-
-        padding-right: 2px;
-    }
-
-    .account-card > .account-actions {
-        grid-column: 2;
-        grid-row: 2;
-
-        width: 100%;
-        min-width: 0;
-
-        margin-top: 2px;
-
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-
-        gap: 5px;
-    }
-
-    .account-card .identity-name {
-        font-size: 11px;
-
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .account-card .identity-email {
-        font-size: 9px;
-
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    /*
-     * Button can now keep its text because it no longer competes
-     * with the account name on the first row.
-     */
-    .switch-btn {
-        width: auto;
-        min-width: 57px;
-
-        padding-left: 8px;
-        padding-right: 8px;
-
-        color: var(--vscode-button-foreground);
-    }
-
-    .switch-btn::after {
-        content: none;
-    }
-
-    .icon-btn.more {
-        flex: 0 0 25px;
-    }
-
-    /*
-     * Active badge stays visually secondary and aligned
-     * with the overflow action.
-     */
-    .account-card .badge.success {
-        margin-left: auto;
-    }
+.active-state {
+    margin-top: 3px;
+    color: var(--ag-success);
+    font-size: 9px;
+    font-weight: 550;
 }
 
-
-/* --------------------------------------------------------- */
-/* Very narrow sidebar                                       */
-/* --------------------------------------------------------- */
-
-@media (max-width: 225px) {
-    /*
-     * Only at genuinely tiny widths do we collapse the Switch
-     * text into an icon-only control.
-     */
-
-    .switch-btn {
-        position: relative;
-
-        width: 30px;
-        min-width: 30px;
-
-        overflow: hidden;
-
-        padding-left: 0;
-        padding-right: 0;
-
-        white-space: nowrap;
-
-        color: transparent;
-    }
-
-    .switch-btn::after {
-        content: "⇄";
-
-        position: absolute;
-        inset: 0;
-
-        display: grid;
-        place-items: center;
-
-        color: var(--vscode-button-foreground);
-
-        font-size: 12px;
-    }
-
-    .account-actions {
-        justify-content: flex-start;
-    }
-
-    .account-card .badge.success {
-        margin-left: 0;
-    }
+.switch-btn {
+    color: var(--ag-link);
 }
 
-
-/* --------------------------------------------------------- */
-/* Extremely narrow sidebar                                  */
-/* --------------------------------------------------------- */
-
-@media (max-width: 190px) {
-    .account-card {
-        grid-template-columns:
-            30px
-            minmax(0, 1fr);
-
-        column-gap: 6px;
-    }
-
-    .avatar.small {
-        width: 30px;
-        height: 30px;
-        flex-basis: 30px;
-
-        font-size: 10px;
-    }
-
-    .account-card .identity-name {
-        font-size: 10px;
-    }
-
-    .account-card .identity-email {
-        font-size: 8px;
-    }
-
-    .badge {
-        padding-left: 5px;
-        padding-right: 5px;
-
-        font-size: 8px;
-    }
+.delete-account-btn {
+    color: var(--ag-muted);
+    opacity: .56;
 }
 
+.account-row:hover .delete-account-btn,
+.delete-account-btn:focus-visible {
+    opacity: 1;
+}
 
-/* --------------------------------------------------------- */
-/* Saved account hover emphasis                              */
-/* --------------------------------------------------------- */
-
-.account-card:not(.active):hover {
-    box-shadow:
-        inset 2px 0 0
+.delete-account-btn:hover:not(:disabled) {
+    color: var(--ag-error);
+    border-color:
         color-mix(
             in srgb,
-            var(--vscode-focusBorder) 46%,
+            var(--ag-error) 35%,
+            var(--ag-border)
+        );
+    background:
+        color-mix(
+            in srgb,
+            var(--ag-error) 7%,
             transparent
         );
 }
 
+.empty-panel,
+.error-panel {
+    padding:
+        10px
+        8px;
+    color: var(--ag-fg);
+    font-size: 10px;
+}
 
-/* --------------------------------------------------------- */
-/* Active saved account                                      */
-/* --------------------------------------------------------- */
-
-.account-card.active {
-    box-shadow:
-        inset 2px 0 0
-        color-mix(
-            in srgb,
-            var(--ag-success) 85%,
-            transparent
-        ),
-        0 4px 14px
-        color-mix(
-            in srgb,
-            var(--ag-success) 5%,
-            transparent
-        );
+.secondary-text {
+    margin-top: 3px;
+    color: var(--ag-muted);
+    font-size: 9px;
+    line-height: 1.45;
 }
 
 
-/* --------------------------------------------------------- */
-/* Add account card                                          */
-/* --------------------------------------------------------- */
+/* ========================================================= */
+/* Runtime                                                   */
+/* ========================================================= */
 
-.add-card > span:last-child {
-    min-width: 0;
-}
-
-.add-title,
-.add-subtitle {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-@media (max-width: 230px) {
-    .add-card {
-        gap: 8px;
-    }
-
-    .add-subtitle {
-        white-space: nowrap;
-    }
-}
-
-
-/* --------------------------------------------------------- */
-/* Runtime rows                                              */
-/* --------------------------------------------------------- */
-
-.runtime-row {
-    min-width: 0;
-}
-
-.runtime-copy {
-    overflow: hidden;
-}
-
-.runtime-state {
+.runtime-section {
     flex: 0 0 auto;
 }
 
-@media (max-width: 235px) {
-    .runtime-name {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .runtime-state {
-        font-size: 8px;
-    }
+.runtime-summary,
+.runtime-state {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 9px;
+    white-space: nowrap;
 }
+
+.runtime-summary.healthy,
+.runtime-state:not(.error) {
+    color: var(--ag-success);
+}
+
+.runtime-summary.warning,
+.runtime-state.error {
+    color: var(--ag-error);
+}
+
+.runtime-panel {
+    overflow: hidden;
+    border:
+        1px solid
+        var(--ag-border);
+    border-radius: 5px;
+    background: var(--ag-raised);
+}
+
+.runtime-row {
+    display: grid;
+    grid-template-columns:
+        auto
+        minmax(0, 1fr)
+        auto;
+    align-items: center;
+    gap: 8px;
+    min-height: 39px;
+    padding:
+        6px
+        8px;
+}
+
+.runtime-row + .runtime-row {
+    border-top: 1px solid var(--ag-border);
+}
+
+.runtime-symbol {
+    display: grid;
+    place-items: center;
+    width: 23px;
+    height: 23px;
+    border: 1px solid var(--ag-border);
+    border-radius: 5px;
+    color: var(--ag-muted);
+    font-size: 8.5px;
+    font-weight: 700;
+}
+
+.runtime-copy {
+    min-width: 0;
+}
+
+.runtime-name {
+    overflow: hidden;
+    font-size: 10px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.runtime-detail {
+    overflow: hidden;
+    margin-top: 1px;
+    color: var(--ag-muted);
+    font-size: 9px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 
 /* ========================================================= */
-/* v0.3.0 U11 accessibility polish                           */
+/* Footer                                                    */
 /* ========================================================= */
 
-
-/* --------------------------------------------------------- */
-/* Keyboard focus                                            */
-/* --------------------------------------------------------- */
-
-.btn:focus-visible,
-.icon-btn:focus-visible,
-.add-card:focus-visible {
-    outline:
-        2px solid
-        var(--vscode-focusBorder);
-
-    outline-offset: 2px;
+.developer-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+    min-height: 34px;
+    padding:
+        7px
+        3px
+        8px;
+    border-top: 1px solid var(--ag-border);
+    color: var(--ag-muted);
+    font-size: 9px;
 }
 
-.account-card:focus-within {
-    border-color:
-        var(--vscode-focusBorder);
+.developer-footer-copy {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.developer-footer strong {
+    color: var(--ag-fg);
+    font-weight: 600;
+}
+
+.developer-footer a,
+.about-row a {
+    color: var(--ag-link);
+    text-decoration: none;
+}
+
+.developer-footer a:hover,
+.about-row a:hover {
+    text-decoration: underline;
+}
+
+.footer-version {
+    flex: 0 0 auto;
+    font-variant-numeric: tabular-nums;
 }
 
 
-/* --------------------------------------------------------- */
-/* Current semantic state                                    */
-/* --------------------------------------------------------- */
+/* ========================================================= */
+/* Settings                                                  */
+/* ========================================================= */
 
-.account-card[aria-current="true"] {
-    border-color:
+.settings-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
+    padding: 6px;
+    background:
         color-mix(
             in srgb,
-            var(--ag-success) 72%,
-            var(--vscode-focusBorder)
+            #000 34%,
+            transparent
         );
 }
 
+.settings-panel {
+    display: flex;
+    flex:
+        1
+        1
+        auto;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--ag-border);
+    border-radius: 7px;
+    background: var(--ag-bg);
+    box-shadow:
+        0 8px 28px
+        color-mix(
+            in srgb,
+            #000 28%,
+            transparent
+        );
+}
 
-/* --------------------------------------------------------- */
-/* Reduced motion                                            */
-/* --------------------------------------------------------- */
+.settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 45px;
+    padding:
+        8px
+        9px
+        8px
+        12px;
+    border-bottom: 1px solid var(--ag-border);
+}
+
+.settings-header h2 {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.settings-body {
+    flex:
+        1
+        1
+        auto;
+    overflow-y: auto;
+    padding: 12px;
+}
+
+.settings-group + .settings-group {
+    margin-top: 17px;
+}
+
+.settings-group h3 {
+    margin:
+        0
+        0
+        9px;
+    color: var(--ag-muted);
+    font-size: 9.5px;
+    font-weight: 650;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.field {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr);
+    gap: 5px;
+    margin-bottom: 11px;
+    font-size: 10px;
+}
+
+.field select {
+    height: 30px;
+    padding:
+        3px
+        7px;
+    font-size: 10px;
+}
+
+.field.subfield {
+    margin-left: 18px;
+    margin-top: 4px;
+    margin-bottom: 8px;
+    padding-left: 8px;
+    border-left: 2px solid var(--vscode-focusBorder, #007fd4);
+}
+
+.check-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 30px;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.check-row input {
+    margin: 0;
+}
+
+.settings-note {
+    margin-top: 15px;
+    padding-top: 8px;
+    border-top: 1px solid var(--ag-border);
+    color: var(--ag-muted);
+    font-size: 9px;
+}
+
+.settings-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    padding:
+        9px
+        11px;
+    border-top: 1px solid var(--ag-border);
+}
+
+.about-group {
+    padding-top: 2px;
+}
+
+.about-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 25px;
+    color: var(--ag-muted);
+    font-size: 10px;
+}
+
+.about-row > :last-child {
+    overflow: hidden;
+    color: var(--ag-fg);
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* ========================================================= */
+/* Delete confirmation                                       */
+/* ========================================================= */
+
+.dialog-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: grid;
+    place-items: center;
+    padding: 12px;
+    background:
+        color-mix(
+            in srgb,
+            #000 44%,
+            transparent
+        );
+}
+
+.confirm-dialog {
+    width:
+        min(
+            100%,
+            330px
+        );
+    overflow: hidden;
+    border: 1px solid var(--ag-border);
+    border-radius: 7px;
+    background: var(--ag-bg);
+    box-shadow:
+        0 10px 34px
+        color-mix(
+            in srgb,
+            #000 35%,
+            transparent
+        );
+}
+
+.confirm-dialog-header {
+    display: grid;
+    grid-template-columns:
+        auto
+        minmax(0, 1fr);
+    gap: 10px;
+    padding:
+        13px
+        13px
+        10px;
+}
+
+.confirm-dialog-header h2 {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.danger-symbol {
+    display: grid;
+    place-items: center;
+    width: 23px;
+    height: 23px;
+    border:
+        1px solid
+        color-mix(
+            in srgb,
+            var(--ag-error) 55%,
+            var(--ag-border)
+        );
+    border-radius: 50%;
+    color: var(--ag-error);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.confirm-account-name {
+    margin-top: 5px;
+    overflow: hidden;
+    font-size: 10px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.confirm-account-email {
+    overflow: hidden;
+    margin-top: 1px;
+    color: var(--ag-muted);
+    font-size: 9px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.confirm-description {
+    margin: 0;
+    padding:
+        0
+        13px
+        13px;
+    color: var(--ag-muted);
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.confirm-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    padding:
+        9px
+        11px;
+    border-top: 1px solid var(--ag-border);
+    background: var(--ag-raised);
+}
+
+.btn.destructive {
+    color: var(--vscode-button-foreground);
+    border-color: var(--ag-error);
+    background: var(--ag-error);
+}
+
+.btn.destructive:hover:not(:disabled) {
+    filter: brightness(1.08);
+}
+
+
+/* ========================================================= */
+/* Loading                                                   */
+/* ========================================================= */
+
+.loading-line {
+    height: 8px;
+    border-radius: 3px;
+    background:
+        color-mix(
+            in srgb,
+            var(--ag-muted) 15%,
+            transparent
+        );
+}
+
+.loading-line + .loading-line {
+    margin-top: 7px;
+}
+
+.loading-line.wide {
+    width: 70%;
+}
+
+.loading-line.short {
+    width: 42%;
+}
+
+
+/* ========================================================= */
+/* Responsive                                                */
+/* ========================================================= */
+
+@media (max-width: 280px) {
+    .product-title {
+        max-width: 145px;
+    }
+
+    .connection-state {
+        display: none;
+    }
+
+    .current-identity-row {
+        grid-template-columns:
+            auto
+            minmax(0, 1fr);
+    }
+
+    .action-row {
+        padding-left: 50px;
+    }
+
+    .account-row {
+        grid-template-columns:
+            auto
+            minmax(0, 1fr);
+        grid-template-rows:
+            auto
+            auto;
+    }
+
+    .account-row > .avatar {
+        grid-column: 1;
+        grid-row:
+            1 /
+            span 2;
+        align-self: start;
+    }
+
+    .account-row > .identity {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .account-row > .account-actions {
+        grid-column: 2;
+        grid-row: 2;
+        justify-content: flex-start;
+        margin-top: 3px;
+    }
+}
+
+@media (max-width: 225px) {
+    .product-subtitle,
+    .runtime-detail {
+        display: none;
+    }
+
+    .product-title {
+        max-width: 110px;
+    }
+
+    .developer-footer-copy > span:first-child {
+        display: none;
+    }
+}
+
+@media (max-height: 560px) {
+    .content-shell {
+        gap: 8px;
+        padding:
+            7px
+            0;
+    }
+
+    .topbar {
+        min-height: 43px;
+    }
+
+    .developer-footer {
+        min-height: 30px;
+    }
+
+    .current-panel {
+        padding-top: 1px;
+    }
+
+    .action-row {
+        margin-top: 7px;
+    }
+}
+
+
+/* ========================================================= */
+/* Accessibility                                             */
+/* ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
     *::after {
-        scroll-behavior: auto !important;
-
-        animation-duration: 0.01ms !important;
+        animation-duration: .01ms !important;
         animation-iteration-count: 1 !important;
-
-        transition-duration: 0.01ms !important;
+        transition-duration: .01ms !important;
     }
 
-    .operation-spinner {
+    .spinner {
         animation: none;
-
-        border-color:
-            var(--vscode-focusBorder);
-
-        opacity: .7;
-    }
-
-    .btn:not(:disabled):hover,
-    .add-card:not(:disabled):hover {
-        transform: none;
     }
 }
 
-
-/* --------------------------------------------------------- */
-/* High Contrast / Forced Colors                             */
-/* --------------------------------------------------------- */
-
 @media (forced-colors: active) {
-    .hero-card,
-    .account-card,
-    .runtime-card,
-    .add-card,
-    .operation-banner,
-    .feedback-banner {
-        border:
-            1px solid
-            CanvasText;
-
-        background:
-            Canvas;
-
-        box-shadow:
-            none;
+    .runtime-panel,
+    .settings-panel,
+    .confirm-dialog,
+    .avatar,
+    .add-symbol {
+        border-color: CanvasText;
+        background: Canvas;
+        box-shadow: none;
     }
 
-    .account-card.active,
-    .account-card[aria-current="true"] {
+    .account-list {
+        border-color: CanvasText;
+    }
+
+    .account-row {
+        border-color: CanvasText;
+    }
+
+    .account-row.active::before {
+        background: Highlight;
+    }
+
+    .btn.destructive {
+        color: ButtonText;
         border:
             2px solid
             Highlight;
-
-        box-shadow:
-            none;
+        background: ButtonFace;
     }
 
-    .btn,
-    .icon-btn,
-    .add-card {
-        forced-color-adjust: auto;
-    }
-
-    .status-dot {
-        box-shadow:
-            none;
-    }
-
-    .avatar {
-        border:
-            1px solid
-            CanvasText;
-
-        background:
-            Canvas;
-
-        color:
-            CanvasText;
-
-        box-shadow:
-            none;
-    }
-
-    .badge.success,
-    .runtime-state {
-        color:
-            CanvasText;
+    .danger-symbol {
+        border-color: CanvasText;
+        color: CanvasText;
     }
 }
-
-
-/* --------------------------------------------------------- */
-/* Better disabled distinction                               */
-/* --------------------------------------------------------- */
-
-button:disabled {
-    filter:
-        saturate(.45);
-}
-
-
-/* --------------------------------------------------------- */
-/* Text selection                                            */
-/* --------------------------------------------------------- */
-
-.identity-name,
-.identity-email,
-.runtime-detail {
-    user-select: text;
-}
-
-
-/* --------------------------------------------------------- */
-/* Prevent accidental layout overflow                        */
-/* --------------------------------------------------------- */
-
-.brand-copy,
-.identity,
-.runtime-copy {
-    min-width: 0;
-}
-
 /* ========================================================= */
-/* v0.3.0 U12 final visual polish                            */
+/* M7.1D.1 - Native toolbar + natural content flow           */
 /* ========================================================= */
-
-
-/* --------------------------------------------------------- */
-/* Global visual rhythm                                      */
-/* --------------------------------------------------------- */
-
-body {
-    padding:
-        9px
-        9px
-        15px;
-}
 
 .app {
-    gap: 13px;
+    grid-template-rows:
+        minmax(0, 1fr)
+        auto;
+}
+
+/*
+ * The native VS Code View title now owns branding,
+ * Refresh and Settings.
+ */
+
+.topbar {
+    display: none !important;
+}
+
+
+/*
+ * Main content follows normal document flow.
+ *
+ * It may scroll as a fallback on a short viewport, while the
+ * footer stays outside that scroll area.
+ */
+
+.content-shell {
+    gap: 10px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding:
+        9px
+        0
+        12px;
+    scrollbar-width: thin;
+}
+
+
+/*
+ * Saved Accounts must not stretch merely to occupy all
+ * available vertical space.
+ */
+
+.saved-section {
+    flex:
+        0
+        0
+        auto;
+    min-height: 0;
+}
+
+.saved-body {
+    flex:
+        0
+        0
+        auto;
+    min-height: 0;
+}
+
+
+/*
+ * Search and Add Google Account stay above the list.
+ *
+ * A short list uses its natural height. A long list receives
+ * its own scroll area.
+ */
+
+.account-list {
+    flex:
+        0
+        1
+        auto;
+    max-height:
+        clamp(
+            118px,
+            34vh,
+            350px
+        );
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+
+/*
+ * Account rows at the standard VS Code sidebar width.
+ */
+
+.account-row {
+    min-height: 52px;
+    padding:
+        7px
+        3px
+        7px
+        7px;
+}
+
+.account-actions {
+    align-self: center;
+    gap: 2px;
+}
+
+.switch-btn {
+    min-width: 48px;
+}
+
+
+/*
+ * Slightly reduce Current Account vertical footprint.
+ */
+
+.current-panel {
+    padding:
+        2px
+        3px
+        1px;
+}
+
+.current-identity-row {
+    gap: 9px;
+}
+
+.action-row {
+    margin-top: 8px;
+}
+
+
+/*
+ * Runtime now follows Saved Accounts naturally.
+ */
+
+.runtime-section {
+    flex:
+        0
+        0
+        auto;
+    margin-top: 2px;
+    padding-bottom: 3px;
+}
+
+
+/*
+ * Flat expanded Runtime rows.
+ */
+
+.runtime-panel {
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+.runtime-row {
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto;
+    min-height: 35px;
+    gap: 8px;
+    padding:
+        5px
+        4px;
+    border-top: 0;
+    border-bottom:
+        1px solid
+        color-mix(
+            in srgb,
+            var(--ag-border) 72%,
+            transparent
+        );
+}
+
+.runtime-row + .runtime-row {
+    border-top: 0;
+}
+
+.runtime-row:last-child {
+    border-bottom: 0;
+}
+
+.runtime-symbol {
+    display: none;
+}
+
+.runtime-name {
+    font-size: 9.75px;
+}
+
+.runtime-detail {
+    font-size: 8.75px;
+}
+
+
+/*
+ * Footer is always visible because it remains outside
+ * .content-shell.
+ */
+
+.developer-footer {
+    min-height: 34px;
+    flex:
+        0
+        0
+        auto;
+    padding:
+        7px
+        3px
+        8px;
+    background: var(--ag-bg);
+}
+
+.developer-footer-copy {
+    gap: 4px;
+}
+
+
+/*
+ * Standard narrow VS Code sidebar.
+ */
+
+@media (min-width: 226px) and (max-width: 300px) {
+    .account-row {
+        grid-template-columns:
+            auto
+            minmax(0, 1fr)
+            auto;
+    }
+
+    .account-actions {
+        max-width: 78px;
+    }
+
+    .btn.compact {
+        padding:
+            4px
+            6px;
+    }
+}
+
+
+/*
+ * Very short sidebar.
+ */
+
+@media (max-height: 560px) {
+    .content-shell {
+        gap: 7px;
+        padding:
+            6px
+            0
+            9px;
+    }
+
+    .account-list {
+        max-height:
+            clamp(
+                94px,
+                27vh,
+                220px
+            );
+    }
+
+    .developer-footer {
+        min-height: 30px;
+        padding:
+            5px
+            3px
+            6px;
+    }
+}
+/* ========================================================= */
+/* M7.1D.2 - Marketplace visual target                       */
+/* ========================================================= */
+
+
+/*
+ * Saved Account header actions:
+ *
+ * Saved accounts                     2  +
+ */
+
+.saved-header-actions {
+    display:
+        inline-flex;
+    align-items:
+        center;
+    gap:
+        3px;
+}
+
+.saved-add-btn {
+    width:
+        24px;
+    height:
+        24px;
+    color:
+        var(--ag-muted);
+}
+
+.saved-add-btn:hover:not(:disabled),
+.saved-add-btn:focus-visible {
+    color:
+        var(--ag-fg);
+}
+
+
+/*
+ * Count is information, not a badge-heavy decoration.
+ */
+
+.count {
+    display:
+        inline-flex;
+    align-items:
+        center;
+    justify-content:
+        center;
+    min-width:
+        18px;
+    height:
+        22px;
+    padding:
+        0
+        4px;
+    border:
+        0;
+    color:
+        var(--ag-muted);
+    background:
+        transparent;
+    font-size:
+        9px;
+    font-variant-numeric:
+        tabular-nums;
+}
+
+
+/*
+ * Search is now the first control below Saved Accounts.
+ */
+
+.saved-controls {
+    gap:
+        5px;
+}
+
+
+/*
+ * There is no large Add Account card anymore.
+ */
+
+.add-account,
+.add-symbol,
+.add-copy {
+    display:
+        none !important;
+}
+
+
+/*
+ * Slightly cleaner section rhythm matching the agreed mockup.
+ */
+
+.content-shell {
+    gap:
+        11px;
 }
 
 .section {
-    gap: 6px;
+    gap:
+        5px;
 }
 
 .section-header {
-    min-height: 23px;
-
-    padding-left: 1px;
-    padding-right: 1px;
-}
-
-.section-title {
-    font-size: 9px;
-    font-weight: 720;
-
-    letter-spacing: .105em;
+    min-height:
+        26px;
 }
 
 
-/* --------------------------------------------------------- */
-/* Brand                                                     */
-/* --------------------------------------------------------- */
-
-.brand {
-    gap: 8px;
-
-    padding:
-        0
-        2px
-        2px;
-}
-
-.brand-mark {
-    width: 32px;
-    height: 32px;
-
-    flex-basis: 32px;
-}
-
-.brand-a {
-    font-size: 22px;
-    font-weight: 820;
-
-    color:
-        var(--vscode-textLink-foreground);
-
-    text-shadow:
-        0 0 12px
-        color-mix(
-            in srgb,
-            var(--vscode-focusBorder) 18%,
-            transparent
-        );
-}
-
-.brand-orbit {
-    left: 1px;
-    top: 12px;
-
-    width: 30px;
-    height: 8px;
-
-    opacity: .82;
-}
-
-.brand-title {
-    font-size: 12px;
-    font-weight: 760;
-
-    letter-spacing: .08em;
-}
-
-.brand-subtitle {
-    margin-top: 1px;
-
-    font-size: 10px;
-}
-
-
-/* --------------------------------------------------------- */
-/* Current account hero                                      */
-/* --------------------------------------------------------- */
-
-.hero-card {
-    position: relative;
-
-    padding: 11px;
-
-    border-color:
-        color-mix(
-            in srgb,
-            var(--vscode-focusBorder) 30%,
-            var(--ag-border)
-        );
-
-    background:
-        radial-gradient(
-            circle at 108% 115%,
-            color-mix(
-                in srgb,
-                var(--vscode-focusBorder) 16%,
-                transparent
-            ),
-            transparent 47%
-        ),
-        linear-gradient(
-            135deg,
-            color-mix(
-                in srgb,
-                var(--vscode-textLink-foreground) 4%,
-                transparent
-            ),
-            transparent 52%
-        ),
-        var(--ag-card);
-
-    box-shadow:
-        0 6px 20px
-        color-mix(
-            in srgb,
-            #000 10%,
-            transparent
-        );
-}
-
-.hero-card::after {
-    content: "";
-
-    position: absolute;
-
-    left: 12px;
-    right: 12px;
-    top: 0;
-
-    height: 1px;
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            color-mix(
-                in srgb,
-                var(--vscode-focusBorder) 55%,
-                transparent
-            ),
-            transparent
-        );
-
-    pointer-events: none;
-}
-
-.hero-status-row {
-    margin-bottom: 9px;
-}
-
-.hero-card .badge.success {
-    min-height: 19px;
-
-    padding:
-        2px
-        7px;
-
-    font-size: 8px;
-
-    letter-spacing: .07em;
-
-    box-shadow: none;
-}
-
-.hero-card .status-dot {
-    width: 6px;
-    height: 6px;
-
-    flex-basis: 6px;
-
-    box-shadow:
-        0 0 5px
-        currentColor;
-}
-
-.hero-card .avatar {
-    width: 40px;
-    height: 40px;
-
-    flex-basis: 40px;
-
-    font-size: 14px;
-}
-
-.hero-card .identity-name {
-    font-size: 11px;
-    font-weight: 680;
-}
-
-.hero-card .identity-email {
-    margin-top: 1px;
-
-    font-size: 9px;
-}
-
-.identity-label {
-    margin-top: 5px;
-
-    padding:
-        2px
-        6px;
-
-    font-size: 9px;
-
-    background:
-        color-mix(
-            in srgb,
-            var(--vscode-textLink-foreground) 8%,
-            transparent
-        );
-}
-
-.hero-actions {
-    gap: 6px;
-
-    margin-top: 10px;
-}
-
-.hero-actions .btn {
-    min-height: 27px;
-
-    font-size: 9px;
-}
-
-
-/* --------------------------------------------------------- */
-/* Buttons                                                   */
-/* --------------------------------------------------------- */
-
-.btn {
-    border-radius: 6px;
-
-    box-shadow: none;
-}
-
-.btn.secondary {
-    border-color:
-        color-mix(
-            in srgb,
-            var(--vscode-foreground) 15%,
-            var(--ag-border)
-        );
-}
-
-.btn.danger {
-    background:
-        color-mix(
-            in srgb,
-            var(--vscode-errorForeground) 5%,
-            transparent
-        );
-
-    border-color:
-        color-mix(
-            in srgb,
-            var(--vscode-errorForeground) 26%,
-            var(--ag-border)
-        );
-}
-
-.btn:not(:disabled):active,
-.add-card:not(:disabled):active,
-.icon-btn:not(:disabled):active {
-    transform: translateY(1px);
-}
-
-
-/* --------------------------------------------------------- */
-/* Saved account cards                                       */
-/* --------------------------------------------------------- */
+/*
+ * Account rows remain list-oriented rather than card-oriented.
+ */
 
 .account-list {
-    gap: 6px;
+    border-top:
+        0;
+    border-bottom:
+        0;
 }
 
-.account-card {
-    padding:
-        8px
-        9px;
-
-    min-height: 59px;
-
-    border-radius: 9px;
-
-    border-color:
+.account-row {
+    border-bottom:
+        1px solid
         color-mix(
             in srgb,
-            var(--vscode-foreground) 9%,
-            var(--ag-border)
-        );
-
-    background:
-        color-mix(
-            in srgb,
-            var(--ag-card) 96%,
-            var(--vscode-editor-background)
-        );
-}
-
-.account-card:hover {
-    border-color:
-        color-mix(
-            in srgb,
-            var(--vscode-focusBorder) 42%,
-            var(--ag-border)
-        );
-}
-
-.account-card.active {
-    border-color:
-        color-mix(
-            in srgb,
-            var(--ag-success) 42%,
-            var(--ag-border)
-        );
-
-    background:
-        linear-gradient(
-            90deg,
-            color-mix(
-                in srgb,
-                var(--ag-success) 6%,
-                transparent
-            ),
-            transparent 72%
-        ),
-        var(--ag-card);
-
-    box-shadow:
-        inset 2px 0 0
-        color-mix(
-            in srgb,
-            var(--ag-success) 72%,
+            var(--ag-border) 75%,
             transparent
         );
 }
 
-.avatar.small {
-    width: 33px;
-    height: 33px;
-
-    flex-basis: 33px;
-
-    font-size: 10px;
+.account-row:last-child {
+    border-bottom:
+        0;
 }
 
-.account-card .identity-name {
+
+/*
+ * Runtime should read like an inline diagnostics section.
+ */
+
+.runtime-section {
+    margin-top:
+        1px;
+}
+
+.runtime-panel {
+    padding:
+        1px
+        0;
+}
+
+
+/*
+ * Preserve a small breathing space above the persistent footer.
+ */
+
+.content-shell {
+    padding-bottom:
+        14px;
+}
+
+
+/*
+ * Footer remains deliberately quiet.
+ */
+
+.developer-footer {
+    font-size:
+        9px;
+}
+
+.footer-version {
+    color:
+        var(--ag-muted);
+}
+/* ========================================================= */
+/* M7.1D.3 - Startup state & account row polish              */
+/* ========================================================= */
+
+
+/*
+ * Current Account is primary context, so it no longer has a
+ * collapsible chevron.
+ */
+
+.current-static-header {
+    padding-left:
+        3px;
+}
+
+.section-static-title {
+    display:
+        flex;
+    align-items:
+        center;
+    min-width:
+        0;
+    min-height:
+        26px;
+}
+
+
+/*
+ * Neutral transient startup / refresh state.
+ */
+
+.current-state-panel {
+    padding:
+        6px
+        4px
+        5px;
+    color:
+        var(--ag-fg);
+    font-size:
+        10px;
+}
+
+.current-state-panel.checking {
+    color:
+        var(--ag-fg);
+}
+
+.current-state-panel.error strong {
+    color:
+        var(--ag-error);
+}
+
+.connection-state.checking {
+    color:
+        var(--ag-muted);
+}
+
+.runtime-summary.checking,
+.runtime-state.checking {
+    color:
+        var(--ag-muted) !important;
+}
+
+.runtime-summary.healthy,
+.runtime-state.healthy {
+    color:
+        var(--ag-success);
+}
+
+.runtime-summary.warning,
+.runtime-state.error {
+    color:
+        var(--ag-error);
+}
+
+
+/*
+ * Saved account row hierarchy:
+ *
+ * avatar | identity / switch | delete
+ *
+ * Delete stays anchored at the upper-right instead of falling
+ * underneath Switch.
+ */
+
+.account-row {
+    grid-template-columns:
+        auto
+        minmax(0, 1fr)
+        auto;
+    align-items:
+        start;
+}
+
+.account-delete-top {
+    align-self:
+        start;
+    justify-self:
+        end;
+    margin-top:
+        -1px;
+}
+
+.account-switch-row {
+    display:
+        flex;
+    align-items:
+        center;
+    margin-top:
+        7px;
+}
+
+.account-switch-row .switch-btn {
+    min-width:
+        48px;
+}
+
+
+/*
+ * Destructive action remains quiet until interaction.
+ */
+
+.account-delete-top {
+    opacity:
+        .5;
+}
+
+.account-row:hover .account-delete-top,
+.account-delete-top:focus-visible {
+    opacity:
+        1;
+}
+
+
+/*
+ * At the normal narrow VS Code sidebar width, preserve the
+ * three-column identity/delete structure. Switch remains under
+ * the identity instead of sharing the delete column.
+ */
+
+@media (min-width: 226px) and (max-width: 300px) {
+    .account-row {
+        grid-template-columns:
+            auto
+            minmax(0, 1fr)
+            auto;
+    }
+
+    .account-switch-row {
+        margin-top:
+            6px;
+    }
+}
+
+
+/*
+ * Very narrow views still keep delete next to identity while
+ * allowing the identity column to shrink.
+ */
+
+@media (max-width: 225px) {
+    .account-row {
+        grid-template-columns:
+            auto
+            minmax(0, 1fr)
+            auto;
+        grid-template-rows:
+            auto;
+    }
+
+    .account-row > .avatar {
+        grid-column:
+            1;
+        grid-row:
+            1;
+        align-self:
+            start;
+    }
+
+    .account-row > .identity {
+        grid-column:
+            2;
+        grid-row:
+            1;
+    }
+
+    .account-row > .account-delete-top {
+        grid-column:
+            3;
+        grid-row:
+            1;
+    }
+}
+/* ========================================================= */
+/* M7.1D.4 - Toast & current status polish                   */
+/* ========================================================= */
+
+
+/*
+ * Toasts live outside normal layout flow.
+ * Actions such as Signing out, Switching account and
+ * Account state updated no longer move sections vertically.
+ */
+
+.toast-host {
+    position:
+        fixed;
+    z-index:
+        300;
+    top:
+        8px;
+    left:
+        8px;
+    right:
+        8px;
+    display:
+        flex;
+    justify-content:
+        center;
+    pointer-events:
+        none;
+}
+
+.toast {
+    display:
+        flex;
+    align-items:
+        center;
+    gap:
+        7px;
+    width:
+        min(
+            100%,
+            360px
+        );
+    min-height:
+        34px;
+    padding:
+        7px
+        9px;
+    border:
+        1px solid
+        var(--ag-border);
+    border-radius:
+        6px;
+    color:
+        var(--ag-fg);
+    background:
+        var(--ag-raised);
+    box-shadow:
+        0
+        4px
+        14px
+        color-mix(
+            in srgb,
+            #000 22%,
+            transparent
+        );
+    font-size:
+        10px;
+    line-height:
+        1.35;
+    pointer-events:
+        auto;
+}
+
+.toast.operation {
+    border-color:
+        color-mix(
+            in srgb,
+            var(--ag-focus) 30%,
+            var(--ag-border)
+        );
+}
+
+.toast.success {
+    border-color:
+        color-mix(
+            in srgb,
+            var(--ag-success) 38%,
+            var(--ag-border)
+        );
+}
+
+.toast.error {
+    border-color:
+        color-mix(
+            in srgb,
+            var(--ag-error) 45%,
+            var(--ag-border)
+        );
+}
+
+.toast-message {
+    min-width:
+        0;
+    overflow:
+        hidden;
+    text-overflow:
+        ellipsis;
+}
+
+.toast-symbol {
+    display:
+        grid;
+    place-items:
+        center;
+    width:
+        16px;
+    height:
+        16px;
+    flex:
+        0
+        0
+        16px;
+    color:
+        var(--ag-success);
+    font-size:
+        10px;
+    font-weight:
+        700;
+}
+
+.toast.error .toast-symbol {
+    color:
+        var(--ag-error);
+}
+
+
+/*
+ * Legacy in-flow notice styling is no longer used by normal
+ * operation/feedback rendering, but we leave the original rules
+ * intact for compatibility.
+ */
+
+
+/*
+ * Current Account now uses only:
+ *
+ * avatar | identity
+ *
+ * Connection state sits alongside the account label.
+ */
+
+.current-identity-row {
+    grid-template-columns:
+        auto
+        minmax(0, 1fr);
+}
+
+.current-label-status-row {
+    display:
+        flex;
+    align-items:
+        center;
+    justify-content:
+        space-between;
+    gap:
+        8px;
+    min-width:
+        0;
+}
+
+.current-label-status-row .account-label {
+    min-width:
+        0;
+    overflow:
+        hidden;
+    text-overflow:
+        ellipsis;
+    white-space:
+        nowrap;
+}
+
+.connection-state.inline {
+    flex:
+        0
+        0
+        auto;
+    margin:
+        0;
+    font-size:
+        9px;
+}
+
+.current-status-row {
+    display:
+        flex;
+    justify-content:
+        flex-end;
+    margin-top:
+        5px;
+}
+
+
+/*
+ * Narrow sidebar: connection text remains inside identity width
+ * rather than living in a third grid column.
+ */
+
+@media (max-width: 280px) {
+    .current-identity-row {
+        grid-template-columns:
+            auto
+            minmax(0, 1fr);
+    }
+
+    .connection-state.inline {
+        display:
+            inline-flex;
+    }
+}
+
+
+/*
+ * On extremely narrow widths preserve the status dot and allow
+ * the label to surrender space first.
+ */
+
+@media (max-width: 210px) {
+    .current-label-status-row {
+        gap:
+            5px;
+    }
+
+    .connection-state.inline {
+        font-size:
+            8.5px;
+    }
+}
+
+
+/*
+ * High contrast / forced colors.
+ */
+
+@media (forced-colors: active) {
+    .toast {
+        color:
+            CanvasText;
+        border-color:
+            CanvasText;
+        background:
+            Canvas;
+        box-shadow:
+            none;
+    }
+}
+/* ========================================================= */
+/* M7.1D.4.1 - Current action button nowrap                  */
+/* ========================================================= */
+
+.action-row {
+    display:
+        flex;
+    align-items:
+        center;
+    flex-wrap:
+        nowrap;
+    gap:
+        6px;
+}
+
+.action-row .btn {
+    flex:
+        0
+        0
+        auto;
+    white-space:
+        nowrap;
+    min-width:
+        max-content;
+}
+
+/* ========================================================= */
+/* M7.3A - Official quota summary / compact dashboard        */
+/* Responsive readability final                              */
+/* ========================================================= */
+
+.avatar {
+    position: relative;
+    overflow: hidden;
+}
+
+.avatar-fallback {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.avatar-image {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+}
+
+.avatar-image[hidden] {
+    display: none;
+}
+
+
+/* ========================================================= */
+/* Current account                                           */
+/* ========================================================= */
+
+.current-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+    margin-top: 2px;
+}
+
+.current-label-edit {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+}
+
+.current-label-edit .account-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* ========================================================= */
+/* Usage                                                     */
+/* ========================================================= */
+
+.usage-section {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-top: 11px;
+    padding-top: 0;
+}
+
+.usage-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+}
+
+.usage-title {
+    color: var(--ag-fg);
     font-size: 10px;
     font-weight: 650;
 }
 
-.account-card .identity-email {
-    margin-top: 1px;
-
+.usage-updated {
+    flex:
+        0
+        1
+        auto;
+    max-width: 105px;
+    overflow: hidden;
+    color: var(--ag-muted);
     font-size: 8px;
+    font-variant-numeric: tabular-nums;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.account-card .badge.success {
-    min-height: 18px;
+.usage-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 
+.usage-empty {
     padding:
-        2px
-        6px;
+        3px
+        0;
+    font-size: 9px;
+}
 
-    font-size: 8px;
 
-    letter-spacing: .05em;
+/* ========================================================= */
+/* Quota group                                               */
+/* ========================================================= */
 
-    background:
+.quota-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.quota-group + .quota-group {
+    padding-top: 8px;
+    border-top:
+        1px solid
         color-mix(
             in srgb,
-            var(--ag-success) 6%,
+            var(--ag-border) 52%,
             transparent
         );
 }
 
-.account-card .status-dot {
-    width: 5px;
-    height: 5px;
-
-    flex-basis: 5px;
+.quota-group-heading {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
 }
 
+.quota-group-title {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--ag-fg);
+    font-size: 10px;
+    font-weight: 650;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
-/* --------------------------------------------------------- */
-/* Switch action                                             */
-/* --------------------------------------------------------- */
+.quota-info-button {
+    display: inline-grid;
+    place-items: center;
+    flex:
+        0
+        0
+        auto;
+    width: 15px;
+    height: 15px;
+    margin: 0;
+    padding: 0;
+    border:
+        1px solid
+        var(--ag-border);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ag-muted);
+    font:
+        600 9px/1
+        var(--vscode-font-family);
+    cursor: help;
+}
 
-.switch-btn {
-    min-height: 25px;
-
-    min-width: 54px;
-
-    padding:
-        4px
-        7px;
-
-    color:
-        var(--vscode-textLink-foreground);
-
-    background:
-        color-mix(
-            in srgb,
-            var(--vscode-textLink-foreground) 6%,
-            transparent
-        );
-
+.quota-info-button:hover,
+.quota-info-button:focus-visible {
     border-color:
+        var(--ag-focus);
+    color:
+        var(--ag-fg);
+    outline: none;
+}
+
+
+/* ========================================================= */
+/* Current quota                                             */
+/* Weekly + 5-hour stay side-by-side at normal VS Code width */
+/* ========================================================= */
+
+.quota-buckets {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+    gap: 10px;
+    min-width: 0;
+}
+
+.quota-bucket {
+    min-width: 0;
+}
+
+.quota-bucket.disabled {
+    opacity: 0.62;
+}
+
+.quota-bucket-heading {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto;
+    align-items: start;
+    gap:
+        2px
+        4px;
+    min-width: 0;
+}
+
+.quota-window-name {
+    min-width: 0;
+    color: var(--ag-fg);
+    font-size: 9.25px;
+    font-weight: 550;
+    line-height: 1.25;
+
+    /*
+     * Do not ellipsize operational quota labels at default width.
+     * "Weekly limit" / "5-hour limit" may use two lines if needed.
+     */
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.quota-percent {
+    flex:
+        0
+        0
+        auto;
+    color: var(--ag-fg);
+    font-size: 9.25px;
+    line-height: 1.25;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.quota-progress {
+    display: block;
+    width: 100%;
+    height: 5px;
+    margin-top: 5px;
+    overflow: hidden;
+    border: 0;
+    border-radius: 2px;
+    appearance: none;
+    -webkit-appearance: none;
+    background:
         color-mix(
             in srgb,
-            var(--vscode-textLink-foreground) 22%,
-            var(--ag-border)
+            var(--ag-border) 72%,
+            transparent
         );
+}
 
+.quota-progress::-webkit-progress-bar {
+    border-radius: 2px;
+    background:
+        color-mix(
+            in srgb,
+            var(--ag-border) 72%,
+            transparent
+        );
+}
+
+.quota-progress::-webkit-progress-value {
+    border-radius: 2px;
+    background:
+        var(
+            --vscode-progressBar-background,
+            var(--ag-focus)
+        );
+}
+
+.quota-progress::-moz-progress-bar {
+    border-radius: 2px;
+    background:
+        var(
+            --vscode-progressBar-background,
+            var(--ag-focus)
+        );
+}
+
+.quota-bucket-meta {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    margin-top: 4px;
+    color: var(--ag-muted);
+    font-size: 8.5px;
+    line-height: 1.35;
+    font-variant-numeric: tabular-nums;
+}
+
+.quota-bucket-meta > * {
+    max-width: 100%;
+}
+
+.quota-reset {
+    max-width: 100%;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+
+/* ========================================================= */
+/* Saved account header                                      */
+/* ========================================================= */
+
+.saved-account-identity {
+    min-width: 0;
+}
+
+.saved-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    min-width: 0;
+}
+
+.saved-label {
+    flex:
+        1
+        1
+        auto;
+    min-width: 0;
+}
+
+.saved-title-actions {
+    display: flex;
+    align-items: center;
+    flex:
+        0
+        0
+        auto;
+    gap: 3px;
+}
+
+.saved-active-badge {
+    display: inline-flex;
+    align-items: center;
+    flex:
+        0
+        0
+        auto;
+    color:
+        var(
+            --vscode-testing-iconPassed,
+            var(--ag-fg)
+        );
     font-size: 8px;
     font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
 }
 
-.switch-btn:hover:not(:disabled) {
-    color:
-        var(--vscode-button-foreground);
-
-    background:
-        var(--vscode-button-background);
-
-    border-color:
-        var(--vscode-button-background);
+.saved-meta-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+    margin-top: 2px;
 }
 
-
-/* --------------------------------------------------------- */
-/* Overflow menu                                             */
-/* --------------------------------------------------------- */
-
-.icon-btn.more {
-    width: 24px;
-    height: 24px;
-
-    border-radius: 6px;
-
-    font-size: 14px;
+.saved-meta-row .identity-email {
+    flex:
+        1
+        1
+        auto;
+    min-width: 0;
 }
 
-.icon-btn.more:hover {
-    border-color:
-        color-mix(
-            in srgb,
-            var(--vscode-focusBorder) 30%,
-            var(--ag-border)
-        );
-}
-
-
-/* --------------------------------------------------------- */
-/* Add Account                                               */
-/* --------------------------------------------------------- */
-
-.add-card {
-    min-height: 49px;
-
-    padding:
-        8px
-        9px;
-
-    border-radius: 9px;
-
-    border-color:
-        color-mix(
-            in srgb,
-            var(--vscode-focusBorder) 38%,
-            var(--ag-border)
-        );
-
-    background:
-        color-mix(
-            in srgb,
-            var(--vscode-textLink-foreground) 2.5%,
-            transparent
-        );
-}
-
-.add-card:not(:disabled):hover {
-    border-color:
-        color-mix(
-            in srgb,
-            var(--vscode-focusBorder) 68%,
-            var(--ag-border)
-        );
-
-    background:
-        color-mix(
-            in srgb,
-            var(--vscode-textLink-foreground) 6%,
-            transparent
-        );
-}
-
-.add-icon {
-    width: 25px;
-    height: 25px;
-
-    flex-basis: 25px;
-
-    font-size: 15px;
-}
-
-.add-title {
-    font-size: 10px;
-}
-
-.add-subtitle {
-    font-size: 8px;
-}
-
-
-/* --------------------------------------------------------- */
-/* Saved account count                                       */
-/* --------------------------------------------------------- */
-
-.count {
-    min-width: 18px;
-    height: 18px;
-
-    padding:
+.saved-updated {
+    flex:
         0
-        5px;
-
-    font-size: 9px;
-
-    opacity: .9;
+        0
+        auto;
+    color: var(--ag-muted);
+    font-size: 7.75px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
 }
 
 
-/* --------------------------------------------------------- */
-/* Runtime status panel                                      */
-/* --------------------------------------------------------- */
+/* ========================================================= */
+/* Saved account quota                                       */
+/* Gemini | Claude + GPT                                     */
+/* ========================================================= */
 
-.runtime-card {
-    border-radius: 9px;
-
-    border-color:
+.saved-usage-summary {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+    gap: 10px;
+    min-width: 0;
+    margin-top: 7px;
+    padding-top: 6px;
+    border-top:
+        1px solid
         color-mix(
             in srgb,
-            var(--vscode-foreground) 8%,
-            var(--ag-border)
-        );
-
-    box-shadow:
-        0 4px 14px
-        color-mix(
-            in srgb,
-            #000 6%,
+            var(--ag-border) 52%,
             transparent
         );
 }
 
-.runtime-row {
-    gap: 7px;
-
-    min-height: 39px;
-
-    padding:
-        6px
-        8px;
+.saved-usage-family-column {
+    min-width: 0;
 }
 
-.runtime-icon {
-    width: 22px;
-    height: 22px;
-
-    flex-basis: 22px;
-
-    border-radius: 6px;
-
-    font-size: 9px;
-    font-weight: 700;
-
-    background:
-        color-mix(
-            in srgb,
-            var(--vscode-textLink-foreground) 7%,
-            transparent
-        );
+.saved-usage-family {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--ag-fg);
+    font-size: 8.75px;
+    font-weight: 600;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.runtime-name {
-    font-size: 10px;
-    font-weight: 620;
+
+/*
+ * Do not place Weekly + 5h in one horizontal sentence.
+ * Each metric receives its own row.
+ */
+
+.saved-usage-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    margin-top: 3px;
 }
 
-.runtime-detail {
-    margin-top: 0;
-
-    font-size: 8px;
-
-    opacity: .9;
-}
-
-.runtime-state {
+.saved-usage-metric {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
     gap: 4px;
+    min-width: 0;
+    color: var(--ag-muted);
+    font-size: 8.25px;
+    line-height: 1.3;
+    font-variant-numeric: tabular-nums;
+}
 
+.saved-usage-metric-label {
+    min-width: 0;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+}
+
+.saved-usage-metric-value {
+    flex:
+        0
+        0
+        auto;
+    color: var(--ag-muted);
+    white-space: nowrap;
+}
+
+.saved-quota-reset {
+    margin-top: 3px;
+    min-width: 0;
+    color: var(--ag-muted);
     font-size: 8px;
+    line-height: 1.35;
+    font-variant-numeric: tabular-nums;
+
+    /*
+     * Reset time is useful operational information.
+     * Let it wrap instead of truncating at normal sidebar width.
+     */
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
-.runtime-state .status-dot {
-    width: 5px;
-    height: 5px;
-
-    flex-basis: 5px;
-
-    box-shadow:
-        0 0 4px
-        currentColor;
-}
-
-
-/* --------------------------------------------------------- */
-/* Runtime Ready indicator                                   */
-/* --------------------------------------------------------- */
-
-.section-header .runtime-state {
-    min-height: 19px;
-
-    padding:
-        2px
-        5px;
-
-    border-radius: 999px;
-
-    background:
-        color-mix(
-            in srgb,
-            var(--ag-success) 5%,
-            transparent
-        );
+.saved-five-hour-reset {
+    margin-top: 1px;
 }
 
 
-/* --------------------------------------------------------- */
-/* Busy / feedback                                           */
-/* --------------------------------------------------------- */
+/* ========================================================= */
+/* Responsive widths                                         */
+/* ========================================================= */
 
-.operation-banner,
-.feedback-banner {
-    min-height: 31px;
-
-    padding:
-        6px
-        8px;
-
-    border-radius: 8px;
-
-    font-size: 9px;
-}
-
-.operation-spinner {
-    width: 13px;
-    height: 13px;
-
-    flex-basis: 13px;
-
-    border-width: 1.5px;
-}
-
-.feedback-symbol {
-    width: 17px;
-    height: 17px;
-
-    flex-basis: 17px;
-
-    font-size: 9px;
-}
+/*
+ * Normal/default VS Code sidebar:
+ * Keep two-column quota layout and allow text to wrap.
+ *
+ * We deliberately do NOT shrink typography at ~250px anymore.
+ */
 
 
-/* --------------------------------------------------------- */
-/* Medium sidebar final refinement                           */
-/* --------------------------------------------------------- */
-
-@media (max-width: 320px) {
-    .account-card {
-        min-height: 67px;
-
-        padding:
-            8px
-            9px;
-    }
-
-    .account-card > .account-actions {
-        margin-top: 1px;
-    }
-
-    .switch-btn {
-        min-width: 55px;
-    }
-}
-
-
-/* --------------------------------------------------------- */
-/* Narrow sidebar final refinement                           */
-/* --------------------------------------------------------- */
-
+/*
+ * Only when the user makes the sidebar genuinely narrow do we
+ * reduce spacing slightly. Still keep two columns.
+ */
 @media (max-width: 225px) {
-    .account-card {
-        min-height: 65px;
+    .quota-buckets,
+    .saved-usage-summary {
+        gap: 6px;
     }
 
-    .switch-btn {
-        width: 29px;
-        min-width: 29px;
+    .quota-window-name,
+    .quota-percent {
+        font-size: 8.75px;
     }
 
-    .icon-btn.more {
-        width: 23px;
-        height: 23px;
+    .quota-bucket-meta {
+        font-size: 8px;
+    }
+
+    .saved-usage-family {
+        font-size: 8.25px;
+    }
+
+    .saved-usage-metric {
+        font-size: 7.75px;
+    }
+
+    .saved-quota-reset {
+        font-size: 7.5px;
+    }
+
+    .saved-updated {
+        font-size: 7.25px;
     }
 }
 
 
-/* --------------------------------------------------------- */
-/* High contrast final overrides                             */
-/* --------------------------------------------------------- */
+/*
+ * Very narrow sidebar:
+ * At this point preserving readability is more important than
+ * forcing two columns.
+ */
+@media (max-width: 205px) {
+    .quota-buckets {
+        grid-template-columns:
+            minmax(0, 1fr);
+        gap: 8px;
+    }
+
+    .saved-usage-summary {
+        grid-template-columns:
+            minmax(0, 1fr);
+        gap: 8px;
+    }
+
+    .saved-usage-family-column + .saved-usage-family-column {
+        padding-top: 6px;
+        border-top:
+            1px solid
+            color-mix(
+                in srgb,
+                var(--ag-border) 45%,
+                transparent
+            );
+    }
+
+    .saved-meta-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 1px;
+    }
+
+    .saved-updated {
+        white-space: normal;
+    }
+}
+
+
+/* ========================================================= */
+/* High contrast                                             */
+/* ========================================================= */
 
 @media (forced-colors: active) {
-    .hero-card::after {
-        display: none;
-    }
-
-    .switch-btn,
-    .btn,
-    .add-card {
+    .quota-progress {
         border:
             1px solid
-            ButtonText;
-    }
-
-    .switch-btn {
-        color:
-            ButtonText;
-
-        background:
-            ButtonFace;
-    }
-
-    .account-card.active {
+            CanvasText;
         background:
             Canvas;
     }
-}
 
+    .quota-progress::-webkit-progress-bar {
+        background:
+            Canvas;
+    }
 
-/* --------------------------------------------------------- */
-/* Reduced-motion final overrides                            */
-/* --------------------------------------------------------- */
+    .quota-progress::-webkit-progress-value {
+        background:
+            Highlight;
+    }
 
-@media (prefers-reduced-motion: reduce) {
-    .hero-card,
-    .account-card,
-    .runtime-card,
-    .add-card,
-    .btn,
-    .icon-btn {
-        transform: none !important;
+    .quota-progress::-moz-progress-bar {
+        background:
+            Highlight;
+    }
+
+    .quota-info-button {
+        border-color:
+            ButtonText;
+        color:
+            ButtonText;
     }
 }
+/* === M7.3A FINAL READABILITY OVERRIDE START === */
+
+/*
+ * Readability policy:
+ * - Keep normal/default sidebar in two columns.
+ * - Increase quota text readability instead of shrinking it.
+ * - Preserve narrow one-column fallback below 205px.
+ * - Do not affect header, account identity, controls, footer, or status.
+ */
+
+
+/* --------------------------------------------------------- */
+/* Current account usage                                    */
+/* --------------------------------------------------------- */
+
+.quota-group {
+    gap: 7px;
+}
+
+.quota-group-title {
+    font-size: 11px;
+    line-height: 1.35;
+    font-weight: 650;
+}
+
+.quota-buckets {
+    gap: 10px;
+}
+
+.quota-window-name {
+    font-size: 10.25px;
+    line-height: 1.25;
+    font-weight: 600;
+}
+
+.quota-percent {
+    font-size: 10.5px;
+    line-height: 1.25;
+    font-weight: 650;
+}
+
+.quota-bucket-meta {
+    margin-top: 4px;
+    font-size: 9.5px;
+    line-height: 1.35;
+}
+
+.quota-progress {
+    margin-top: 4px;
+}
+
+.quota-info-button {
+    margin-left: 2px;
+}
+
+
+/* --------------------------------------------------------- */
+/* Saved accounts usage                                     */
+/* --------------------------------------------------------- */
+
+.saved-usage-summary {
+    gap: 10px;
+}
+
+.saved-usage-family-column {
+    min-width: 0;
+}
+
+.saved-usage-family {
+    overflow: visible;
+    font-size: 10px;
+    line-height: 1.3;
+    font-weight: 650;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.saved-usage-metric {
+    display: grid;
+    grid-template-columns:
+        auto
+        minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: 4px;
+    margin-top: 3px;
+    font-size: 9.25px;
+    line-height: 1.35;
+}
+
+.saved-usage-metric-label {
+    color: var(--ag-muted);
+    white-space: nowrap;
+}
+
+.saved-usage-metric-value {
+    min-width: 0;
+    color: var(--ag-fg);
+    font-weight: 600;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.saved-quota-reset {
+    display: block;
+    margin-top: 2px;
+    color: var(--ag-muted);
+    font-size: 8.75px;
+    line-height: 1.35;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.saved-updated {
+    font-size: 8.25px;
+    line-height: 1.3;
+}
+
+
+/* --------------------------------------------------------- */
+/* Normal compact sidebar                                   */
+/* --------------------------------------------------------- */
+
+@media (max-width: 225px) {
+    .quota-buckets,
+    .saved-usage-summary {
+        gap: 7px;
+    }
+
+    .quota-group-title,
+    .quota-window-name,
+    .quota-percent,
+    .quota-bucket-meta,
+    .saved-usage-family,
+    .saved-usage-metric,
+    .saved-quota-reset {
+        font-size: inherit;
+    }
+}
+
+
+/* --------------------------------------------------------- */
+/* Very narrow sidebar fallback                             */
+/* --------------------------------------------------------- */
+
+@media (max-width: 205px) {
+    .quota-buckets,
+    .saved-usage-summary {
+        grid-template-columns:
+            minmax(0, 1fr);
+        gap: 9px;
+    }
+
+    .saved-usage-family-column + .saved-usage-family-column {
+        padding-top: 7px;
+    }
+}
+
+/* === M7.3A FINAL READABILITY OVERRIDE END === */
+
+/* === M7.3A SAVED ACCOUNTS READABILITY START === */
+
+/*
+ * Saved Accounts only.
+ *
+ * Do not compress two quota families horizontally in a narrow
+ * VS Code sidebar. Stack Gemini and Claude + GPT vertically so
+ * quota values and reset timers remain scan-friendly.
+ */
+
+.saved-usage-summary {
+    grid-template-columns:
+        minmax(0, 1fr);
+    gap: 0;
+    margin-top: 8px;
+}
+
+.saved-usage-family-column {
+    min-width: 0;
+    padding:
+        1px
+        0
+        7px;
+}
+
+.saved-usage-family-column + .saved-usage-family-column {
+    margin-top: 5px;
+    padding-top: 8px;
+    border-top:
+        1px solid
+        color-mix(
+            in srgb,
+            var(--ag-border) 45%,
+            transparent
+        );
+}
+
+.saved-usage-family {
+    margin-bottom: 4px;
+    overflow: visible;
+    color: var(--ag-fg);
+    font-size: 10px;
+    font-weight: 650;
+    line-height: 1.35;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: normal;
+}
+
+.saved-usage-metric {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto;
+    align-items: baseline;
+    gap: 10px;
+    width: 100%;
+    margin-top: 2px;
+    font-size: 9.5px;
+    line-height: 1.4;
+}
+
+.saved-usage-metric-label {
+    min-width: 0;
+    color: var(--ag-muted);
+    white-space: nowrap;
+}
+
+.saved-usage-metric-value {
+    min-width: max-content;
+    color: var(--ag-fg);
+    font-weight: 600;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.saved-quota-reset {
+    display: block;
+    width: 100%;
+    margin-top: 2px;
+    color: var(--ag-muted);
+    font-size: 9px;
+    line-height: 1.4;
+    white-space: normal;
+    overflow-wrap: normal;
+    word-break: normal;
+}
+
+.saved-updated {
+    font-size: 8.25px;
+    line-height: 1.3;
+}
+
+
+/*
+ * The Saved Accounts quota layout is already single-column,
+ * therefore narrower sidebars should reduce spacing only.
+ */
+
+@media (max-width: 225px) {
+    .saved-usage-summary {
+        gap: 0;
+    }
+
+    .saved-usage-family-column + .saved-usage-family-column {
+        margin-top: 4px;
+        padding-top: 7px;
+    }
+}
+
+/* === M7.3A SAVED ACCOUNTS READABILITY END === */
+
+/* === M7.3A SAVED QUOTA PAIRING START === */
+
+/*
+ * Pair each quota window with its own reset countdown:
+ *
+ * Weekly       99.48%
+ * Resets in 6d 14h
+ *
+ * 5-hour       98.36%
+ * Resets in 1h 51m
+ */
+
+.saved-usage-metrics {
+    display: block;
+}
+
+.saved-quota-pair {
+    display: block;
+    width: 100%;
+}
+
+.saved-quota-pair + .saved-quota-pair {
+    margin-top: 6px;
+}
+
+.saved-quota-pair .saved-usage-metric {
+    margin-top: 0;
+}
+
+.saved-quota-pair .saved-quota-reset {
+    margin-top: 1px;
+    padding: 0;
+    color: var(--ag-muted);
+    font-size: 8.5px;
+    font-weight: 400;
+    line-height: 1.35;
+    white-space: nowrap;
+}
+
+@media (max-width: 225px) {
+    .saved-quota-pair + .saved-quota-pair {
+        margin-top: 5px;
+    }
+
+    .saved-quota-pair .saved-quota-reset {
+        white-space: normal;
+    }
+}
+
+/* === M7.3A SAVED QUOTA PAIRING END === */
+
+/* === M7.3A SAVED RESET TYPOGRAPHY START === */
+
+/*
+ * Secondary reset metadata must be visibly subordinate to
+ * Weekly / 5-hour quota values.
+ */
+
+.saved-quota-pair .saved-usage-metric {
+    font-size: 9.5px;
+    line-height: 1.35;
+}
+
+.saved-quota-pair .saved-quota-reset {
+    margin-top: 0;
+    color: var(--ag-muted);
+    font-size: 8px;
+    font-weight: 400;
+    line-height: 1.3;
+    opacity: .76;
+    white-space: nowrap;
+}
+
+.saved-quota-pair + .saved-quota-pair {
+    margin-top: 7px;
+}
+
+@media (max-width: 225px) {
+    .saved-quota-pair .saved-quota-reset {
+        white-space: normal;
+    }
+}
+
+/* === M7.3A SAVED RESET TYPOGRAPHY END === */
+
+/* === M7.3A ACTIVE AVATAR BADGE START === */
+
+/*
+ * Active account presence badge.
+ * The account row already exposes aria-current for accessibility;
+ * this badge is a compact visual indicator attached to the avatar.
+ */
+
+.saved-account-row > .avatar.small {
+    position: relative;
+    overflow: visible;
+}
+
+.saved-avatar-active-badge {
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+    z-index: 2;
+
+    display: grid;
+    place-items: center;
+
+    width: 11px;
+    height: 11px;
+
+    box-sizing: border-box;
+
+    border:
+        2px solid
+        var(--ag-surface);
+
+    border-radius: 50%;
+
+    color:
+        var(--vscode-sideBar-background);
+
+    background:
+        var(
+            --vscode-testing-iconPassed,
+            var(--ag-success)
+        );
+
+    font-size: 6.5px;
+    font-weight: 800;
+    line-height: 1;
+
+    pointer-events: none;
+}
+
+/*
+ * Defensive suppression for stale Webview markup.
+ */
+
+.saved-active-badge {
+    display: none;
+}
+
+@media (forced-colors: active) {
+    .saved-avatar-active-badge {
+        color: HighlightText;
+        border-color: Canvas;
+        background: Highlight;
+    }
+}
+
+/* === M7.3A ACTIVE AVATAR BADGE END === */
+
+/* === M7.3A SAVED ACCOUNT ACTION RAIL START === */
+
+/*
+ * Saved account visual structure:
+ *
+ *   avatar | identity / quota | edit/delete
+ *   switch |
+ *
+ * Active account:
+ * - green presence badge on avatar
+ * - no switch button
+ *
+ * Inactive account:
+ * - compact switch control below avatar
+ */
+
+.saved-account-rail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-self: start;
+    gap: 5px;
+    width: 32px;
+    min-width: 32px;
+}
+
+.saved-account-rail > .avatar.small {
+    position: relative;
+    overflow: visible;
+}
+
+.saved-avatar-active-badge {
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+    z-index: 2;
+
+    display: grid;
+    place-items: center;
+
+    width: 11px;
+    height: 11px;
+    box-sizing: border-box;
+
+    border:
+        2px solid
+        var(--ag-surface);
+    border-radius: 50%;
+
+    color:
+        var(--vscode-sideBar-background);
+
+    background:
+        var(
+            --vscode-testing-iconPassed,
+            var(--ag-success)
+        );
+
+    font-size: 6.5px;
+    font-weight: 800;
+    line-height: 1;
+
+    pointer-events: none;
+}
+
+.saved-rail-switch {
+    width: 24px;
+    height: 22px;
+    min-height: 22px;
+    padding: 0;
+
+    color: var(--ag-muted);
+    border-color: transparent;
+    background: transparent;
+}
+
+.saved-rail-switch:hover:not(:disabled) {
+    color: var(--ag-link);
+    border-color: var(--ag-border);
+    background: var(--ag-hover);
+}
+
+.saved-rail-switch-symbol {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    transform: translateY(-.5px);
+}
+
+/*
+ * Legacy controls are no longer rendered, but keep them hidden
+ * defensively during Webview refresh.
+ */
+
+.saved-active-badge,
+.account-switch-row {
+    display: none;
+}
+
+
+/* --------------------------------------------------------- */
+/* Grid integration                                          */
+/* --------------------------------------------------------- */
+
+.saved-account-row > .saved-account-rail {
+    grid-column: 1;
+}
+
+.saved-account-row > .saved-account-identity {
+    grid-column: 2;
+}
+
+.saved-account-row > .account-delete-top {
+    grid-column: 3;
+}
+
+
+/* --------------------------------------------------------- */
+/* Narrow sidebar                                            */
+/* --------------------------------------------------------- */
+
+@media (max-width: 225px) {
+    .saved-account-row > .saved-account-rail {
+        grid-column: 1;
+        grid-row: 1;
+        align-self: start;
+    }
+
+    .saved-account-row > .saved-account-identity {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .saved-account-row > .account-delete-top {
+        grid-column: 3;
+        grid-row: 1;
+    }
+}
+
+
+/* --------------------------------------------------------- */
+/* High contrast                                             */
+/* --------------------------------------------------------- */
+
+@media (forced-colors: active) {
+    .saved-avatar-active-badge {
+        color: HighlightText;
+        border-color: Canvas;
+        background: Highlight;
+    }
+
+    .saved-rail-switch {
+        color: ButtonText;
+    }
+
+    .saved-rail-switch:hover:not(:disabled) {
+        border-color: Highlight;
+    }
+}
+
+/* === M7.3A SAVED ACCOUNT ACTION RAIL END === */
+
+/* === M7.3A SAVED UPDATED METADATA START === */
+
+/*
+ * Account metadata hierarchy:
+ *
+ * account label
+ * email
+ * updated timestamp
+ *
+ * Updated time is secondary metadata and should sit directly
+ * below the email instead of sharing its horizontal row.
+ */
+
+.saved-meta-row {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.saved-meta-row .identity-email {
+    width: 100%;
+    min-width: 0;
+}
+
+.saved-meta-row .saved-updated {
+    display: block;
+    width: 100%;
+    margin-top: 0;
+
+    color: var(--ag-muted);
+    font-size: 8px;
+    font-weight: 400;
+    line-height: 1.3;
+
+    opacity: .72;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* === M7.3A SAVED UPDATED METADATA END === */
+
+/* === M7.3A SAVED FULL WIDTH QUOTA PANELS START === */
+
+/*
+ * Saved account structure:
+ *
+ * [avatar] identity
+ *
+ * [ Gemini       ][ Claude + GPT ]
+ *
+ * Quota belongs to the account as a whole, not only to the
+ * identity column, so it spans the complete account width.
+ */
+
+.saved-account-quota-area {
+    grid-column: 1 / -1;
+
+    width: 100%;
+    min-width: 0;
+
+    margin-top: 5px;
+}
+
+
+/*
+ * renderSavedUsageSummary currently owns its own wrapper.
+ * Make that wrapper the two-column quota grid.
+ */
+
+.saved-account-quota-area > * {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    align-items: stretch;
+    gap: 6px;
+
+    width: 100%;
+    min-width: 0;
+}
+
+
+/*
+ * Each direct child represents one quota family:
+ *
+ * Gemini
+ * Claude + GPT
+ *
+ * Keep these deliberately understated. They are information
+ * panels, not dashboard/marketing cards.
+ */
+
+.saved-account-quota-area > * > * {
+    min-width: 0;
+
+    box-sizing: border-box;
+
+    padding: 6px 7px;
+
+    border:
+        1px solid
+        var(--ag-border);
+
+    border-radius: 4px;
+
+    background:
+        color-mix(
+            in srgb,
+            var(--vscode-sideBar-background) 94%,
+            var(--vscode-foreground) 6%
+        );
+}
+
+
+/*
+ * Avoid inherited horizontal offsets from the previous
+ * identity-column layout.
+ */
+
+.saved-account-quota-area .saved-usage-summary,
+.saved-account-quota-area .saved-usage-family,
+.saved-account-quota-area .saved-family-usage,
+.saved-account-quota-area .saved-usage-group {
+    margin-left: 0;
+    margin-right: 0;
+    min-width: 0;
+}
+
+
+/*
+ * Family heading:
+ * Gemini / Claude + GPT
+ */
+
+.saved-account-quota-area
+:is(
+    .saved-usage-family,
+    .saved-family-usage,
+    .saved-usage-group
+)
+> :first-child {
+    margin-top: 0;
+}
+
+
+/*
+ * Keep percentages and reset labels readable.
+ */
+
+.saved-account-quota-area .saved-usage-metric,
+.saved-account-quota-area .saved-family-metric,
+.saved-account-quota-area .saved-quota-metric {
+    min-width: 0;
+}
+
+.saved-account-quota-area
+[data-layout="quota-panels"] {
+    width: 100%;
+}
+
+
+/* --------------------------------------------------------- */
+/* Narrow sidebars                                           */
+/* --------------------------------------------------------- */
+
+/*
+ * Around this width two quota panels become too compressed.
+ * Stack them instead of shrinking typography aggressively.
+ */
+
+@media (max-width: 220px) {
+    .saved-account-quota-area > * {
+        grid-template-columns:
+            minmax(0, 1fr);
+    }
+}
+
+
+/*
+ * Extremely narrow view:
+ * retain readability and avoid horizontal overflow.
+ */
+
+@media (max-width: 205px) {
+    .saved-account-quota-area {
+        margin-top: 4px;
+    }
+
+    .saved-account-quota-area > * {
+        gap: 5px;
+    }
+
+    .saved-account-quota-area > * > * {
+        padding: 5px 6px;
+    }
+}
+
+
+/* --------------------------------------------------------- */
+/* High contrast                                             */
+/* --------------------------------------------------------- */
+
+@media (forced-colors: active) {
+    .saved-account-quota-area > * > * {
+        border-color: CanvasText;
+        background: Canvas;
+    }
+}
+
+/* === M7.3A SAVED FULL WIDTH QUOTA PANELS END === */
+
+/* === M7.3A SAVED QUOTA ALIGNMENT START === */
+
+/*
+ * Saved quota panels must behave as a matched pair.
+ *
+ * Claude + GPT may wrap to two lines at normal sidebar width.
+ * Reserve the same two-line heading area for Gemini so Weekly
+ * and 5h always start at exactly the same vertical position.
+ */
+
+.saved-account-quota-area > * {
+    align-items: stretch;
+}
+
+.saved-account-quota-area > * > * {
+    height: 100%;
+}
+
+
+/*
+ * Known saved quota family containers.
+ *
+ * Grid rows:
+ *   family heading
+ *   Weekly block
+ *   5h block
+ *
+ * The heading gets a fixed two-line minimum height.
+ */
+
+.saved-account-quota-area
+:is(
+    .saved-usage-family,
+    .saved-family-usage,
+    .saved-usage-group
+) {
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+}
+
+
+/*
+ * Family heading:
+ *
+ * Gemini
+ *
+ * Claude + GPT
+ *
+ * Use two line-heights for both panels. Gemini therefore keeps
+ * an intentional empty second line rather than allowing its
+ * Weekly metric to move upward.
+ */
+
+.saved-account-quota-area
+:is(
+    .saved-usage-family,
+    .saved-family-usage,
+    .saved-usage-group
+)
+> :first-child {
+    box-sizing: border-box;
+
+    min-height: 26px;
+    margin: 0 0 3px;
+
+    line-height: 13px;
+}
+
+
+/*
+ * Metric rows use the same two-column geometry:
+ *
+ * Weekly             7.10%
+ * 5h                   100%
+ */
+
+.saved-account-quota-area
+:is(
+    .saved-usage-metric,
+    .saved-family-metric,
+    .saved-quota-metric,
+    .saved-metric-row,
+    .saved-usage-row
+) {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto;
+
+    align-items: baseline;
+
+    width: 100%;
+    min-width: 0;
+
+    column-gap: 5px;
+}
+
+
+/*
+ * Keep labels pinned left and percentages pinned right.
+ */
+
+.saved-account-quota-area
+:is(
+    .saved-usage-metric,
+    .saved-family-metric,
+    .saved-quota-metric,
+    .saved-metric-row,
+    .saved-usage-row
+)
+> :first-child {
+    min-width: 0;
+    text-align: left;
+}
+
+.saved-account-quota-area
+:is(
+    .saved-usage-metric,
+    .saved-family-metric,
+    .saved-quota-metric,
+    .saved-metric-row,
+    .saved-usage-row
+)
+> :last-child {
+    min-width: max-content;
+    text-align: right;
+}
+
+
+/*
+ * The reset line belongs to its metric but should not alter
+ * horizontal alignment of Weekly / 5h.
+ */
+
+.saved-account-quota-area
+:is(
+    .saved-usage-reset,
+    .saved-family-reset,
+    .saved-quota-reset,
+    .saved-reset
+) {
+    display: block;
+
+    width: 100%;
+    min-width: 0;
+
+    margin-top: 1px;
+
+    text-align: left;
+}
+
+
+/*
+ * Give both family panels the same overall geometry.
+ */
+
+.saved-account-quota-area > * {
+    grid-auto-rows: 1fr;
+}
+
+
+/*
+ * Narrow mode already stacks the panels. Once stacked, the
+ * fixed heading height is unnecessary because horizontal
+ * cross-panel alignment no longer matters.
+ */
+
+@media (max-width: 220px) {
+    .saved-account-quota-area
+    :is(
+        .saved-usage-family,
+        .saved-family-usage,
+        .saved-usage-group
+    )
+    > :first-child {
+        min-height: auto;
+    }
+}
+
+
+/* === M7.3A SAVED QUOTA ALIGNMENT END === */
+
+/* === M7.3A SAVED QUOTA GEOMETRY FINAL START === */
+
+/*
+ * FINAL saved-account quota geometry.
+ *
+ * Both families must occupy an identical grid cell and stretch
+ * to exactly the same height.
+ */
+
+.saved-account-quota-area {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+.saved-account-quota-area > * {
+    display: grid !important;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr)) !important;
+
+    align-items: stretch !important;
+    align-content: stretch !important;
+
+    gap: 6px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+
+/*
+ * Each quota-family panel.
+ *
+ * Explicit grid rows remove content-driven vertical drift.
+ *
+ * Row 1 = family title
+ * Row 2 = Weekly
+ * Row 3 = 5h
+ */
+
+.saved-account-quota-area > * > * {
+    display: grid !important;
+
+    grid-template-rows:
+        28px
+        minmax(28px, auto)
+        minmax(28px, auto) !important;
+
+    align-content: start !important;
+    align-self: stretch !important;
+
+    height: 100% !important;
+    min-height: 100% !important;
+
+    box-sizing: border-box !important;
+
+    margin: 0 !important;
+
+    padding: 6px 7px !important;
+}
+
+
+/*
+ * Family title.
+ *
+ * Both Gemini and Claude + GPT reserve exactly the same
+ * vertical space, regardless of whether the title wraps.
+ */
+
+.saved-account-quota-area > * > * > :first-child {
+    display: flex !important;
+    align-items: flex-start !important;
+
+    min-height: 28px !important;
+    height: 28px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    line-height: 13px !important;
+
+    overflow: hidden !important;
+}
+
+
+/*
+ * Known family wrappers.
+ */
+
+.saved-account-quota-area
+:is(
+    .saved-usage-family,
+    .saved-family-usage,
+    .saved-usage-group,
+    .saved-quota-family
+) {
+    display: grid !important;
+
+    grid-template-rows:
+        28px
+        minmax(28px, auto)
+        minmax(28px, auto) !important;
+
+    align-content: start !important;
+    align-self: stretch !important;
+
+    height: 100% !important;
+    min-height: 100% !important;
+}
+
+
+/*
+ * Family heading has identical geometry in both cards.
+ */
+
+.saved-account-quota-area
+:is(
+    .saved-usage-family,
+    .saved-family-usage,
+    .saved-usage-group,
+    .saved-quota-family
+)
+> :first-child {
+    min-height: 28px !important;
+    height: 28px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    line-height: 13px !important;
+}
+
+
+/*
+ * A usage item contains:
+ *
+ * Weekly        7.10%
+ * Resets in ...
+ *
+ * or:
+ *
+ * 5h             100%
+ * Resets in ...
+ *
+ * Give every item the same geometry.
+ */
+
+.saved-account-quota-area
+:is(
+    .saved-usage-item,
+    .saved-family-item,
+    .saved-quota-item,
+    .saved-usage-block,
+    .saved-family-block
+) {
+    display: grid !important;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto !important;
+
+    grid-template-rows:
+        auto
+        auto !important;
+
+    align-items: baseline !important;
+
+    column-gap: 4px !important;
+    row-gap: 0 !important;
+
+    min-width: 0 !important;
+    min-height: 28px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+
+/*
+ * First line:
+ *
+ * Weekly        7.10%
+ * 5h             100%
+ */
+
+.saved-account-quota-area
+:is(
+    .saved-usage-row,
+    .saved-metric-row,
+    .saved-family-row,
+    .saved-quota-row
+) {
+    display: grid !important;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto !important;
+
+    align-items: baseline !important;
+
+    column-gap: 4px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+}
+
+
+/*
+ * Left metric labels.
+ */
+
+.saved-account-quota-area
+:is(
+    .saved-usage-row,
+    .saved-metric-row,
+    .saved-family-row,
+    .saved-quota-row
+)
+> :first-child {
+    justify-self: start !important;
+    text-align: left !important;
+}
+
+
+/*
+ * Percentages.
+ */
+
+.saved-account-quota-area
+:is(
+    .saved-usage-row,
+    .saved-metric-row,
+    .saved-family-row,
+    .saved-quota-row
+)
+> :last-child {
+    justify-self: end !important;
+
+    min-width: max-content !important;
+
+    text-align: right !important;
+}
+
+
+/*
+ * Reset time always occupies the second line underneath
+ * its respective metric.
+ */
+
+.saved-account-quota-area
+:is(
+    .saved-usage-reset,
+    .saved-family-reset,
+    .saved-quota-reset,
+    .saved-reset,
+    .saved-reset-time
+) {
+    grid-column: 1 / -1 !important;
+
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    text-align: left !important;
+
+    white-space: nowrap !important;
+}
+
+
+/*
+ * Defensive equal-height enforcement for the first two
+ * family panels even if older CSS gives them align-self:start.
+ */
+
+.saved-account-quota-area > * > :nth-child(1),
+.saved-account-quota-area > * > :nth-child(2) {
+    align-self: stretch !important;
+    height: 100% !important;
+}
+
+
+/*
+ * Narrow sidebar fallback.
+ *
+ * Once panels stack vertically, matching cross-column height
+ * is no longer required.
+ */
+
+@media (max-width: 220px) {
+    .saved-account-quota-area > * {
+        grid-template-columns:
+            minmax(0, 1fr) !important;
+    }
+
+    .saved-account-quota-area > * > * {
+        height: auto !important;
+        min-height: 0 !important;
+    }
+}
+
+
+/* === M7.3A SAVED QUOTA GEOMETRY FINAL END === */
+
+/* === M7.3A FINAL SAVED QUOTA VISUAL START === */
+
+/*
+ * M7.3A final visual target:
+ *
+ * - main content starts on the same left guide as the native
+ *   "Antigravity Account Switcher" view title
+ * - Saved Account quota remains a two-family layout
+ * - compact native VS Code density
+ * - label + percentage share one row
+ * - progress bar below
+ * - remaining text below bar
+ * - compact Reset metadata
+ */
+
+
+/* =============================================================
+ * WEBVIEW CONTENT ALIGNMENT
+ * ============================================================= */
+
+/*
+ * Remove browser defaults first.
+ */
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/*
+ * A single horizontal gutter only.
+ *
+ * The previous layout effectively accumulated more than one inset,
+ * causing Current account / Usage / Saved accounts to start farther
+ * right than the native view title.
+ */
+body {
+    box-sizing: border-box;
+
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+
+/*
+ * Cancel nested horizontal gutters from common root/content wrappers.
+ * Nonexistent selectors are harmless.
+ */
+.account-switcher,
+.account-switcher-root,
+.account-switcher-container,
+.account-switcher-content,
+.dashboard,
+.dashboard-content,
+.webview-content,
+.main-content,
+.content,
+main {
+    box-sizing: border-box;
+
+    margin-left: 0;
+    margin-right: 0;
+
+    padding-left: 0;
+    padding-right: 0;
+
+    width: 100%;
+}
+
+
+/*
+ * Major dashboard sections must share one vertical left guide.
+ */
+.current-account,
+.current-account-section,
+.usage,
+.usage-section,
+.saved-accounts,
+.saved-accounts-section,
+.antigravity-status,
+.status-section,
+.footer,
+.account-switcher-footer {
+    margin-left: 0;
+    margin-right: 0;
+
+    padding-left: 0;
+    padding-right: 0;
+}
+
+
+/* =============================================================
+ * SAVED ACCOUNT QUOTA AREA
+ * ============================================================= */
+
+.saved-account-quota-area {
+    box-sizing: border-box;
+
+    width: 100%;
+    min-width: 0;
+
+    margin-top: 7px;
+    margin-bottom: 3px;
+
+    align-items: stretch;
+}
+
+
+/*
+ * Family panels.
+ */
+.saved-account-quota-area > * {
+    box-sizing: border-box;
+
+    min-width: 0;
+    height: auto;
+    min-height: 0;
+}
+
+
+/*
+ * Family title:
+ *
+ * Gemini
+ *
+ * Claude + GPT
+ *
+ * Reserve only enough geometry to keep the metrics aligned if
+ * Claude + GPT wraps to two lines.
+ */
+.saved-account-quota-area > * > :first-child {
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: flex-start;
+
+    min-width: 0;
+    min-height: 28px;
+
+    margin: 0 0 5px 0;
+    padding: 0;
+
+    line-height: 14px;
+
+    overflow: hidden;
+}
+
+
+/* =============================================================
+ * METRIC ROW
+ * ============================================================= */
+
+.saved-account-quota-area .saved-family-metric,
+.saved-account-quota-area .saved-usage-metric,
+.saved-account-quota-area .saved-quota-metric,
+.saved-account-quota-area .saved-metric-row,
+.saved-account-quota-area .saved-usage-row {
+    box-sizing: border-box;
+
+    display: block;
+
+    width: 100%;
+    min-width: 0;
+
+    min-height: 0;
+
+    margin: 0;
+    padding: 0;
+}
+
+
+/*
+ * Label + percentage share one compact row.
+ *
+ * Weekly          7.10%
+ */
+.saved-account-quota-area .saved-quota-main {
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: row;
+
+    align-items: baseline;
+    justify-content: space-between;
+
+    width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    gap: 5px;
+
+    line-height: 14px;
+}
+
+
+.saved-account-quota-area .saved-quota-label {
+    display: block;
+
+    flex: 1 1 auto;
+
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    text-align: left;
+}
+
+
+.saved-account-quota-area .saved-quota-value {
+    display: block;
+
+    flex: 0 0 auto;
+
+    min-width: max-content;
+
+    margin: 0;
+    padding: 0;
+
+    white-space: nowrap;
+
+    text-align: right;
+
+    font-weight: 600;
+}
+
+
+/* =============================================================
+ * SAVED QUOTA PROGRESS
+ * ============================================================= */
+
+.saved-quota-progress {
+    box-sizing: border-box;
+
+    position: relative;
+
+    display: block;
+
+    width: 100%;
+    height: 4px;
+
+    margin-top: 3px;
+    margin-bottom: 3px;
+
+    overflow: hidden;
+
+    border-radius: 2px;
+
+    background:
+        var(
+            --vscode-progressBar-background,
+            rgba(128, 128, 128, 0.28)
+        );
+}
+
+
+.saved-quota-progress-fill {
+    display: block;
+
+    width: var(--saved-quota-percent, 0%);
+    max-width: 100%;
+    height: 100%;
+
+    border-radius: inherit;
+
+    background:
+        var(
+            --vscode-foreground,
+            rgba(220, 220, 220, 0.82)
+        );
+}
+
+
+/*
+ * Example:
+ *
+ * 7.10% remaining
+ */
+.saved-quota-remaining {
+    display: block;
+
+    width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    line-height: 12px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    color:
+        var(
+            --vscode-descriptionForeground,
+            var(--vscode-foreground)
+        );
+
+    opacity: 0.84;
+}
+
+
+/* =============================================================
+ * RESET METADATA
+ * ============================================================= */
+
+.saved-account-quota-area .saved-quota-reset,
+.saved-account-quota-area .saved-usage-reset,
+.saved-account-quota-area .saved-metric-reset {
+    display: block;
+
+    box-sizing: border-box;
+
+    width: 100%;
+    min-width: 0;
+
+    margin-top: 1px;
+    margin-left: 0;
+
+    padding: 0;
+
+    line-height: 12px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    text-align: left;
+
+    color:
+        var(
+            --vscode-descriptionForeground,
+            var(--vscode-foreground)
+        );
+
+    opacity: 0.8;
+}
+
+
+/* =============================================================
+ * WEEKLY -> 5H SEPARATION
+ * ============================================================= */
+
+/*
+ * Keep the second metric visually separated, but do not create
+ * the huge vertical whitespace seen in the previous version.
+ */
+.saved-account-quota-area
+:is(
+    .saved-family-metric,
+    .saved-usage-metric,
+    .saved-quota-metric
+)
++
+:is(
+    .saved-family-metric,
+    .saved-usage-metric,
+    .saved-quota-metric
+) {
+    margin-top: 7px;
+    padding-top: 7px;
+
+    border-top: 1px solid
+        color-mix(
+            in srgb,
+            var(--vscode-panel-border, currentColor) 38%,
+            transparent
+        );
+}
+
+
+/* =============================================================
+ * DEFENSIVE OLD-LAYOUT RESET
+ * ============================================================= */
+
+.saved-account-quota-area
+:is(
+    .saved-family-metric,
+    .saved-usage-metric,
+    .saved-quota-metric,
+    .saved-metric-row,
+    .saved-usage-row
+)
+> :first-child {
+    margin-left: 0;
+}
+
+
+.saved-account-quota-area
+:is(
+    .saved-family-metric,
+    .saved-usage-metric,
+    .saved-quota-metric,
+    .saved-metric-row,
+    .saved-usage-row
+)
+> :last-child {
+    margin-left: 0;
+}
+
+
+/* =============================================================
+ * VERY NARROW SIDEBAR
+ * ============================================================= */
+
+@media (max-width: 210px) {
+    .saved-account-quota-area > * > :first-child {
+        min-height: 0;
+    }
+}
+
+/* === M7.3A FINAL SAVED QUOTA VISUAL END === */
+
+/* === M7.3A ANTIGRAVITY STATUS MODAL START === */
+
+/*
+ * Compact status pill positioned cleanly above Current Account.
+ */
+.runtime-status-bar {
+    display: flex;
+    align-items: center;
+    margin: 4px 0 10px 0;
+}
+
+.runtime-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px;
+    border: 1px solid var(--ag-border);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--ag-card-bg, #252526) 88%, transparent);
+    color: var(--ag-fg-muted, var(--vscode-descriptionForeground, #cccccc));
+    font-size: 11px;
+    line-height: 1.35;
+    cursor: pointer;
+    transition: background 0.12s ease, border-color 0.12s ease;
+    user-select: none;
+}
+
+.runtime-status-pill:hover {
+    background: var(--vscode-toolbar-hoverBackground, rgba(255, 255, 255, 0.08));
+    border-color: var(--vscode-focusBorder, #007fd4);
+    color: var(--ag-fg, var(--vscode-foreground, #ffffff));
+}
+
+.runtime-status-pill .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.runtime-status-pill.healthy .status-dot {
+    background-color: var(--vscode-testing-iconPassed, #4ec9b0);
+    box-shadow: 0 0 4px rgba(78, 201, 176, 0.4);
+}
+
+.runtime-status-pill.warning .status-dot {
+    background-color: var(--vscode-testing-iconFailed, #f14c4c);
+    box-shadow: 0 0 4px rgba(241, 76, 76, 0.4);
+}
+
+.runtime-status-pill.checking .status-dot {
+    background-color: var(--vscode-charts-yellow, #cca700);
+}
+
+.runtime-status-pill-label {
+    font-weight: 500;
+    opacity: 0.85;
+}
+
+.runtime-status-pill-value {
+    color: var(--ag-fg, var(--vscode-foreground, #ffffff));
+    font-weight: 600;
+}
+
+/*
+ * Small popup / modal dialog for detailed runtime diagnostics
+ */
+.runtime-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    background: color-mix(in srgb, #000 45%, transparent);
+    animation: runtimeModalFadeIn 0.15s ease-out;
+}
+
+.runtime-modal-panel {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+    max-height: 85vh;
+    overflow: hidden;
+    border: 1px solid var(--ag-border);
+    border-radius: 8px;
+    background: var(--ag-bg, var(--vscode-sideBar-background, #1e1e1e));
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    animation: runtimeModalZoomIn 0.15s ease-out;
+}
+
+@keyframes runtimeModalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes runtimeModalZoomIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.runtime-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px 8px 12px;
+    border-bottom: 1px solid var(--ag-border);
+}
+
+.runtime-modal-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.runtime-modal-title .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.runtime-modal-title .status-dot.healthy {
+    background-color: var(--vscode-testing-iconPassed, #4ec9b0);
+}
+
+.runtime-modal-title .status-dot.warning {
+    background-color: var(--vscode-testing-iconFailed, #f14c4c);
+}
+
+.runtime-modal-title .status-dot.checking {
+    background-color: var(--vscode-charts-yellow, #cca700);
+}
+
+.runtime-modal-title h2 {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 650;
+    color: var(--ag-fg, var(--vscode-foreground, #ffffff));
+}
+
+.runtime-modal-body {
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.runtime-modal-body .runtime-panel {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--ag-border);
+    border-radius: 5px;
+    background: var(--ag-raised);
+    overflow: hidden;
+}
+
+/* === M7.3A ANTIGRAVITY STATUS MODAL END === */
+
+/* === M7.3A SAVED ACCOUNT LIST NATURAL HEIGHT START === */
+
+/*
+ * Usage limit heading alignment: ensure both Weekly limit and 5-hour limit
+ * have identical 2-line height so quota progress bars and cards align horizontally.
+ */
+.quota-bucket-heading {
+    min-height: 26px;
+    align-items: flex-start;
+}
+
+.quota-window-name {
+    min-height: 26px;
+    line-height: 1.25;
+}
+
+/*
+ * Keep entire sidebar fixed: html, body, and content-shell do NOT scroll.
+ * Current Account, Usage, search controls, and footer stay pinned.
+ * ONLY the saved accounts list (.account-list) scrolls when it overflows.
+ */
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden !important;
+}
+
+#app,
+.app {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+.content-shell {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    gap: 8px !important;
+    padding: 6px 0 !important;
+}
+
+.runtime-status-bar {
+    flex: 0 0 auto !important;
+}
+
+.current-section {
+    flex: 0 0 auto !important;
+}
+
+.saved-section {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+.saved-section > .section-header {
+    flex: 0 0 auto !important;
+}
+
+.saved-body {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+.saved-controls {
+    flex: 0 0 auto !important;
+}
+
+.account-list {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+}
+
+.developer-footer {
+    flex: 0 0 auto !important;
+}
+
+/* === M7.3A SAVED ACCOUNT LIST PINNED LAYOUT END === */
+
+/* === M7.3A ACTION BUTTONS AND BADGES START === */
+
+/*
+ * Saved account rail width and badge alignment
+ */
+.saved-account-rail {
+    width: 44px !important;
+    min-width: 44px !important;
+    gap: 4px !important;
+    align-items: center !important;
+}
+
+.saved-rail-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-size: 9px;
+    font-weight: 600;
+    line-height: 1.2;
+    padding: 2px 5px;
+    border-radius: 4px;
+    white-space: nowrap;
+    user-select: none;
+    box-sizing: border-box;
+    text-decoration: none;
+}
+
+.saved-rail-badge.active-badge {
+    color: var(--vscode-testing-iconPassed, #4ec9b0);
+    background: color-mix(in srgb, var(--vscode-testing-iconPassed, #4ec9b0) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--vscode-testing-iconPassed, #4ec9b0) 30%, transparent);
+}
+
+.saved-rail-badge.switch-badge-btn {
+    cursor: pointer;
+    color: var(--vscode-foreground, #cccccc);
+    background: color-mix(in srgb, var(--ag-card-bg, #252526) 88%, transparent);
+    border: 1px solid var(--ag-border);
+    transition: background 0.1s ease, border-color 0.1s ease, color 0.1s ease;
+}
+
+.saved-rail-badge.switch-badge-btn:hover:not(:disabled) {
+    background: var(--vscode-toolbar-hoverBackground, rgba(255, 255, 255, 0.08));
+    border-color: var(--vscode-focusBorder, #007fd4);
+    color: var(--ag-fg, #ffffff);
+}
+
+.saved-rail-badge .badge-icon {
+    font-size: 10px;
+    line-height: 1;
+}
+
+/*
+ * Action buttons: Add (+), Edit (pen), Delete (trash) explicit button badges
+ */
+.saved-add-btn {
+    border: 1px solid var(--ag-border) !important;
+    border-radius: 4px !important;
+    background: color-mix(in srgb, var(--ag-card-bg, #252526) 80%, transparent) !important;
+    width: 22px !important;
+    height: 22px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: background 0.1s ease, border-color 0.1s ease;
+}
+
+.saved-add-btn:hover:not(:disabled) {
+    border-color: var(--vscode-focusBorder, #007fd4) !important;
+    background: var(--vscode-toolbar-hoverBackground) !important;
+}
+
+.current-label-edit .edit-icon,
+.saved-title-actions .edit-icon,
+.saved-title-actions .delete-account-btn {
+    border: 1px solid var(--ag-border) !important;
+    border-radius: 4px !important;
+    background: color-mix(in srgb, var(--ag-card-bg, #252526) 60%, transparent) !important;
+    width: 22px !important;
+    height: 22px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    opacity: 0.85 !important;
+    transition: background 0.1s ease, border-color 0.1s ease, color 0.1s ease;
+}
+
+.current-label-edit .edit-icon:hover:not(:disabled),
+.saved-title-actions .edit-icon:hover:not(:disabled) {
+    opacity: 1 !important;
+    border-color: var(--vscode-focusBorder, #007fd4) !important;
+    background: var(--vscode-toolbar-hoverBackground) !important;
+}
+
+.saved-title-actions .delete-account-btn:hover:not(:disabled) {
+    opacity: 1 !important;
+    border-color: var(--vscode-testing-iconFailed, #f14c4c) !important;
+    color: var(--vscode-testing-iconFailed, #f14c4c) !important;
+    background: color-mix(in srgb, var(--vscode-testing-iconFailed, #f14c4c) 15%, transparent) !important;
+}
+
+/*
+ * Footer developer and version typography polish
+ */
+.developer-footer {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+    min-height: 32px !important;
+    padding: 6px 4px 6px !important;
+    border-top: 1px solid var(--ag-border) !important;
+    color: var(--ag-muted) !important;
+    font-size: 10.5px !important;
+    user-select: none !important;
+    flex: 0 0 auto !important;
+}
+
+.developer-footer-copy {
+    display: flex !important;
+    align-items: center !important;
+    gap: 3px !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+    font-size: 10.5px !important;
+}
+
+.footer-prefix {
+    opacity: 0.8 !important;
+    font-size: 10.5px !important;
+    margin-right: 1px !important;
+    color: var(--ag-muted, var(--vscode-descriptionForeground)) !important;
+}
+
+.developer-link {
+    font-size: 10.5px !important;
+    font-weight: 600 !important;
+    color: var(--vscode-textLink-foreground, var(--ag-link)) !important;
+    text-decoration: none !important;
+    transition: color 0.12s ease !important;
+}
+
+.developer-link:hover {
+    text-decoration: underline !important;
+    color: var(--vscode-textLink-activeForeground, var(--vscode-textLink-foreground, var(--ag-link))) !important;
+}
+
+.footer-version {
+    flex: 0 0 auto !important;
+    font-size: 10.5px !important;
+    opacity: 0.75 !important;
+    font-variant-numeric: tabular-nums !important;
+    color: var(--ag-muted, var(--vscode-descriptionForeground)) !important;
+}
+
+/* === M7.3A ACTION BUTTONS AND BADGES END === */

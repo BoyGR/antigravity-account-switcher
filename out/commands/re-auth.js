@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerReAuthCommand = registerReAuthCommand;
 const vscode = __importStar(require("vscode"));
 const hub_auth_client_1 = require("../antigravity/hub-auth-client");
+const ui_sync_1 = require("../antigravity/ui-sync");
 const COMMAND_ID = "boygr.antigravityAccountSwitcher.reAuth";
 const OUTPUT_CHANNEL = "Antigravity Re-auth";
 function registerReAuthCommand(context) {
@@ -142,6 +143,13 @@ function registerReAuthCommand(context) {
                 output.appendLine("=== Re-auth did not finish with valid authentication ===");
                 vscode.window.showWarningMessage("Antigravity Re-auth returned, but valid authentication was not confirmed.");
             }
+            const syncResult = await (0, ui_sync_1.syncAntigravityUi)();
+            if (!syncResult.syncedOfficialPanel) {
+                const reloadChoice = await vscode.window.showInformationMessage("Antigravity Re-auth completed. Reload window to update the official Antigravity panel?", "Reload Window", "Later");
+                if (reloadChoice === "Reload Window") {
+                    await vscode.commands.executeCommand("workbench.action.reloadWindow");
+                }
+            }
         }
         catch (error) {
             const message = error instanceof Error
@@ -152,6 +160,12 @@ function registerReAuthCommand(context) {
             output.appendLine("");
             output.appendLine(message);
             vscode.window.showErrorMessage(`Antigravity Re-auth failed: ${message}`);
+            try {
+                await (0, ui_sync_1.syncAntigravityUi)();
+            }
+            catch {
+                // Safely ignore secondary sync error
+            }
         }
     });
     context.subscriptions.push(disposable);

@@ -5,7 +5,12 @@ exports.findManagedAccount = findManagedAccount;
 exports.saveCurrentAccountMetadata = saveCurrentAccountMetadata;
 exports.removeManagedAccount = removeManagedAccount;
 exports.updateManagedAccountLabel = updateManagedAccountLabel;
+exports.getManagedAccountQuotaSnapshots = getManagedAccountQuotaSnapshots;
+exports.getManagedAccountQuotaSnapshot = getManagedAccountQuotaSnapshot;
+exports.saveManagedAccountQuotaSnapshot = saveManagedAccountQuotaSnapshot;
+exports.removeManagedAccountQuotaSnapshot = removeManagedAccountQuotaSnapshot;
 const STORAGE_KEY = "boygr.antigravity.accounts.v1";
+const QUOTA_STORAGE_KEY = "boygr.antigravity.quotaSnapshots.v1";
 function normalizeEmail(email) {
     return email.trim().toLowerCase();
 }
@@ -100,5 +105,76 @@ async function updateManagedAccountLabel(context, email, label) {
         },
     });
     return updated;
+}
+function emptyQuotaSnapshotState() {
+    return {
+        version: 1,
+        accounts: {},
+    };
+}
+function getManagedAccountQuotaSnapshots(context) {
+    const stored = context.globalState.get(QUOTA_STORAGE_KEY);
+    if (!stored ||
+        stored.version !== 1) {
+        return {};
+    }
+    return {
+        ...stored.accounts,
+    };
+}
+function getManagedAccountQuotaSnapshot(context, email) {
+    const normalized = normalizeEmail(email);
+    return getManagedAccountQuotaSnapshots(context)[normalized];
+}
+async function saveManagedAccountQuotaSnapshot(context, email, snapshot) {
+    const normalized = normalizeEmail(email);
+    if (!normalized) {
+        throw new Error("Cannot save an Antigravity quota snapshot without an email.");
+    }
+    const existing = context.globalState.get(QUOTA_STORAGE_KEY);
+    const state = existing?.version === 1
+        ? {
+            version: 1,
+            accounts: {
+                ...existing.accounts,
+            },
+        }
+        : emptyQuotaSnapshotState();
+    const stored = {
+        email: normalized,
+        fetchedAt: snapshot.fetchedAt,
+        profilePictureAvailable: snapshot.profilePictureAvailable,
+        modelConfigCount: snapshot.modelConfigCount,
+        quotaModelCount: snapshot.quotaModelCount,
+        models: snapshot.models.map(model => ({
+            index: model.index,
+            modelId: model.modelId,
+            model: model.model,
+            remainingFraction: model.remainingFraction,
+            resetTime: model.resetTime,
+        })),
+    };
+    state.accounts[normalized] =
+        stored;
+    await context.globalState.update(QUOTA_STORAGE_KEY, state);
+    return stored;
+}
+async function removeManagedAccountQuotaSnapshot(context, email) {
+    const normalized = normalizeEmail(email);
+    const existing = context.globalState.get(QUOTA_STORAGE_KEY);
+    if (!existing ||
+        existing.version !== 1 ||
+        !existing.accounts[normalized]) {
+        return false;
+    }
+    const accounts = {
+        ...existing.accounts,
+    };
+    delete accounts[normalized];
+    await context.globalState.update(QUOTA_STORAGE_KEY, {
+        version: 1,
+        accounts,
+    });
+    return true;
 }
 //# sourceMappingURL=account-registry.js.map

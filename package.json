@@ -1,193 +1,250 @@
 {
-  "name": "boygr-antigravity-account-switcher",
-  "displayName": "Antigravity Account Switcher",
-  "description": "Manage and switch Google accounts used by Google Antigravity in Visual Studio Code through Antigravity's existing authentication flow.",
-  "version": "0.3.0",
-  "publisher": "boygr",
-  "engines": {
-    "vscode": "^1.95.0"
-  },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "onCommand:boygr.antigravityAccountSwitcher.diagnose",
-    "onCommand:boygr.antigravityAccountSwitcher.status",
-    "onCommand:boygr.antigravityAccountSwitcher.inspectBridge",
-    "onCommand:boygr.antigravityAccountSwitcher.authStatus",
-    "onCommand:boygr.antigravityAccountSwitcher.signIn",
-    "onCommand:boygr.antigravityAccountSwitcher.reAuth",
-    "onCommand:boygr.antigravityAccountSwitcher.signOut",
-    "onCommand:boygr.antigravityAccountSwitcher.currentAccount",
-    "onCommand:boygr.antigravityAccountSwitcher.saveCurrentAccount",
-    "onCommand:boygr.antigravityAccountSwitcher.manageAccounts",
-    "onView:boygr.antigravityAccountSwitcher.accountsView",
-    "onCommand:boygr.antigravityAccountSwitcher.addAccount"
-  ],
-  "main": "./out/extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "boygr.antigravityAccountSwitcher.diagnose",
-        "title": "Diagnose",
-        "category": "Antigravity Account Switcher"
-      },
-      {
-        "command": "boygr.antigravityAccountSwitcher.status",
-        "title": "Status",
-        "category": "Antigravity Account Switcher"
-      },
-      {
-        "command": "boygr.antigravityAccountSwitcher.inspectBridge",
-        "title": "Inspect Bridge",
-        "category": "Antigravity Account Switcher"
-      },
-      {
-        "command": "boygr.antigravityAccountSwitcher.authStatus",
-        "title": "Auth Status",
-        "category": "Antigravity Account Switcher"
-      },
-      {
-        "command": "boygr.antigravityAccountSwitcher.signIn",
-        "title": "Sign In",
-        "category": "Antigravity Account Switcher"
-      },
-      {
-        "command": "boygr.antigravityAccountSwitcher.reAuth",
-        "title": "Re-auth",
-        "category": "Antigravity Account Switcher"
-      },
-      {
-        "command": "boygr.antigravityAccountSwitcher.signOut",
-        "title": "Sign Out",
-        "category": "Antigravity Account Switcher"
-      },
-      {
-        "command": "boygr.antigravityAccountSwitcher.currentAccount",
-        "title": "Current Account",
-        "category": "Antigravity Account Switcher"
-      },
-      {
-        "command": "boygr.antigravityAccountSwitcher.saveCurrentAccount",
-        "title": "Save Current Account",
-        "category": "Antigravity Account Switcher"
-      },
-      {
-        "command": "boygr.antigravityAccountSwitcher.manageAccounts",
-        "title": "Manage Accounts",
-        "category": "Antigravity Account Switcher"
-      },
-      {
-        "command": "boygr.antigravityAccountSwitcher.refreshAccountsView",
-        "title": "Refresh Accounts",
-        "icon": "$(refresh)",
-        "category": "Antigravity Account Switcher"
-      },
-      {
-        "command": "boygr.antigravityAccountSwitcher.addAccount",
-        "title": "Add / Switch Google Account",
-        "category": "Antigravity Account Switcher"
-      },
-      {
-        "command": "boygr.antigravityAccountSwitcher.editAccountLabel",
-        "title": "Edit Account Label",
-        "category": "Antigravity Account Switcher"
-      },
-      {
-        "command": "boygr.antigravityAccountSwitcher.removeSavedAccount",
-        "title": "Remove from Saved Accounts",
-        "category": "Antigravity Account Switcher"
-      }
+    "name": "boygr-antigravity-account-switcher",
+    "displayName": "Antigravity Account Switcher",
+    "description": "Manage and switch Google accounts used by Google Antigravity in Visual Studio Code through Antigravity's existing authentication flow.",
+    "version": "0.4.0",
+    "publisher": "boygr",
+    "engines": {
+        "vscode": "^1.95.0"
+    },
+    "categories": [
+        "Other"
     ],
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "antigravityAccounts",
-          "title": "Antigravity Account Switcher",
-          "icon": "media/antigravity.svg"
+    "activationEvents": [
+        "onCommand:boygr.antigravityAccountSwitcher.diagnose",
+        "onCommand:boygr.antigravityAccountSwitcher.status",
+        "onCommand:boygr.antigravityAccountSwitcher.inspectBridge",
+        "onCommand:boygr.antigravityAccountSwitcher.authStatus",
+        "onCommand:boygr.antigravityAccountSwitcher.signIn",
+        "onCommand:boygr.antigravityAccountSwitcher.reAuth",
+        "onCommand:boygr.antigravityAccountSwitcher.signOut",
+        "onCommand:boygr.antigravityAccountSwitcher.currentAccount",
+        "onCommand:boygr.antigravityAccountSwitcher.saveCurrentAccount",
+        "onCommand:boygr.antigravityAccountSwitcher.manageAccounts",
+        "onView:boygr.antigravityAccountSwitcher.accountsView",
+        "onCommand:boygr.antigravityAccountSwitcher.addAccount"
+    ],
+    "main": "./out/extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "boygr.antigravityAccountSwitcher.diagnose",
+                "title": "Diagnose",
+                "category": "Antigravity Account Switcher"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.status",
+                "title": "Status",
+                "category": "Antigravity Account Switcher"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.inspectBridge",
+                "title": "Inspect Bridge",
+                "category": "Antigravity Account Switcher"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.authStatus",
+                "title": "Auth Status",
+                "category": "Antigravity Account Switcher"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.signIn",
+                "title": "Sign In",
+                "category": "Antigravity Account Switcher"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.reAuth",
+                "title": "Re-auth",
+                "category": "Antigravity Account Switcher"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.signOut",
+                "title": "Sign Out",
+                "category": "Antigravity Account Switcher"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.currentAccount",
+                "title": "Current Account",
+                "category": "Antigravity Account Switcher"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.saveCurrentAccount",
+                "title": "Save Current Account",
+                "category": "Antigravity Account Switcher"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.manageAccounts",
+                "title": "Manage Accounts",
+                "category": "Antigravity Account Switcher"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.refreshAccountsView",
+                "title": "Refresh",
+                "icon": "$(refresh)",
+                "category": "Antigravity Account Switcher"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.addAccount",
+                "title": "Add / Switch Google Account",
+                "category": "Antigravity Account Switcher"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.switchAccount",
+                "title": "Switch Account",
+                "category": "Antigravity Account Switcher"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.diagnose",
+                "title": "Diagnose Antigravity",
+                "category": "Antigravity Account Switcher"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.editAccountLabel",
+                "title": "Edit Account Label",
+                "category": "Antigravity Account Switcher"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.removeSavedAccount",
+                "title": "Remove from Saved Accounts",
+                "category": "Antigravity Account Switcher"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.openSettings",
+                "title": "Settings",
+                "category": "Antigravity Account Switcher",
+                "icon": "$(gear)"
+            }
+        ],
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "antigravityAccounts",
+                    "title": "Antigravity Account Switcher",
+                    "icon": "media/antigravity.svg"
+                }
+            ]
+        },
+        "views": {
+            "antigravityAccounts": [
+                {
+                    "id": "boygr.antigravityAccountSwitcher.accountsView",
+                    "name": "Antigravity Account Switcher",
+                    "type": "webview",
+                    "contextualTitle": "Antigravity Account Switcher"
+                }
+            ]
+        },
+        "menus": {
+            "view/title": [
+                {
+                    "command": "boygr.antigravityAccountSwitcher.refreshAccountsView",
+                    "when": "view == boygr.antigravityAccountSwitcher.accountsView",
+                    "group": "navigation@1"
+                },
+                {
+                    "command": "boygr.antigravityAccountSwitcher.openSettings",
+                    "when": "view == boygr.antigravityAccountSwitcher.accountsView",
+                    "group": "navigation@2"
+                }
+            ],
+            "view/item/context": [
+                {
+                    "command": "boygr.antigravityAccountSwitcher.switchAccount",
+                    "when": "view == boygr.antigravityAccountSwitcher.accountsView && viewItem == antigravity.savedAccount",
+                    "group": "1_switch"
+                },
+                {
+                    "command": "boygr.antigravityAccountSwitcher.editAccountLabel",
+                    "when": "view == boygr.antigravityAccountSwitcher.accountsView && viewItem == antigravity.savedAccount",
+                    "group": "2_manage"
+                },
+                {
+                    "command": "boygr.antigravityAccountSwitcher.editAccountLabel",
+                    "when": "view == boygr.antigravityAccountSwitcher.accountsView && viewItem == antigravity.savedAccount.current",
+                    "group": "2_manage"
+                },
+                {
+                    "command": "boygr.antigravityAccountSwitcher.removeSavedAccount",
+                    "when": "view == boygr.antigravityAccountSwitcher.accountsView && viewItem == antigravity.savedAccount",
+                    "group": "3_remove"
+                },
+                {
+                    "command": "boygr.antigravityAccountSwitcher.removeSavedAccount",
+                    "when": "view == boygr.antigravityAccountSwitcher.accountsView && viewItem == antigravity.savedAccount.current",
+                    "group": "3_remove"
+                }
+            ],
+            "commandPalette": [
+                {
+                    "command": "boygr.antigravityAccountSwitcher.editAccountLabel",
+                    "when": "false"
+                },
+                {
+                    "command": "boygr.antigravityAccountSwitcher.removeSavedAccount",
+                    "when": "false"
+                }
+            ]
+        },
+        "configuration": {
+            "title": "Antigravity Account Switcher",
+            "properties": {
+                "boygr.antigravityAccountSwitcher.autoRefreshIntervalMinutes": {
+                    "type": "integer",
+                    "default": 5,
+                    "enum": [0, 1, 5, 15, 30, 60],
+                    "enumDescriptions": [
+                        "Off (Manual only)",
+                        "Every 1 minute",
+                        "Every 5 minutes (Recommended)",
+                        "Every 15 minutes",
+                        "Every 30 minutes",
+                        "Every 1 hour"
+                    ],
+                    "description": "Interval in minutes to automatically refresh quota for the active Antigravity account (0 to disable)."
+                },
+                "boygr.antigravityAccountSwitcher.enableLowQuotaReminder": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Show a notification alert when remaining quota drops below the warning threshold."
+                },
+                "boygr.antigravityAccountSwitcher.lowQuotaThresholdPercent": {
+                    "type": "integer",
+                    "default": 20,
+                    "enum": [5, 10, 15, 20, 25, 30],
+                    "description": "Remaining quota percentage threshold that triggers a low quota warning notification."
+                },
+                "boygr.antigravityAccountSwitcher.autoSyncOfficialUi": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically synchronize Antigravity's official sidebar after switching accounts or modifying authentication."
+                }
+            }
         }
-      ]
     },
-    "views": {
-      "antigravityAccounts": [
-        {
-          "id": "boygr.antigravityAccountSwitcher.accountsView",
-          "name": "Accounts",
-          "type": "webview"
-        }
-      ]
+    "scripts": {
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "package": "vsce package",
+        "vscode:prepublish": "npm run compile",
+        "package:vsix": "npx --yes @vscode/vsce package"
     },
-    "menus": {
-      "view/title": [
-        {
-          "command": "boygr.antigravityAccountSwitcher.refreshAccountsView",
-          "when": "view == boygr.antigravityAccountSwitcher.accountsView",
-          "group": "navigation"
-        }
-      ],
-      "view/item/context": [
-        {
-          "command": "boygr.antigravityAccountSwitcher.switchAccount",
-          "when": "view == boygr.antigravityAccountSwitcher.accountsView && viewItem == antigravity.savedAccount",
-          "group": "1_switch"
-        },
-        {
-          "command": "boygr.antigravityAccountSwitcher.editAccountLabel",
-          "when": "view == boygr.antigravityAccountSwitcher.accountsView && viewItem == antigravity.savedAccount",
-          "group": "2_manage"
-        },
-        {
-          "command": "boygr.antigravityAccountSwitcher.editAccountLabel",
-          "when": "view == boygr.antigravityAccountSwitcher.accountsView && viewItem == antigravity.savedAccount.current",
-          "group": "2_manage"
-        },
-        {
-          "command": "boygr.antigravityAccountSwitcher.removeSavedAccount",
-          "when": "view == boygr.antigravityAccountSwitcher.accountsView && viewItem == antigravity.savedAccount",
-          "group": "3_remove"
-        },
-        {
-          "command": "boygr.antigravityAccountSwitcher.removeSavedAccount",
-          "when": "view == boygr.antigravityAccountSwitcher.accountsView && viewItem == antigravity.savedAccount.current",
-          "group": "3_remove"
-        }
-      ],
-      "commandPalette": [
-        {
-          "command": "boygr.antigravityAccountSwitcher.editAccountLabel",
-          "when": "false"
-        },
-        {
-          "command": "boygr.antigravityAccountSwitcher.removeSavedAccount",
-          "when": "false"
-        }
-      ]
+    "devDependencies": {
+        "@types/node": "^24.0.0",
+        "@types/vscode": "^1.95.0",
+        "@vscode/vsce": "^3.6.0",
+        "typescript": "^5.9.0"
+    },
+    "license": "UNLICENSED",
+    "private": true,
+    "keywords": [
+        "antigravity",
+        "google",
+        "account",
+        "account-switcher",
+        "vscode"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/BoyGR/antigravity-account-switcher.git"
     }
-  },
-  "scripts": {
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "package": "vsce package",
-    "vscode:prepublish": "npm run compile",
-    "package:vsix": "npx --yes @vscode/vsce package"
-  },
-  "devDependencies": {
-    "@types/node": "^24.0.0",
-    "@types/vscode": "^1.95.0",
-    "@vscode/vsce": "^3.6.0",
-    "typescript": "^5.9.0"
-  },
-  "license": "UNLICENSED",
-  "private": true,
-  "keywords": [
-    "antigravity",
-    "google",
-    "account",
-    "account-switcher",
-    "vscode"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/BoyGR/antigravity-account-switcher.git"
-  }
 }
