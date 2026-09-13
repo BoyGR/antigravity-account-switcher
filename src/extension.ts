@@ -14,6 +14,8 @@ import { registerSignInCommand } from "./commands/sign-in";
 import { registerSignOutCommand } from "./commands/sign-out";
 import { registerStatusCommand } from "./commands/status";
 import { registerSwitchAccountCommand } from "./commands/switch-account";
+import { registerStatusBarMenuCommand } from "./commands/status-bar-menu";
+import { AntigravityStatusBarManager } from "./status-bar/status-bar-manager";
 import { registerAntigravityAccountWebview } from "./views/account-webview-provider";
 
 export function activate(
@@ -38,9 +40,21 @@ export function activate(
             diagnoseAntigravity,
         );
 
+    const statusBarManager =
+        new AntigravityStatusBarManager();
+
     const accountWebview =
         registerAntigravityAccountWebview(
             context,
+            statusBarManager,
+        );
+
+    const statusBarMenuCommand =
+        registerStatusBarMenuCommand(
+            context,
+            async () => {
+                await accountWebview.refresh();
+            },
         );
 
     const refreshCommand =
@@ -52,6 +66,8 @@ export function activate(
         );
 
     context.subscriptions.push(
+        statusBarManager,
+        statusBarMenuCommand,
         diagnoseCommand,
         refreshCommand,
     );

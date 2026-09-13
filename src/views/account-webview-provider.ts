@@ -28,6 +28,7 @@ import {
 } from "../antigravity/hub-detector";
 import { QuotaMonitorService } from "../antigravity/quota-monitor-service";
 import { syncAntigravityUi } from "../antigravity/ui-sync";
+import { AntigravityStatusBarManager } from "../status-bar/status-bar-manager";
 
 type ThemePreference =
     | "vscode"
@@ -181,6 +182,7 @@ export class AntigravityAccountWebviewProvider
 
     constructor(
         private readonly context: vscode.ExtensionContext,
+        private readonly statusBarManager?: AntigravityStatusBarManager,
     ) {
         const prefs = this.getStoredPreferences();
         this.quotaMonitor = new QuotaMonitorService(
@@ -195,6 +197,11 @@ export class AntigravityAccountWebviewProvider
                     ...this.snapshot,
                     usage,
                 };
+                this.statusBarManager?.update(
+                    this.snapshot.current,
+                    usage,
+                    Boolean(this.snapshot.runtime?.process),
+                );
                 if (this.view) {
                     await this.postState(false);
                 }
@@ -435,6 +442,12 @@ export class AntigravityAccountWebviewProvider
             usageError,
             error,
         };
+
+        this.statusBarManager?.update(
+            current,
+            usage,
+            Boolean(runtime?.process),
+        );
 
         const success =
             Boolean(current);
@@ -970,10 +983,12 @@ export class AntigravityAccountWebviewProvider
 
 export function registerAntigravityAccountWebview(
     context: vscode.ExtensionContext,
+    statusBarManager?: AntigravityStatusBarManager,
 ): AntigravityAccountWebviewProvider {
     const provider =
         new AntigravityAccountWebviewProvider(
             context,
+            statusBarManager,
         );
 
     const registration =
@@ -1001,6 +1016,8 @@ export function registerAntigravityAccountWebview(
         registration,
         settingsCommand,
     );
+
+    void provider.refresh();
 
     return provider;
 }

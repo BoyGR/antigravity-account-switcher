@@ -6,8 +6,6 @@
 
 A Visual Studio Code extension for managing, monitoring quota, and switching Google accounts used by Google Antigravity.
 
-Developed by [Boy Gilang Ramadhan](https://boygr.com).
-
 ---
 
 ## Overview
@@ -16,7 +14,7 @@ Developed by [Boy Gilang Ramadhan](https://boygr.com).
 
 ### Status
 
-- **Version**: `0.4.1`
+- **Version**: `0.5.0`
 - **Supported Platforms**: Windows, macOS, Linux
 - **Compatibility**: Visual Studio Code, Google Antigravity extension `1.3.0+`, AGY backend `1.2.2+`
 
@@ -39,19 +37,26 @@ Developed by [Boy Gilang Ramadhan](https://boygr.com).
   - Skeleton loading screen on initial startup.
 - **Footer**: Developer attribution and links with safe external browser navigation.
 
-### 2. Auto-Refresh Quota & Low Quota Reminders
+### 2. Status Bar Item & 1-Click Menu
+- **Real-Time Quota Glance**: Directly monitors active account quota from VS Code's status bar (e.g. `AGY: 85%`).
+- **Color-Coded Status Alerts**: Dynamic warning background when quota $\le 20\%$ and critical error background when $\le 10\%$.
+- **Rich Markdown Tooltip**: Hovering reveals active account details, 5-hour quota, weekly quota, exact reset countdown, and quick links.
+- **Customizable Display Formats**: Choose between `compact` (`AGY: 85%`), `detailed` (`AGY: 85% (1h 45m)`), and `percentageOnly` (`85%`).
+- **1-Click Quick Menu**: Click the status bar item to open a sleek QuickPick menu for instant account switching, adding accounts, opening dashboard, or refreshing.
+
+### 3. Auto-Refresh Quota & Low Quota Reminders
 - **Background Quota Monitoring**: Automatically polls and refreshes active account quota at customizable intervals (e.g. 1m, 5m, 15m, 30m, 1h).
 - **Low Quota Notification Alert**: Displays warning notifications when quota drops below threshold (e.g. 20%) with quick action buttons:
   - `[Switch Account]`: Opens interactive account switcher.
   - `[View Details]`: Opens the account switcher dashboard.
 - **Smart Deduplication**: Prevents alert spam by tracking notification state per reset cycle.
 
-### 3. Antigravity UI Synchronization (No Window Reload)
+### 4. Antigravity UI Synchronization (No Window Reload)
 - **Instant Official Panel Sync**: Automatically reconnects and refreshes the official Google Antigravity sidebar (`google.google-antigravity`) upon account switch, sign-out, or re-authentication via internal RPC hooks (`antigravity.reconnect` / `antigravity.triggerUpdate`).
 - **Zero Disruptions**: Eliminates the need to reload the VS Code window or lose active editor states.
 - **Safe Fallback**: Provides an optional prompt to reload window only if official auto-sync cannot be confirmed.
 
-### 4. Settings & Personalization Modal
+### 5. Settings & Personalization Modal
 - Accessible via the gear icon (`⚙`) on the dashboard header:
   - **Appearance**: Theme selection (*Follow VS Code*, *Dark*, *Light*, *System*) and Bilingual Language support (*English*, *Bahasa Indonesia*, *Automatic*).
   - **Quota & Reminders**: Enable/disable background auto-refresh, polling interval, and warning threshold (5% - 30%).
@@ -77,6 +82,7 @@ Access these commands via the VS Code Command Palette (`Ctrl+Shift+P` / `Cmd+Shi
 | Command | Title | Description |
 | :--- | :--- | :--- |
 | `boygr.antigravityAccountSwitcher.refreshAccountsView` | **Refresh** | Refresh runtime status, active account, quota, and saved accounts |
+| `boygr.antigravityAccountSwitcher.statusBarMenu` | **Status Bar Menu** | Open QuickPick menu to switch accounts or manage session directly from status bar |
 | `boygr.antigravityAccountSwitcher.switchAccount` | **Switch Account** | Switch to a saved account (opens QuickPick if called without arguments) |
 | `boygr.antigravityAccountSwitcher.addAccount` | **Add / Switch Google Account** | Initiate login to register a new Google account |
 | `boygr.antigravityAccountSwitcher.manageAccounts` | **Manage Accounts** | QuickPick-based account manager menu |
@@ -96,6 +102,12 @@ Customize behavior via VS Code Settings (`settings.json`):
 
 ```json
 {
+  // Show Antigravity active account quota indicator in the status bar (default: true)
+  "boygr.antigravityAccountSwitcher.showStatusBarItem": true,
+
+  // Display format for status bar indicator: "compact", "detailed", "percentageOnly" (default: "compact")
+  "boygr.antigravityAccountSwitcher.statusBarFormat": "compact",
+
   // Auto-refresh quota interval in minutes (0 = manual only, default: 5)
   "boygr.antigravityAccountSwitcher.autoRefreshIntervalMinutes": 5,
 
@@ -116,7 +128,7 @@ Customize behavior via VS Code Settings (`settings.json`):
 
 ### From VSIX Package
 
-1. Download or locate `antigravity-account-switcher-0.4.1.vsix`.
+1. Download or locate `antigravity-account-switcher-0.5.0.vsix`.
 2. In VS Code:
    - Go to **Extensions** (`Ctrl+Shift+X` / `Cmd+Shift+X`).
    - Click the `...` menu (top right of Extensions view).
@@ -124,7 +136,7 @@ Customize behavior via VS Code Settings (`settings.json`):
    - Choose the file.
 3. Or install via terminal:
    ```powershell
-   code --install-extension antigravity-account-switcher-0.4.1.vsix
+   code --install-extension antigravity-account-switcher-0.5.0.vsix
    ```
 
 ---
@@ -147,8 +159,8 @@ npm run package:vsix
 
 ---
 
-## License & Credits
+## Author & License
 
-- **Developer**: [Boy Gilang Ramadhan](https://boygr.com)
+- **Author & Developer**: [Boy Gilang Ramadhan](https://boygr.com)
 - **License**: [MIT License](LICENSE)
 - **Disclaimer**: Not affiliated with or endorsed by Google. Google Antigravity is a trademark of Google LLC.

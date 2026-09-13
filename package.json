@@ -2,7 +2,7 @@
     "name": "antigravity-account-switcher",
     "displayName": "Antigravity Account Switcher",
     "description": "Manage and switch Google accounts used by Google Antigravity in Visual Studio Code through Antigravity's existing authentication flow.",
-    "version": "0.4.1",
+    "version": "0.5.0",
     "publisher": "boygr",
     "author": {
         "name": "Boy Gilang Ramadhan",
@@ -37,7 +37,8 @@
         "onCommand:boygr.antigravityAccountSwitcher.saveCurrentAccount",
         "onCommand:boygr.antigravityAccountSwitcher.manageAccounts",
         "onView:boygr.antigravityAccountSwitcher.accountsView",
-        "onCommand:boygr.antigravityAccountSwitcher.addAccount"
+        "onCommand:boygr.antigravityAccountSwitcher.addAccount",
+        "onCommand:boygr.antigravityAccountSwitcher.statusBarMenu"
     ],
     "main": "./dist/extension.js",
     "contributes": {
@@ -128,6 +129,11 @@
                 "title": "Settings",
                 "category": "Antigravity Account Switcher",
                 "icon": "$(gear)"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.statusBarMenu",
+                "title": "Status Bar Menu",
+                "category": "Antigravity Account Switcher"
             }
         ],
         "viewsContainers": {
@@ -209,6 +215,26 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Automatically synchronize Antigravity's official sidebar after switching accounts or modifying authentication."
+                },
+                "boygr.antigravityAccountSwitcher.showStatusBarItem": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Show Antigravity active account quota indicator in the status bar."
+                },
+                "boygr.antigravityAccountSwitcher.statusBarFormat": {
+                    "type": "string",
+                    "default": "compact",
+                    "enum": [
+                        "compact",
+                        "detailed",
+                        "percentageOnly"
+                    ],
+                    "enumDescriptions": [
+                        "Compact (e.g. AGY: 85%)",
+                        "Detailed with countdown (e.g. AGY: 85% (1h 45m))",
+                        "Percentage only (e.g. 85%)"
+                    ],
+                    "description": "Display format for the Antigravity quota indicator in the status bar."
                 }
             }
         }

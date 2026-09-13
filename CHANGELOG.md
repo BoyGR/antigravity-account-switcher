@@ -4,6 +4,22 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [0.5.0] - 2026-09-13
+
+### Added
+- **Status Bar Quota Indicator**:
+  - Real-time remaining quota display on VS Code's status bar (`AGY: 85%`).
+  - Dynamic severity color coding: warning background at $\le 20\%$ quota, error background at $\le 10\%$ quota.
+  - Rich Markdown hover tooltip showing active account email, 5-hour quota, weekly quota, next reset countdown, and quick navigation shortcuts.
+  - Customizable display formats: `compact` (`AGY: 85%`), `detailed` (`AGY: 85% (1h 45m)`), and `percentageOnly` (`85%`).
+  - Configurable status bar visibility (`boygr.antigravityAccountSwitcher.showStatusBarItem`).
+- **1-Click Status Bar QuickPick Menu**:
+  - Quick action popup accessible directly by clicking the status bar item.
+  - One-click account switching between all saved Antigravity accounts with active status indicator.
+  - Shortcut actions to Add / Switch Account, Open Dashboard, Refresh Quota, and Open Settings.
+
+---
+
 ## [0.4.1] - 2026-09-13
 
 ### Added
