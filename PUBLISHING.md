@@ -11,7 +11,7 @@ Panduan lengkap untuk mempublikasikan ekstensi **Antigravity Account Switcher** 
 Identitas publisher di `package.json`:
 - **Publisher ID**: `boygr`
 - **Extension Name**: `antigravity-account-switcher`
-- **VSIX File**: `release/antigravity-account-switcher-1.0.0.vsix`
+- **VSIX File**: `release/antigravity-account-switcher-1.0.1.vsix`
 
 ---
 
@@ -29,7 +29,7 @@ Metode ini **tidak membutuhkan token CLI** dan bisa langsung dilakukan lewat bro
    - Klik tombol **New extension** $\rightarrow$ pilih **Visual Studio Code**.
    - Drag & drop atau pilih file:
      ```
-     release/antigravity-account-switcher-1.0.0.vsix
+     release/antigravity-account-switcher-1.0.1.vsix
      ```
    - Klik **Upload**.
 5. Tunggu proses verifikasi Microsoft (biasanya 2–5 menit). Ekstensi akan berstatus **Active** dan langsung dapat dicari di Extensions tab VS Code sedunia!
@@ -67,7 +67,7 @@ npm run publish:marketplace
 ```
 Atau jika ingin mempublikasikan file VSIX yang sudah dibuat:
 ```powershell
-npx @vscode/vsce publish --packagePath release/antigravity-account-switcher-1.0.0.vsix
+npx @vscode/vsce publish --packagePath release/antigravity-account-switcher-1.0.1.vsix
 ```
 
 ---
@@ -83,7 +83,7 @@ Open VSX adalah registry open-source alternatif yang digunakan oleh editor berba
    - Masuk ke profil Anda $\rightarrow$ **Namespaces**.
    - Daftarkan namespace `boygr`.
 4. Klik **Publish Extension**:
-   - Unggah file `release/antigravity-account-switcher-1.0.0.vsix`.
+   - Unggah file `release/antigravity-account-switcher-1.0.1.vsix`.
    - Ekstensi langsung tersedia untuk pengguna Cursor dan VSCodium.
 
 ---
@@ -93,7 +93,7 @@ Open VSX adalah registry open-source alternatif yang digunakan oleh editor berba
 2. Simpan token tersebut.
 3. Jalankan perintah publish:
 ```powershell
-npx ovsx publish release/antigravity-account-switcher-1.0.0.vsix -p <OPEN_VSX_TOKEN>
+npx ovsx publish release/antigravity-account-switcher-1.0.1.vsix -p <OPEN_VSX_TOKEN>
 ```
 Atau login:
 ```powershell
@@ -108,10 +108,10 @@ npm run publish:openvsx
 
 ## 3. Checklist Verifikasi Sebelum Publish
 
-- [x] Versi `package.json` dan `package-lock.json` sudah sinkron (`1.0.0`).
+- [x] Versi `package.json` dan `package-lock.json` sudah sinkron (`1.0.1`).
 - [x] Ikon ekstensi berformat PNG dan transparan (`media/icon.png`).
 - [x] Dokumentasi `README.md` dan `CHANGELOG.md` sudah lengkap dan rapi.
 - [x] Lisensi MIT (`LICENSE.txt`) disertakan.
 - [x] Kompilasi berhasil tanpa peringatan TypeScript atau error bundler esbuild (`npm run compile`).
-- [x] File VSIX telah terbuat dan diuji instalasinya secara lokal (`release/antigravity-account-switcher-1.0.0.vsix`).
+- [x] File VSIX telah terbuat dan diuji instalasinya secara lokal (`release/antigravity-account-switcher-1.0.1.vsix`).
 

@@ -41,7 +41,7 @@
         vaultedEmails: [],
 
         meta: {
-            version: "1.0.0",
+            version: "1.0.1",
             developer: "Boy Gilang Ramadhan",
             website: "https://boygr.com",
             iconUri: "",
@@ -4395,7 +4395,7 @@
                                 </span>
 
                                 <span>
-                                    v${escapeHtml(state.meta?.version || "1.0.0")}
+                                    v${escapeHtml(state.meta?.version || "1.0.1")}
                                 </span>
                             </div>
 

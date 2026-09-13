@@ -14,7 +14,7 @@ A Visual Studio Code extension for managing, monitoring quota, and switching Goo
 
 ### Status
 
-- **Version**: `1.0.0`
+- **Version**: `1.0.1`
 - **Supported Platforms**: Windows (with Instant Token Swapping), macOS, Linux
 - **Compatibility**: Visual Studio Code, Google Antigravity extension `1.3.0+`, AGY backend `1.2.2+`
 
@@ -220,7 +220,7 @@ Customize behavior via VS Code Settings (`settings.json`):
 
 ### From VSIX Package
 
-1. Download or locate `release/antigravity-account-switcher-1.0.0.vsix`.
+1. Download or locate `release/antigravity-account-switcher-1.0.1.vsix`.
 2. In VS Code:
    - Go to **Extensions** (`Ctrl+Shift+X` / `Cmd+Shift+X`).
    - Click the `...` menu (top right of Extensions view).
@@ -228,7 +228,7 @@ Customize behavior via VS Code Settings (`settings.json`):
    - Choose the file.
 3. Or install via terminal:
    ```powershell
-   code --install-extension release/antigravity-account-switcher-1.0.0.vsix
+   code --install-extension release/antigravity-account-switcher-1.0.1.vsix
    ```
 
 ---

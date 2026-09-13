@@ -4,6 +4,21 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.0.1] - 2026-09-14
+
+### Fixed
+- **Label Editor Vertical Layout**:
+  - Replaced horizontal grid styling in `.label-editor` with vertical flex column layout, preventing color picker dots and group pills from overlapping the label input box and Save button.
+  - Ensured label input box expands to full available width with dedicated confirm and cancel action buttons.
+- **Instant Switch Process Respawn Timing**:
+  - Sent official extension reconnect signal (`syncAntigravityUi()`) immediately after terminating `agy.exe`, prompting the Antigravity extension host to instantly spawn a new worker process with the new credentials.
+  - Resolved false error message *"Unable to verify the Antigravity account after authentication: No running Antigravity agy --hub process was found"*.
+- **Workspace Association Startup Tolerance**:
+  - Added polling tolerance during VS Code startup to wait for the Antigravity background process to finish booting before verifying workspace account links.
+  - Eliminated false *"Workspace is linked to ... Switch accounts now?"* confirmation prompts when already running as the associated account.
+
+---
+
 ## [1.0.0] - 2026-09-14
 
 ### Added
