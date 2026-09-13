@@ -469,7 +469,7 @@ export class AntigravityAccountWebviewProvider
                 version:
                     String(
                         this.context.extension.packageJSON.version ??
-                        "0.4.0",
+                        "0.4.1",
                     ),
 
                 developer:

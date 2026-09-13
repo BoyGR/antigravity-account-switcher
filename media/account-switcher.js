@@ -35,7 +35,7 @@
         },
 
         meta: {
-            version: "0.4.0",
+            version: "0.4.1",
             developer: "Boy Gilang Ramadhan",
             website: "https://boygr.com",
             iconUri: "",
@@ -3427,7 +3427,7 @@
                                 </span>
 
                                 <span>
-                                    v${escapeHtml(state.meta?.version || "0.4.0")}
+                                    v${escapeHtml(state.meta?.version || "0.4.1")}
                                 </span>
                             </div>
 
@@ -3517,7 +3517,7 @@
 
         const version =
             meta.version ||
-            "0.4.0";
+            "0.4.1";
 
         return `
             <footer class="developer-footer">

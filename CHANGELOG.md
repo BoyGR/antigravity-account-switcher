@@ -4,6 +4,18 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [0.4.1] - 2026-09-13
+
+### Added
+- **Official Transparent Branding**: High-resolution 256x256 transparent PNG extension icon and matching Activity Bar vector silhouette.
+- **Settings Modal Brand Integration**: Integrated official extension logo inside Settings About modal.
+
+### Changed
+- Standardized package identifier to `boygr.antigravity-account-switcher`.
+- Removed redundant prefix for clean, professional marketplace presence.
+
+---
+
 ## [0.4.0] - 2026-09-13
 
 ### Added
