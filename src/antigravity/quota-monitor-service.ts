@@ -20,6 +20,8 @@ export interface QuotaMonitorConfig {
     smartQuotaFallback?: boolean;
     notifyQuotaReset?: boolean;
     autoSwitchOnExhaustion?: boolean;
+    autoRoundRobin?: boolean;
+    enableQuotaAudio?: boolean;
 }
 
 /**
@@ -37,6 +39,8 @@ export class QuotaMonitorService implements vscode.Disposable {
     private config: QuotaMonitorConfig;
     private notifiedDeduplicationKeys = new Set<string>();
     private resetAlarmTimers = new Map<string, NodeJS.Timeout>();
+    private lastAutoRotationTime = 0;
+    public onAudioChime?: (chime: "restored" | "warning") => Promise<void> | void;
 
     constructor(
         private readonly context: vscode.ExtensionContext,
@@ -200,6 +204,10 @@ export class QuotaMonitorService implements vscode.Disposable {
                         }
                     }
 
+                    if (this.config.enableQuotaAudio !== false && this.onAudioChime) {
+                        void this.onAudioChime("warning");
+                    }
+
                     if (bestCandidate) {
                         const candidateName = bestCandidate.label || bestCandidate.email;
                         const alertMsg = `Antigravity Quota Low: ${bucketIdentifier} (${windowLabel}) is at ${remainingPercent}%. Switch to ${candidateName} (${bestCandidate.percent}% quota)?`;
@@ -292,6 +300,27 @@ export class QuotaMonitorService implements vscode.Disposable {
 
         const windowLabel = bucket.window || bucket.description || "current cycle";
         if (bestCandidate) {
+            if (this.config.autoRoundRobin) {
+                const now = Date.now();
+                if (now - this.lastAutoRotationTime > 60000) {
+                    this.lastAutoRotationTime = now;
+                    await vscode.commands.executeCommand(
+                        "boygr.antigravityAccountSwitcher.switchAccount",
+                        {
+                            email: bestCandidate.email,
+                            label: bestCandidate.label,
+                        },
+                    );
+                    const candidateName = bestCandidate.label || bestCandidate.email;
+                    void vscode.window.showInformationMessage(
+                        `⚡ Auto-Round-Robin: Rotated Antigravity account to ${candidateName} (${bestCandidate.percent}% available).`,
+                    );
+                    if (this.config.enableQuotaAudio !== false && this.onAudioChime) {
+                        void this.onAudioChime("warning");
+                    }
+                    return;
+                }
+            }
             const candidateName = bestCandidate.label || bestCandidate.email;
             const alertMsg = `⚡ Antigravity Rate Limit: Quota is exhausted (0%) for ${email}! Switch to ${candidateName} (${bestCandidate.percent}% available)?`;
             const switchBtn = `Switch Now (${candidateName})`;
@@ -376,6 +405,10 @@ export class QuotaMonitorService implements vscode.Disposable {
             );
             const displayName = targetAccount?.label || targetAccount?.email || email;
 
+            if (this.config.enableQuotaAudio !== false && this.onAudioChime) {
+                void this.onAudioChime("restored");
+            }
+
             if (currentEmail !== targetEmail) {
                 const switchBtn = `Switch back to ${displayName}`;
                 void vscode.window
@@ -422,6 +455,9 @@ export class QuotaMonitorService implements vscode.Disposable {
                     : 20,
             smartQuotaFallback: config.smartQuotaFallback !== false,
             notifyQuotaReset: config.notifyQuotaReset !== false,
+            autoSwitchOnExhaustion: config.autoSwitchOnExhaustion !== false,
+            autoRoundRobin: config.autoRoundRobin === true,
+            enableQuotaAudio: config.enableQuotaAudio !== false,
         };
     }
 

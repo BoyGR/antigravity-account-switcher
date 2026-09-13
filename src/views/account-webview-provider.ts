@@ -72,6 +72,10 @@ interface AccountSwitcherPreferences {
     lowQuotaThresholdPercent: number;
 
     smartQuotaFallback: boolean;
+
+    autoRoundRobin?: boolean;
+
+    enableQuotaAudio?: boolean;
 }
 
 interface ResolvedAccountSwitcherPreferences
@@ -195,6 +199,8 @@ const DEFAULT_PREFERENCES: AccountSwitcherPreferences = {
     enableLowQuotaReminder: true,
     lowQuotaThresholdPercent: 20,
     smartQuotaFallback: true,
+    autoRoundRobin: false,
+    enableQuotaAudio: true,
 };
 
 export class AntigravityAccountWebviewProvider
@@ -252,6 +258,8 @@ export class AntigravityAccountWebviewProvider
                 reminderEnabled: prefs.enableLowQuotaReminder,
                 thresholdPercent: prefs.lowQuotaThresholdPercent,
                 smartQuotaFallback: prefs.smartQuotaFallback,
+                autoRoundRobin: prefs.autoRoundRobin,
+                enableQuotaAudio: prefs.enableQuotaAudio,
             },
             async usage => {
                 this.snapshot = {
@@ -269,6 +277,14 @@ export class AntigravityAccountWebviewProvider
                 }
             },
         );
+        this.quotaMonitor.onAudioChime = async (chime: "restored" | "warning") => {
+            if (this.view) {
+                await this.view.webview.postMessage({
+                    type: "playChime",
+                    chime,
+                });
+            }
+        };
         this.context.subscriptions.push(this.quotaMonitor);
     }
 
@@ -371,6 +387,22 @@ export class AntigravityAccountWebviewProvider
 
         await this.view.webview.postMessage({
             type: "openSettings",
+        });
+    }
+
+    async openQuotaMatrix(): Promise<void> {
+        if (!this.view) {
+            await vscode.commands.executeCommand(
+                `${VIEW_ID}.focus`,
+            );
+        }
+
+        if (!this.view) {
+            return;
+        }
+
+        await this.view.webview.postMessage({
+            type: "openQuotaMatrix",
         });
     }
 
@@ -990,6 +1022,16 @@ export class AntigravityAccountWebviewProvider
                 ? input.smartQuotaFallback
                 : DEFAULT_PREFERENCES.smartQuotaFallback;
 
+        const autoRoundRobin =
+            typeof input.autoRoundRobin === "boolean"
+                ? input.autoRoundRobin
+                : DEFAULT_PREFERENCES.autoRoundRobin;
+
+        const enableQuotaAudio =
+            typeof input.enableQuotaAudio === "boolean"
+                ? input.enableQuotaAudio
+                : DEFAULT_PREFERENCES.enableQuotaAudio;
+
         return {
             version: 1,
             theme,
@@ -1010,6 +1052,8 @@ export class AntigravityAccountWebviewProvider
             enableLowQuotaReminder,
             lowQuotaThresholdPercent,
             smartQuotaFallback,
+            autoRoundRobin,
+            enableQuotaAudio,
         };
     }
 
@@ -1054,6 +1098,8 @@ export class AntigravityAccountWebviewProvider
             enableLowQuotaReminder?: boolean;
             lowQuotaThresholdPercent?: number;
             smartQuotaFallback?: boolean;
+            autoRoundRobin?: boolean;
+            enableQuotaAudio?: boolean;
         },
     ): Promise<void> {
         const preferences =
@@ -1072,6 +1118,8 @@ export class AntigravityAccountWebviewProvider
             reminderEnabled: preferences.enableLowQuotaReminder,
             thresholdPercent: preferences.lowQuotaThresholdPercent,
             smartQuotaFallback: preferences.smartQuotaFallback,
+            autoRoundRobin: preferences.autoRoundRobin,
+            enableQuotaAudio: preferences.enableQuotaAudio,
         });
     }
 

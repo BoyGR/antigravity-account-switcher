@@ -108,9 +108,10 @@ npm run publish:openvsx
 
 ## 3. Checklist Verifikasi Sebelum Publish
 
-- [x] Versi `package.json` dan `package-lock.json` sudah sinkron (`0.8.0`).
+- [x] Versi `package.json` dan `package-lock.json` sudah sinkron (`0.9.0`).
 - [x] Ikon ekstensi berformat PNG dan transparan (`media/icon.png`).
 - [x] Dokumentasi `README.md` dan `CHANGELOG.md` sudah lengkap dan rapi.
 - [x] Lisensi MIT (`LICENSE.txt`) disertakan.
 - [x] Kompilasi berhasil tanpa peringatan TypeScript atau error bundler esbuild (`npm run compile`).
-- [x] File VSIX telah terbuat dan diuji instalasinya secara lokal (`release/antigravity-account-switcher-0.8.0.vsix`).
+- [x] File VSIX telah terbuat dan diuji instalasinya secara lokal (`release/antigravity-account-switcher-0.9.0.vsix`).
+

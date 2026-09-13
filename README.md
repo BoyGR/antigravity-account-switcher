@@ -14,7 +14,7 @@ A Visual Studio Code extension for managing, monitoring quota, and switching Goo
 
 ### Status
 
-- **Version**: `0.8.0`
+- **Version**: `0.9.0`
 - **Supported Platforms**: Windows, macOS, Linux
 - **Compatibility**: Visual Studio Code, Google Antigravity extension `1.3.0+`, AGY backend `1.2.2+`
 
@@ -101,6 +101,21 @@ A Visual Studio Code extension for managing, monitoring quota, and switching Goo
 - Direct "Export" button in the 7-Day Quota Analytics dashboard header.
 - Accessible via command `boygr.antigravityAccountSwitcher.exportQuotaAnalytics`.
 
+### 13. Multi-Account Quota Matrix Dashboard
+- Full-screen modal comparison matrix displaying real-time 5-hour and weekly quota progress bars, exact reset countdowns, and 1-click switch buttons for all saved accounts side-by-side.
+- Dedicated "Quota Matrix" trigger button in the runtime status bar and title navigation action.
+- Accessible via command `boygr.antigravityAccountSwitcher.quotaOverview`.
+
+### 14. Auto-Round-Robin Account Rotation
+- Automatically switches to the best backup account with the highest available quota when active account quota drops to 0% exhaustion or encounters rate limit errors.
+- Built-in 60-second cooldown protection against rapid switching loops.
+- Configurable via `boygr.antigravityAccountSwitcher.autoRoundRobin`.
+
+### 15. Subtle Quota Audio Chimes
+- Pure synthesized Web Audio API (`AudioContext`) melodic feedback for quota restoration (ascending chime) and critical quota warnings (gentle descending tone).
+- Zero external audio files required, completely lightweight and non-intrusive.
+- Configurable via `boygr.antigravityAccountSwitcher.enableQuotaAudio`.
+
 ---
 
 ## Security Model
@@ -121,6 +136,7 @@ Access these commands via the VS Code Command Palette (`Ctrl+Shift+P` / `Cmd+Shi
 | :--- | :--- | :--- | :--- |
 | `boygr.antigravityAccountSwitcher.statusBarMenu` | **Status Bar Menu** | `Alt+A` (`Cmd+Alt+A`) | Open QuickPick menu to switch accounts sorted by quota |
 | `boygr.antigravityAccountSwitcher.refreshAccountsView` | **Refresh** | `Alt+Shift+A` (`Cmd+Alt+Shift+A`) | Refresh runtime status, active account, quota, and saved accounts |
+| `boygr.antigravityAccountSwitcher.quotaOverview` | **View Multi-Account Quota Matrix...** | | Open full-screen quota comparison matrix for all accounts |
 | `boygr.antigravityAccountSwitcher.switchAccount` | **Switch Account** | | Switch to a saved account directly or via QuickPick |
 | `boygr.antigravityAccountSwitcher.setWorkspaceAccount` | **Set Default Account for Workspace...** | | Link active project folder to a default Antigravity account |
 | `boygr.antigravityAccountSwitcher.clearWorkspaceAccount` | **Clear Default Account for Workspace** | | Remove project folder account link |
@@ -175,7 +191,13 @@ Customize behavior via VS Code Settings (`settings.json`):
   "boygr.antigravityAccountSwitcher.autoPromptWorkspaceAccount": true,
 
   // Automatically sync official Antigravity UI on account changes (default: true)
-  "boygr.antigravityAccountSwitcher.autoSyncOfficialUi": true
+  "boygr.antigravityAccountSwitcher.autoSyncOfficialUi": true,
+
+  // Automatically switch to best backup account on quota exhaustion (default: false)
+  "boygr.antigravityAccountSwitcher.autoRoundRobin": false,
+
+  // Play subtle synthesized audio chimes on quota restoration or warning (default: true)
+  "boygr.antigravityAccountSwitcher.enableQuotaAudio": true
 }
 ```
 
@@ -185,7 +207,7 @@ Customize behavior via VS Code Settings (`settings.json`):
 
 ### From VSIX Package
 
-1. Download or locate `release/antigravity-account-switcher-0.8.0.vsix`.
+1. Download or locate `release/antigravity-account-switcher-0.9.0.vsix`.
 2. In VS Code:
    - Go to **Extensions** (`Ctrl+Shift+X` / `Cmd+Shift+X`).
    - Click the `...` menu (top right of Extensions view).
@@ -193,7 +215,7 @@ Customize behavior via VS Code Settings (`settings.json`):
    - Choose the file.
 3. Or install via terminal:
    ```powershell
-   code --install-extension release/antigravity-account-switcher-0.8.0.vsix
+   code --install-extension release/antigravity-account-switcher-0.9.0.vsix
    ```
 
 ---

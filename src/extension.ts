@@ -95,12 +95,21 @@ export function activate(
 
     const exportAnalyticsCommand = registerExportAnalyticsCommand(context);
 
+    const quotaOverviewCommand =
+        vscode.commands.registerCommand(
+            "boygr.antigravityAccountSwitcher.quotaOverview",
+            async () => {
+                await accountWebview.openQuotaMatrix();
+            },
+        );
+
     context.subscriptions.push(
         statusBarManager,
         statusBarMenuCommand,
         diagnoseCommand,
         refreshCommand,
         exportAnalyticsCommand,
+        quotaOverviewCommand,
         ...backupCommands,
         ...recoveryCommands,
         ...workspaceCommands,

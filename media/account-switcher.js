@@ -32,10 +32,13 @@
             autoRefreshIntervalMinutes: 5,
             enableLowQuotaReminder: true,
             lowQuotaThresholdPercent: 20,
+            smartQuotaFallback: true,
+            autoRoundRobin: false,
+            enableQuotaAudio: true,
         },
 
         meta: {
-            version: "0.8.0",
+            version: "0.9.0",
             developer: "Boy Gilang Ramadhan",
             website: "https://boygr.com",
             iconUri: "",
@@ -96,6 +99,9 @@
             null,
 
         runtimeModalOpen:
+            false,
+
+        quotaMatrixOpen:
             false,
     };
 
@@ -495,6 +501,27 @@
 
             exportAnalytics:
                 "Export Analytics",
+
+            autoRoundRobin:
+                "Auto-Round-Robin (Switch on rate limit)",
+
+            enableQuotaAudio:
+                "Subtle Audio Alerts (Web Audio)",
+
+            quotaMatrix:
+                "Quota Matrix",
+
+            quotaMatrixTitle:
+                "Multi-Account Quota Matrix",
+
+            quotaMatrixSub:
+                "Real-time quota comparison across all accounts",
+
+            switchNow:
+                "Switch",
+
+            noSnapshotYet:
+                "No quota data yet",
 
             workspace:
                 "Workspace",
@@ -896,6 +923,27 @@
             exportAnalytics:
                 "Ekspor Analitik",
 
+            autoRoundRobin:
+                "Auto-Round-Robin (Ganti saat kuota habis)",
+
+            enableQuotaAudio:
+                "Notifikasi Suara Lembut (Web Audio)",
+
+            quotaMatrix:
+                "Matriks Kuota",
+
+            quotaMatrixTitle:
+                "Matriks Kuota Multi-Akun",
+
+            quotaMatrixSub:
+                "Perbandingan sisa kuota semua akun secara real-time",
+
+            switchNow:
+                "Ganti",
+
+            noSnapshotYet:
+                "Belum ada data kuota",
+
             workspace:
                 "Workspace",
 
@@ -1104,6 +1152,15 @@
                     />
                 </svg>
             `,
+
+            matrix: `
+                <svg ${common}>
+                    <rect x="2.2" y="2.2" width="4.8" height="4.8" rx="1.2" stroke="currentColor" stroke-width="1.2"/>
+                    <rect x="9" y="2.2" width="4.8" height="4.8" rx="1.2" stroke="currentColor" stroke-width="1.2"/>
+                    <rect x="2.2" y="9" width="4.8" height="4.8" rx="1.2" stroke="currentColor" stroke-width="1.2"/>
+                    <rect x="9" y="9" width="4.8" height="4.8" rx="1.2" stroke="currentColor" stroke-width="1.2"/>
+                </svg>
+            `,
         };
 
         return icons[name] || "";
@@ -1114,6 +1171,58 @@
         )
             .trim()
             .toLowerCase();
+    }
+
+    function playChime(type) {
+        if (state.preferences?.enableQuotaAudio === false) {
+            return;
+        }
+
+        try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) {
+                return;
+            }
+
+            const ctx = new AudioCtx();
+            if (type === "restored") {
+                const freqs = [523.25, 659.25, 783.99, 1046.5];
+                freqs.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = "sine";
+                    osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.07);
+                    gain.gain.setValueAtTime(0.06, ctx.currentTime + idx * 0.07);
+                    gain.gain.exponentialRampToValueAtTime(
+                        0.0001,
+                        ctx.currentTime + idx * 0.07 + 0.55
+                    );
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(ctx.currentTime + idx * 0.07);
+                    osc.stop(ctx.currentTime + idx * 0.07 + 0.55);
+                });
+            } else if (type === "warning") {
+                const freqs = [440, 369.99];
+                freqs.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = "sine";
+                    osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.12);
+                    gain.gain.setValueAtTime(0.05, ctx.currentTime + idx * 0.12);
+                    gain.gain.exponentialRampToValueAtTime(
+                        0.0001,
+                        ctx.currentTime + idx * 0.12 + 0.4
+                    );
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(ctx.currentTime + idx * 0.12);
+                    osc.stop(ctx.currentTime + idx * 0.12 + 0.4);
+                });
+            }
+        } catch {
+            // Autoplay restrictions handled gracefully
+        }
     }
 
     function persistUi() {
@@ -3485,6 +3594,17 @@
                     <span class="runtime-status-pill-label">Antigravity:</span>
                     <span class="runtime-status-pill-value">${escapeHtml(summaryText)}</span>
                 </button>
+
+                <button
+                    type="button"
+                    class="quota-matrix-trigger-btn"
+                    data-action="open-quota-matrix"
+                    title="${escapeHtml(t("quotaMatrixTitle"))}"
+                    aria-label="${escapeHtml(t("quotaMatrixTitle"))}"
+                >
+                    ${icon("matrix", "matrix-icon")}
+                    <span>${escapeHtml(t("quotaMatrix"))}</span>
+                </button>
             </div>
         `;
     }
@@ -3682,7 +3802,200 @@
             </div>
         `;
     }
-        function renderSettings() {
+
+    function renderQuotaMatrixModal() {
+        if (!ui.quotaMatrixOpen) {
+            return "";
+        }
+
+        const accounts = state.accounts || [];
+        const snapshots = state.usageSnapshots || {};
+        const currentEmail = normalizeEmail(state.current?.email || "");
+
+        const sorted = [...accounts].sort((a, b) => {
+            const aNorm = normalizeEmail(a.email);
+            const bNorm = normalizeEmail(b.email);
+            if (aNorm === currentEmail) return -1;
+            if (bNorm === currentEmail) return 1;
+
+            const aPct = getAccountQuotaPercent(a);
+            const bPct = getAccountQuotaPercent(b);
+            const aVal = typeof aPct === "number" ? aPct : -1;
+            const bVal = typeof bPct === "number" ? bPct : -1;
+
+            if (aVal !== bVal) {
+                return bVal - aVal;
+            }
+
+            return (a.label || a.displayName || a.email).localeCompare(b.label || b.displayName || b.email);
+        });
+
+        const cardsHtml = sorted.length === 0
+            ? `
+                <div class="matrix-empty secondary-text">
+                    ${escapeHtml(t("noSaved"))}
+                </div>
+            `
+            : sorted.map(account => {
+                const norm = normalizeEmail(account.email);
+                const isActive = Boolean(currentEmail && norm === currentEmail);
+                const usage = isActive ? (state.usage || snapshots[norm]) : snapshots[norm];
+
+                const displayName = account.displayName || account.label || account.email;
+                const localLabel = account.label || (isActive ? t("currentAccountLabel") : "");
+
+                let fiveHourPct = null;
+                let fiveHourReset = "";
+                let weeklyPct = null;
+                let weeklyReset = "";
+
+                if (usage?.buckets && Array.isArray(usage.buckets)) {
+                    for (const b of usage.buckets) {
+                        const id = (b.displayName || b.bucketId || "").toLowerCase();
+                        const win = (b.window || b.description || "").toLowerCase();
+                        const is5h = id.includes("5-hour") || id.includes("5h") || win.includes("5 hour") || win.includes("5h");
+                        const isWeekly = id.includes("week") || win.includes("week") || win.includes("7 day");
+
+                        if (typeof b.remainingFraction === "number" && !b.disabled) {
+                            const pct = Math.max(0, Math.min(100, Math.round(b.remainingFraction * 100)));
+                            const resetStr = b.resetTime ? formatResetTime(b.resetTime) : "";
+
+                            if (is5h || (fiveHourPct === null && !isWeekly)) {
+                                fiveHourPct = pct;
+                                fiveHourReset = resetStr;
+                            } else if (isWeekly) {
+                                weeklyPct = pct;
+                                weeklyReset = resetStr;
+                            }
+                        }
+                    }
+                }
+
+                if (fiveHourPct === null) {
+                    const fallbackPct = getAccountQuotaPercent(account);
+                    if (typeof fallbackPct === "number") {
+                        fiveHourPct = fallbackPct;
+                    }
+                }
+
+                const toneClass = (pct) => {
+                    if (typeof pct !== "number") return "tone-empty";
+                    return pct <= 15 ? "tone-critical" : pct <= 35 ? "tone-warn" : "tone-healthy";
+                };
+
+                return `
+                    <div class="matrix-card ${isActive ? "active-matrix-card" : ""}">
+                        <div class="matrix-identity-col">
+                            ${renderAvatar(
+                                displayName,
+                                account.email,
+                                account.profilePictureUrl || (isActive ? state.current?.profilePictureUrl : undefined),
+                                account.colorTag ? `matrix-avatar tag-${escapeHtml(account.colorTag)}` : "matrix-avatar"
+                            )}
+                            <div class="matrix-identity-info">
+                                <div class="matrix-name-row">
+                                    <span class="matrix-account-name" title="${escapeHtml(displayName)}">${escapeHtml(displayName)}</span>
+                                    ${account.colorTag ? `<span class="color-tag-dot dot-${escapeHtml(account.colorTag)}"></span>` : ""}
+                                    ${isActive ? `<span class="badge active-badge">${escapeHtml(t("active"))}</span>` : ""}
+                                </div>
+                                <div class="matrix-email-row" title="${escapeHtml(account.email)}">${escapeHtml(account.email)}</div>
+                                <div class="matrix-tags-row">
+                                    ${localLabel ? `<span class="account-label">${escapeHtml(localLabel)}</span>` : ""}
+                                    ${account.group ? `<span class="group-pill" title="Group: ${escapeHtml(account.group)}">🏷️ ${escapeHtml(account.group)}</span>` : ""}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="matrix-quota-col">
+                            <div class="matrix-quota-block">
+                                <div class="matrix-quota-label-row">
+                                    <span class="matrix-quota-dim">${escapeHtml(t("fiveHourShort") || "5h")}:</span>
+                                    <strong>${typeof fiveHourPct === "number" ? `${fiveHourPct}%` : "-"}</strong>
+                                </div>
+                                <div class="matrix-quota-track">
+                                    <div class="matrix-quota-fill ${toneClass(fiveHourPct)}" style="width: ${typeof fiveHourPct === "number" ? fiveHourPct : 0}%;"></div>
+                                </div>
+                                ${fiveHourReset ? `<span class="matrix-reset-sub">${escapeHtml(fiveHourReset)}</span>` : ""}
+                            </div>
+
+                            <div class="matrix-quota-block">
+                                <div class="matrix-quota-label-row">
+                                    <span class="matrix-quota-dim">${escapeHtml(t("weeklyShort") || "Weekly")}:</span>
+                                    <strong>${typeof weeklyPct === "number" ? `${weeklyPct}%` : "-"}</strong>
+                                </div>
+                                <div class="matrix-quota-track">
+                                    <div class="matrix-quota-fill ${toneClass(weeklyPct)}" style="width: ${typeof weeklyPct === "number" ? weeklyPct : 0}%;"></div>
+                                </div>
+                                ${weeklyReset ? `<span class="matrix-reset-sub">${escapeHtml(weeklyReset)}</span>` : ""}
+                            </div>
+                        </div>
+
+                        <div class="matrix-action-col">
+                            ${isActive
+                                ? `<span class="matrix-connected-pill">✓ ${escapeHtml(t("connected"))}</span>`
+                                : `
+                                    <button
+                                        type="button"
+                                        class="btn btn-primary compact matrix-switch-btn"
+                                        data-action="switch"
+                                        data-email="${escapeHtml(account.email)}"
+                                        title="${escapeHtml(t("switch"))}"
+                                    >
+                                        ${escapeHtml(t("switchNow"))}
+                                    </button>
+                                `
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join("");
+
+        return `
+            <div class="matrix-modal-backdrop" data-action="close-quota-matrix">
+                <section
+                    class="matrix-modal-panel"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="${escapeHtml(t("quotaMatrixTitle"))}"
+                >
+                    <header class="matrix-modal-header">
+                        <div class="matrix-modal-title-group">
+                            <h2>${icon("matrix", "modal-header-icon")} ${escapeHtml(t("quotaMatrixTitle"))}</h2>
+                            <span class="secondary-text">${escapeHtml(t("quotaMatrixSub"))}</span>
+                        </div>
+                        <button
+                            type="button"
+                            class="icon-btn"
+                            data-action="close-quota-matrix"
+                            aria-label="${escapeHtml(t("cancel") || "Close")}"
+                            title="${escapeHtml(t("cancel") || "Close")}"
+                        >
+                            ${icon("close")}
+                        </button>
+                    </header>
+
+                    <div class="matrix-modal-body">
+                        <div class="matrix-list">
+                            ${cardsHtml}
+                        </div>
+                    </div>
+
+                    <footer class="matrix-modal-footer">
+                        <span class="secondary-text">${sorted.length} ${escapeHtml(t("savedAccounts"))}</span>
+                        <button
+                            type="button"
+                            class="btn"
+                            data-action="close-quota-matrix"
+                        >
+                            ${escapeHtml(t("cancel") || "Close")}
+                        </button>
+                    </footer>
+                </section>
+            </div>
+        `;
+    }
+
+    function renderSettings() {
         if (
             !ui.settingsOpen ||
             !ui.settingsDraft
@@ -3914,6 +4227,22 @@
                                     "smartQuotaFallback",
                                     t("smartQuotaFallback"),
                                     draft.smartQuotaFallback !== false
+                                )
+                            }
+
+                            ${
+                                renderCheckbox(
+                                    "autoRoundRobin",
+                                    t("autoRoundRobin"),
+                                    draft.autoRoundRobin === true
+                                )
+                            }
+
+                            ${
+                                renderCheckbox(
+                                    "enableQuotaAudio",
+                                    t("enableQuotaAudio"),
+                                    draft.enableQuotaAudio !== false
                                 )
                             }
                         </div>
@@ -4201,6 +4530,7 @@
             ${renderSettings()}
             ${renderRemoveDialog()}
             ${renderRuntimeModal()}
+            ${renderQuotaMatrixModal()}
         `;
 
         bindAvatarFallback();
@@ -4364,6 +4694,12 @@
 
             smartQuotaFallback:
                 preferences.smartQuotaFallback !== false,
+
+            autoRoundRobin:
+                preferences.autoRoundRobin === true,
+
+            enableQuotaAudio:
+                preferences.enableQuotaAudio !== false,
         };
 
         ui.settingsOpen =
@@ -4606,6 +4942,21 @@
                 return;
             }
 
+            if (action === "open-quota-matrix") {
+                ui.quotaMatrixOpen = true;
+                render();
+                return;
+            }
+
+            if (action === "close-quota-matrix") {
+                if (target.classList.contains("matrix-modal-backdrop") && rawTarget !== target) {
+                    return;
+                }
+                ui.quotaMatrixOpen = false;
+                render();
+                return;
+            }
+
             if (action === "export-accounts") {
                 vscode.postMessage({
                     type: "exportAccounts",
@@ -4779,6 +5130,7 @@
                     );
 
                 if (account) {
+                    ui.quotaMatrixOpen = false;
                     setOperation({
                         type: "switch",
                         email:
@@ -4867,6 +5219,12 @@
                 event.key ===
                     "Escape"
             ) {
+                if (ui.quotaMatrixOpen) {
+                    ui.quotaMatrixOpen = false;
+                    render();
+                    return;
+                }
+
                 if (ui.runtimeModalOpen) {
                     ui.runtimeModalOpen = false;
                     render();
@@ -4992,6 +5350,17 @@
                     "openSettings"
             ) {
                 openSettings();
+                return;
+            }
+
+            if (message.type === "openQuotaMatrix") {
+                ui.quotaMatrixOpen = true;
+                render();
+                return;
+            }
+
+            if (message.type === "playChime") {
+                playChime(message.chime);
                 return;
             }
 

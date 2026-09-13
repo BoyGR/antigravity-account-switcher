@@ -4891,7 +4891,36 @@ main {
 .runtime-status-bar {
     display: flex;
     align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
     margin: 4px 0 10px 0;
+}
+
+.quota-matrix-trigger-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    border: 1px solid var(--ag-border, rgba(255, 255, 255, 0.12));
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--ag-card-bg, #252526) 88%, transparent);
+    color: var(--ag-fg-muted, var(--vscode-descriptionForeground, #cccccc));
+    font-size: 11px;
+    line-height: 1.35;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.quota-matrix-trigger-btn:hover {
+    background: var(--vscode-toolbar-hoverBackground, rgba(255, 255, 255, 0.08));
+    border-color: #38bdf8;
+    color: #38bdf8;
+}
+
+.quota-matrix-trigger-btn .matrix-icon {
+    width: 12px;
+    height: 12px;
 }
 
 .runtime-status-pill {
@@ -5711,6 +5740,261 @@ body {
     border-color: #38bdf8;
     font-weight: 600;
 }
+
+/* === V0.9.0 MULTI-ACCOUNT QUOTA MATRIX MODAL === */
+.matrix-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    background: color-mix(in srgb, #000 60%, transparent);
+    backdrop-filter: blur(2px);
+    animation: runtimeModalFadeIn 0.15s ease-out;
+}
+
+.matrix-modal-panel {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 520px;
+    max-height: 85vh;
+    overflow: hidden;
+    border: 1px solid var(--ag-border, rgba(255, 255, 255, 0.12));
+    border-radius: 10px;
+    background: var(--ag-bg, var(--vscode-sideBar-background, #1e1e1e));
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+    animation: runtimeModalZoomIn 0.15s ease-out;
+}
+
+.matrix-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--ag-border, rgba(255, 255, 255, 0.1));
+    background: var(--ag-raised, rgba(255, 255, 255, 0.02));
+}
+
+.matrix-modal-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.matrix-modal-title-group h2 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--ag-fg, var(--vscode-foreground, #ffffff));
+}
+
+.matrix-modal-title-group .modal-header-icon {
+    width: 15px;
+    height: 15px;
+    color: #38bdf8;
+}
+
+.matrix-modal-title-group .secondary-text {
+    font-size: 11px;
+    color: var(--ag-muted, var(--vscode-descriptionForeground, #888));
+}
+
+.matrix-modal-body {
+    padding: 10px 12px;
+    overflow-y: auto;
+    max-height: calc(85vh - 110px);
+}
+
+.matrix-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.matrix-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--ag-border, rgba(255, 255, 255, 0.08));
+    border-radius: 8px;
+    background: var(--ag-raised, rgba(255, 255, 255, 0.03));
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.matrix-card:hover {
+    background: color-mix(in srgb, var(--ag-raised) 90%, rgba(255, 255, 255, 0.05));
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+.matrix-card.active-matrix-card {
+    border-color: rgba(56, 189, 248, 0.45);
+    background: color-mix(in srgb, var(--ag-raised) 85%, rgba(56, 189, 248, 0.08));
+    box-shadow: inset 2px 0 0 #38bdf8;
+}
+
+.matrix-identity-col {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1 1 38%;
+    min-width: 0;
+}
+
+.matrix-identity-col .matrix-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.matrix-identity-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 2px;
+}
+
+.matrix-name-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.matrix-account-name {
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--ag-fg, var(--vscode-foreground, #fff));
+}
+
+.matrix-email-row {
+    font-size: 10.5px;
+    color: var(--ag-muted, var(--vscode-descriptionForeground, #888));
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.matrix-tags-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-top: 1px;
+}
+
+.matrix-quota-col {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1 1 38%;
+    min-width: 110px;
+}
+
+.matrix-quota-block {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.matrix-quota-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    line-height: 1.2;
+}
+
+.matrix-quota-dim {
+    color: var(--ag-muted, #888);
+}
+
+.matrix-quota-track {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.matrix-quota-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.matrix-quota-fill.tone-healthy {
+    background-color: var(--vscode-testing-iconPassed, #4ec9b0);
+}
+
+.matrix-quota-fill.tone-warn {
+    background-color: var(--vscode-charts-yellow, #cca700);
+}
+
+.matrix-quota-fill.tone-critical {
+    background-color: var(--vscode-testing-iconFailed, #f14c4c);
+}
+
+.matrix-quota-fill.tone-empty {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.matrix-reset-sub {
+    font-size: 9px;
+    color: var(--ag-muted, #777);
+    line-height: 1.1;
+}
+
+.matrix-action-col {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 0 0 auto;
+}
+
+.matrix-switch-btn {
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.matrix-connected-pill {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--vscode-testing-iconPassed, #4ec9b0);
+    padding: 2px 7px;
+    border: 1px solid rgba(78, 201, 176, 0.3);
+    border-radius: 10px;
+    background: rgba(78, 201, 176, 0.1);
+    white-space: nowrap;
+}
+
+.matrix-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    border-top: 1px solid var(--ag-border, rgba(255, 255, 255, 0.1));
+    background: var(--ag-raised, rgba(255, 255, 255, 0.02));
+}
+
+.matrix-modal-footer .secondary-text {
+    font-size: 11px;
+    color: var(--ag-muted, #888);
+}
+
 
 
 

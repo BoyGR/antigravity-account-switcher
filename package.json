@@ -2,7 +2,7 @@
     "name": "antigravity-account-switcher",
     "displayName": "Antigravity Account Switcher",
     "description": "Manage and switch Google accounts used by Google Antigravity in Visual Studio Code through Antigravity's existing authentication flow.",
-    "version": "0.8.0",
+    "version": "0.9.0",
     "publisher": "boygr",
     "author": {
         "name": "Boy Gilang Ramadhan",
@@ -176,6 +176,12 @@
                 "title": "Export Quota Analytics (CSV/JSON)...",
                 "category": "Antigravity Account Switcher",
                 "icon": "$(graph)"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.quotaOverview",
+                "title": "View Multi-Account Quota Matrix...",
+                "category": "Antigravity Account Switcher",
+                "icon": "$(dashboard)"
             }
         ],
         "viewsContainers": {
@@ -205,9 +211,14 @@
                     "group": "navigation@1"
                 },
                 {
-                    "command": "boygr.antigravityAccountSwitcher.openSettings",
+                    "command": "boygr.antigravityAccountSwitcher.quotaOverview",
                     "when": "view == boygr.antigravityAccountSwitcher.accountsView",
                     "group": "navigation@2"
+                },
+                {
+                    "command": "boygr.antigravityAccountSwitcher.openSettings",
+                    "when": "view == boygr.antigravityAccountSwitcher.accountsView",
+                    "group": "navigation@3"
                 }
             ]
         },
@@ -279,6 +290,16 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Suggest an immediate 1-click switch to your best available backup account when active quota is completely exhausted (0%)."
+                },
+                "boygr.antigravityAccountSwitcher.autoRoundRobin": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Automatically rotate to the best available backup account when active account hits rate limit (0% remaining)."
+                },
+                "boygr.antigravityAccountSwitcher.enableQuotaAudio": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Play subtle synthesized audio chimes when quota resets or reaches critical low thresholds."
                 },
                 "boygr.antigravityAccountSwitcher.autoPromptWorkspaceAccount": {
                     "type": "boolean",

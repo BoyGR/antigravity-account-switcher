@@ -4,6 +4,23 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [0.9.0] - 2026-09-14
+
+### Added
+- **Multi-Account Quota Matrix Dashboard**:
+  - Modal comparison view displaying real-time 5-hour and weekly quota progress bars, exact reset countdowns, and 1-click switch buttons for all saved accounts side-by-side.
+  - Dedicated "Quota Matrix" trigger button in the runtime status bar and title navigation action (`boygr.antigravityAccountSwitcher.quotaOverview`).
+- **Auto-Round-Robin Account Rotation**:
+  - Automatically rotates to the best backup account with the highest available quota when active account quota drops to 0% exhaustion or encounters rate limit errors.
+  - Built-in 60-second cooldown protection against rapid switching loops.
+  - Configurable setting `boygr.antigravityAccountSwitcher.autoRoundRobin` (disabled by default for safe opt-in).
+- **Subtle Quota Audio Chimes**:
+  - Pure synthesized Web Audio API (`AudioContext`) melodic sound feedback on quota restoration (ascending chime) and critical quota warnings (gentle descending tone).
+  - Zero external MP3/WAV dependencies, lightweight and non-intrusive.
+  - Configurable setting `boygr.antigravityAccountSwitcher.enableQuotaAudio` (enabled by default).
+
+---
+
 ## [0.8.0] - 2026-09-13
 
 ### Added
