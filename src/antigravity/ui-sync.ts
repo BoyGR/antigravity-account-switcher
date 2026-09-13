@@ -31,15 +31,25 @@ export async function syncAntigravityUi(options?: {
         if (autoSync) {
             try {
                 const commands = await vscode.commands.getCommands(true);
+                const candidateCommands = [
+                    "antigravity.reconnect",
+                    "antigravity.restartHub",
+                    "antigravity.restartServer",
+                    "antigravity.connectHub",
+                    "antigravity.triggerUpdate",
+                ];
 
-                if (commands.includes("antigravity.reconnect")) {
-                    await vscode.commands.executeCommand("antigravity.reconnect");
-                    result.syncedOfficialPanel = true;
-                    result.officialCommandExecuted = "antigravity.reconnect";
-                } else if (commands.includes("antigravity.triggerUpdate")) {
-                    await vscode.commands.executeCommand("antigravity.triggerUpdate");
-                    result.syncedOfficialPanel = true;
-                    result.officialCommandExecuted = "antigravity.triggerUpdate";
+                for (const cmd of candidateCommands) {
+                    if (commands.includes(cmd)) {
+                        try {
+                            await vscode.commands.executeCommand(cmd);
+                            result.syncedOfficialPanel = true;
+                            result.officialCommandExecuted = cmd;
+                            break;
+                        } catch {
+                            // Try next candidate command
+                        }
+                    }
                 }
             } catch (err) {
                 result.error = err instanceof Error ? err.message : String(err);

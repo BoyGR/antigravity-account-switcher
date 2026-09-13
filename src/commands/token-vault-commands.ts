@@ -45,3 +45,4 @@ export function registerTokenVaultCommands(
     context.subscriptions.push(clearDisposable);
     return [clearDisposable];
 }
+

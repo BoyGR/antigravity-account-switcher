@@ -8,6 +8,7 @@ import {
 } from "./hub-auth-client";
 import { detectRunningAgyHub } from "./hub-detector";
 import { TokenVaultService } from "./token-vault-service";
+import { syncAntigravityUi } from "./ui-sync";
 
 const execFileAsync = promisify(execFile);
 
@@ -43,8 +44,9 @@ function delay(milliseconds: number): Promise<void> {
 }
 
 async function waitForCurrentAccount(
-    attempts = 15,
+    attempts = 16,
     delayMs = 1200,
+    onRetry?: (attempt: number) => Promise<void> | void,
 ): Promise<AntigravityCurrentAccount> {
     let lastError: unknown;
 
@@ -57,6 +59,14 @@ async function waitForCurrentAccount(
             return await getAntigravityCurrentAccount();
         } catch (error) {
             lastError = error;
+
+            if (onRetry) {
+                try {
+                    await onRetry(attempt);
+                } catch {
+                    // Ignore retry hook error
+                }
+            }
 
             if (attempt < attempts) {
                 await delay(delayMs);
@@ -204,8 +214,22 @@ export async function switchAntigravityAccount(
                         }
                     }
 
+                    // Brief wait for process termination
+                    await delay(1200);
+
+                    // Signal official Antigravity extension to immediately respawn agy process
+                    await syncAntigravityUi().catch(() => undefined);
+
                     // Wait for fresh agy instance to start and report new account
-                    const afterSwap = await waitForCurrentAccount(16, 1200);
+                    const afterSwap = await waitForCurrentAccount(
+                        20,
+                        1200,
+                        async attempt => {
+                            if (attempt === 3 || attempt === 7) {
+                                await syncAntigravityUi().catch(() => undefined);
+                            }
+                        },
+                    );
                     const afterSwapEmail = normalizeEmail(afterSwap.email);
 
                     if (afterSwapEmail === target) {
@@ -220,7 +244,9 @@ export async function switchAntigravityAccount(
                     }
                 }
             } catch {
-                // Fall back to standard browser OAuth flow if instant swap encountered an issue
+                // If instant swap encountered an issue, give agy a moment to recover before browser fallback
+                await syncAntigravityUi().catch(() => undefined);
+                await delay(1500);
             }
         }
     }
