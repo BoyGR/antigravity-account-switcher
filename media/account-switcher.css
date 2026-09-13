@@ -5122,13 +5122,13 @@ body {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 8px !important;
+    gap: 6px !important;
     min-width: 0 !important;
-    min-height: 32px !important;
-    padding: 6px 4px 6px !important;
+    min-height: 28px !important;
+    padding: 5px 6px 5px 6px !important;
     border-top: 1px solid var(--ag-border) !important;
     color: var(--ag-muted) !important;
-    font-size: 10.5px !important;
+    font-size: 10px !important;
     user-select: none !important;
     flex: 0 0 auto !important;
 }
@@ -5141,22 +5141,27 @@ body {
     overflow: hidden !important;
     white-space: nowrap !important;
     text-overflow: ellipsis !important;
-    font-size: 10.5px !important;
+    font-size: 10px !important;
+    letter-spacing: -0.1px !important;
 }
 
 .footer-prefix {
     opacity: 0.8 !important;
-    font-size: 10.5px !important;
+    font-size: 9.5px !important;
     margin-right: 1px !important;
     color: var(--ag-muted, var(--vscode-descriptionForeground)) !important;
+    flex-shrink: 0 !important;
 }
 
 .developer-link {
-    font-size: 10.5px !important;
+    font-size: 10px !important;
     font-weight: 600 !important;
     color: var(--vscode-textLink-foreground, var(--ag-link)) !important;
     text-decoration: none !important;
     transition: color 0.12s ease !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
 }
 
 .developer-link:hover {
@@ -5166,7 +5171,7 @@ body {
 
 .footer-version {
     flex: 0 0 auto !important;
-    font-size: 10.5px !important;
+    font-size: 9.5px !important;
     opacity: 0.75 !important;
     font-variant-numeric: tabular-nums !important;
     color: var(--ag-muted, var(--vscode-descriptionForeground)) !important;
