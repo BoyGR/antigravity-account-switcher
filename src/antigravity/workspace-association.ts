@@ -93,8 +93,24 @@ export async function checkAndPromptWorkspaceAccount(
         return;
     }
 
-    const current = await getAntigravityCurrentAccount().catch(() => undefined);
-    if (current?.email?.toLowerCase() === targetEmail.toLowerCase()) {
+    // Wait briefly for Antigravity backend to be ready on startup
+    let current = await getAntigravityCurrentAccount().catch(() => undefined);
+    if (!current) {
+        for (let i = 0; i < 5; i++) {
+            await new Promise(r => setTimeout(r, 1500));
+            current = await getAntigravityCurrentAccount().catch(() => undefined);
+            if (current?.email) {
+                break;
+            }
+        }
+    }
+
+    // If current account cannot be determined, do not show false prompt
+    if (!current?.email) {
+        return;
+    }
+
+    if (current.email.toLowerCase() === targetEmail.toLowerCase()) {
         return;
     }
 
