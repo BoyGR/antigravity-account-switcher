@@ -485,7 +485,7 @@ export class AntigravityAccountWebviewProvider
                                   vscode.Uri.joinPath(
                                       this.context.extensionUri,
                                       "media",
-                                      "antigravity.svg",
+                                      "icon.png",
                                   ),
                               )
                               .toString()

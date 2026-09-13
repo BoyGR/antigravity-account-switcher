@@ -5,41 +5,27 @@
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
 >
-    <!-- Antigravity A -->
+    <!-- Outer Upper Orbit Arrow (Clockwise) -->
     <path
-        d="M12 3.2L5.55 19.8H8.55L10.02 15.75H13.98L15.48 19.8H18.5L12 3.2ZM12 9.45L13.05 12.55H10.95L12 9.45Z"
+        d="M3.6 10.5C4.6 6.8 8.1 4 12.2 4C14.8 4 17.2 5.1 18.8 6.9L19.8 4.8V9.5H15.1L17.2 8.3C15.9 6.8 14.1 5.8 12.2 5.8C8.9 5.8 6.1 8 5.2 11.1L3.6 10.5Z"
         fill="currentColor"
     />
 
-    <!-- Upper switching orbit -->
+    <!-- Outer Lower Orbit Arrow (Clockwise) -->
     <path
-        d="M3.45 10.2C4.55 6.95 8.05 4.75 12.1 4.75C15.45 4.75 18.25 6.15 19.65 8.35"
-        stroke="currentColor"
-        stroke-width="1.45"
-        stroke-linecap="round"
+        d="M20.4 13.5C19.4 17.2 15.9 20 11.8 20C9.2 20 6.8 18.9 5.2 17.1L4.2 19.2V14.5H8.9L6.8 15.7C8.1 17.2 9.9 18.2 11.8 18.2C15.1 18.2 17.9 16 18.8 12.9L20.4 13.5Z"
+        fill="currentColor"
     />
 
+    <!-- Central Futuristic Stylized Antigravity 'A' -->
     <path
-        d="M18.05 8.25L19.95 8.75L20.35 6.8"
-        stroke="currentColor"
-        stroke-width="1.45"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        d="M12 5.2L7.3 17.2H9.6L10.7 14.2H13.3L14.4 17.2H16.7L12 5.2ZM12 8.8L12.9 11.8H11.1L12 8.8Z"
+        fill="currentColor"
     />
 
-    <!-- Lower switching orbit -->
+    <!-- Futuristic Energy Swoosh across 'A' -->
     <path
-        d="M20.55 13.8C19.45 17.05 15.95 19.25 11.9 19.25C8.55 19.25 5.75 17.85 4.35 15.65"
-        stroke="currentColor"
-        stroke-width="1.45"
-        stroke-linecap="round"
-    />
-
-    <path
-        d="M5.95 15.75L4.05 15.25L3.65 17.2"
-        stroke="currentColor"
-        stroke-width="1.45"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        d="M8.8 14.2C11 13.6 13.8 12.4 16.5 9.2C15.4 13.4 12.6 15.6 8.8 15.8V14.2Z"
+        fill="currentColor"
     />
 </svg>

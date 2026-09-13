@@ -45,12 +45,15 @@ async function main() {
         logLevel: "info",
     });
 
-    // 5. Copy SVG asset
+    // 5. Copy media assets
     const copyAssets = () => {
-        const svgSrc = path.join(__dirname, "media", "antigravity.svg");
-        const svgDest = path.join(__dirname, "dist", "media", "antigravity.svg");
-        if (fs.existsSync(svgSrc)) {
-            fs.copyFileSync(svgSrc, svgDest);
+        const filesToCopy = ["antigravity.svg", "icon.png"];
+        for (const file of filesToCopy) {
+            const src = path.join(__dirname, "media", file);
+            const dest = path.join(__dirname, "dist", "media", file);
+            if (fs.existsSync(src)) {
+                fs.copyFileSync(src, dest);
+            }
         }
     };
     copyAssets();

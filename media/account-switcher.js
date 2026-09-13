@@ -3416,6 +3416,11 @@
                                 ${escapeHtml(t("about"))}
                             </h3>
 
+                            ${state.meta?.iconUri ? `
+                            <div style="text-align: center; margin: 8px 0 16px 0;">
+                                <img src="${escapeHtml(state.meta.iconUri)}" width="64" height="64" style="border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.35); vertical-align: middle;" alt="Logo" />
+                            </div>` : ""}
+
                             <div class="about-row">
                                 <span>
                                     Antigravity Account Switcher
