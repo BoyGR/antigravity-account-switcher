@@ -4,6 +4,18 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.1.0] - 2026-09-14
+
+### Added
+- **Custom Account Groups Support**:
+  - Added an inline `+ Custom` group creator in the account label editor, allowing users to type and assign arbitrary group names up to 24 characters.
+  - Keyboard shortcuts for rapid editing: **Enter** to confirm and apply group, **Escape** to cancel.
+  - Automatic cross-account group aggregation: any custom group used across accounts is automatically gathered into quick-selection pills for other accounts.
+  - Streamlined default preset groups down to `Personal` and `Work`.
+  - Full automatic integration with the top group filter chips and account search.
+
+---
+
 ## [1.0.1] - 2026-09-14
 
 ### Fixed

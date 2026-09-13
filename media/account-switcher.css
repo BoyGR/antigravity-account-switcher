@@ -5747,6 +5747,71 @@ body {
     font-weight: 600;
 }
 
+.group-tag-btn.add-custom {
+    border-style: dashed;
+    opacity: 0.85;
+}
+
+.group-tag-btn.add-custom:hover {
+    opacity: 1;
+    border-color: #38bdf8;
+    color: #38bdf8;
+}
+
+.custom-group-input-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    background: var(--vscode-input-background, rgba(255, 255, 255, 0.05));
+    border: 1px solid var(--vscode-input-border, rgba(255, 255, 255, 0.15));
+    border-radius: 10px;
+    padding: 0 4px;
+    height: 18px;
+    box-sizing: border-box;
+}
+
+.custom-group-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--vscode-input-foreground, inherit);
+    font-size: 9px;
+    font-family: inherit;
+    width: 70px;
+    padding: 0 2px;
+}
+
+.custom-group-btn {
+    background: transparent;
+    border: none;
+    padding: 0 2px;
+    font-size: 10px;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.15s ease;
+}
+
+.custom-group-btn.confirm {
+    color: #34d399;
+}
+
+.custom-group-btn.confirm:hover {
+    background: rgba(52, 211, 153, 0.2);
+}
+
+.custom-group-btn.cancel {
+    color: var(--ag-muted, #888);
+}
+
+.custom-group-btn.cancel:hover {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.2);
+}
+
 /* === V0.9.0 MULTI-ACCOUNT QUOTA MATRIX MODAL === */
 .matrix-modal-backdrop {
     position: fixed;

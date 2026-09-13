@@ -95,6 +95,12 @@
         editGroup:
             "",
 
+        customGroupInputOpen:
+            false,
+
+        customGroupInputValue:
+            "",
+
         groupFilter:
             "all",
 
@@ -1777,22 +1783,57 @@
                 <div class="label-editor-groups">
                     <span class="label-editor-meta-title">Group:</span>
                     <div class="group-pills-row">
-                        ${["Personal", "Work", "Client"].map(g => `
+                        ${(() => {
+                            const defaultGroups = ["Personal", "Work"];
+                            const existingGroups = (state.accounts || [])
+                                .map(a => (a.group || "").trim())
+                                .filter(Boolean);
+                            const allGroups = Array.from(new Set([...defaultGroups, ...existingGroups]));
+                            if (ui.editGroup && !allGroups.includes(ui.editGroup)) {
+                                allGroups.push(ui.editGroup);
+                            }
+                            return allGroups.map(g => `
+                                <button
+                                    type="button"
+                                    class="group-tag-btn ${ui.editGroup === g ? "selected" : ""}"
+                                    data-action="select-edit-group"
+                                    data-group="${escapeHtml(g)}"
+                                >${escapeHtml(g)}</button>
+                            `).join("");
+                        })()}
+                        ${ui.customGroupInputOpen ? `
+                            <div class="custom-group-input-wrapper">
+                                <input
+                                    type="text"
+                                    class="custom-group-input"
+                                    id="custom-group-input"
+                                    placeholder="Group..."
+                                    value="${escapeHtml(ui.customGroupInputValue || "")}"
+                                    maxlength="24"
+                                />
+                                <button
+                                    type="button"
+                                    class="custom-group-btn confirm"
+                                    data-action="confirm-custom-group"
+                                    title="Terapkan group"
+                                    aria-label="Terapkan group"
+                                >✓</button>
+                                <button
+                                    type="button"
+                                    class="custom-group-btn cancel"
+                                    data-action="cancel-custom-group"
+                                    title="Batal"
+                                    aria-label="Batal"
+                                >✕</button>
+                            </div>
+                        ` : `
                             <button
                                 type="button"
-                                class="group-tag-btn ${ui.editGroup === g ? "selected" : ""}"
-                                data-action="select-edit-group"
-                                data-group="${g}"
-                            >${g}</button>
-                        `).join("")}
-                        ${ui.editGroup && !["Personal", "Work", "Client"].includes(ui.editGroup) ? `
-                            <button
-                                type="button"
-                                class="group-tag-btn selected"
-                                data-action="select-edit-group"
-                                data-group="${escapeHtml(ui.editGroup)}"
-                            >${escapeHtml(ui.editGroup)}</button>
-                        ` : ""}
+                                class="group-tag-btn add-custom"
+                                data-action="open-custom-group"
+                                title="Tambah group baru"
+                            >+ Custom</button>
+                        `}
                         ${ui.editGroup ? `
                             <button
                                 type="button"
@@ -4686,6 +4727,12 @@
         ui.editGroup =
             account.group || "";
 
+        ui.customGroupInputOpen =
+            false;
+
+        ui.customGroupInputValue =
+            "";
+
         render();
     }
 
@@ -4700,6 +4747,12 @@
             "";
 
         ui.editGroup =
+            "";
+
+        ui.customGroupInputOpen =
+            false;
+
+        ui.customGroupInputValue =
             "";
 
         render();
@@ -4843,6 +4896,44 @@
             ) {
                 ui.editValue =
                     target.value;
+                return;
+            }
+
+            if (
+                target instanceof HTMLInputElement &&
+                target.id ===
+                    "custom-group-input"
+            ) {
+                ui.customGroupInputValue =
+                    target.value;
+                return;
+            }
+        }
+    );
+
+    app.addEventListener(
+        "keydown",
+        event => {
+            const target = event.target;
+            if (
+                target instanceof HTMLInputElement &&
+                target.id === "custom-group-input"
+            ) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    const val = target.value.trim();
+                    if (val) {
+                        ui.editGroup = val;
+                    }
+                    ui.customGroupInputOpen = false;
+                    ui.customGroupInputValue = "";
+                    render();
+                } else if (event.key === "Escape") {
+                    event.preventDefault();
+                    ui.customGroupInputOpen = false;
+                    ui.customGroupInputValue = "";
+                    render();
+                }
             }
         }
     );
@@ -5090,6 +5181,38 @@
             if (action === "select-edit-group") {
                 const group = target.dataset.group || "";
                 ui.editGroup = ui.editGroup === group ? "" : group;
+                render();
+                return;
+            }
+
+            if (action === "open-custom-group") {
+                ui.customGroupInputOpen = true;
+                ui.customGroupInputValue = "";
+                render();
+                setTimeout(() => {
+                    const inputEl = document.getElementById("custom-group-input");
+                    if (inputEl) {
+                        inputEl.focus();
+                    }
+                }, 20);
+                return;
+            }
+
+            if (action === "cancel-custom-group") {
+                ui.customGroupInputOpen = false;
+                ui.customGroupInputValue = "";
+                render();
+                return;
+            }
+
+            if (action === "confirm-custom-group") {
+                const inputEl = document.getElementById("custom-group-input");
+                const val = (inputEl ? inputEl.value : ui.customGroupInputValue || "").trim();
+                if (val) {
+                    ui.editGroup = val;
+                }
+                ui.customGroupInputOpen = false;
+                ui.customGroupInputValue = "";
                 render();
                 return;
             }
