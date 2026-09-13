@@ -4,6 +4,20 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [0.5.1] - 2026-09-13
+
+### Fixed
+- **Seamless Saved Accounts Persistence**:
+  - Saved accounts list remains continuously visible and interactive when switching tabs or refocusing the Activity Bar view.
+  - Eliminated full-view blanking during background quota synchronization.
+  - Added non-disruptive inline refresh indicator (`⟳ Updating quota…`) in the header during background polling.
+- **Startup Loading Skeleton**:
+  - Added animated pulse skeleton placeholder and explicit loading feedback (`Loading saved accounts…`) during initial startup and account detection so the feature is immediately clear to the user.
+- **Action Button Responsiveness**:
+  - Quick-switch buttons in the saved accounts list remain clickable during background quota refreshes.
+
+---
+
 ## [0.5.0] - 2026-09-13
 
 ### Added

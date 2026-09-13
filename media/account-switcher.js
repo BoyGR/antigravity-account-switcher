@@ -35,7 +35,7 @@
         },
 
         meta: {
-            version: "0.4.1",
+            version: "0.5.1",
             developer: "Boy Gilang Ramadhan",
             website: "https://boygr.com",
             iconUri: "",
@@ -3587,7 +3587,7 @@
 
         const version =
             meta.version ||
-            "0.4.1";
+            "0.5.1";
 
         return `
             <footer class="developer-footer">
