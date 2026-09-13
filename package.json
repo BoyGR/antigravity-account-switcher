@@ -8,11 +8,22 @@
         "name": "Boy Gilang Ramadhan",
         "url": "https://boygr.com"
     },
+    "license": "MIT",
+    "icon": "media/icon.png",
+    "homepage": "https://boygr.com",
+    "bugs": {
+        "url": "https://github.com/BoyGR/antigravity-account-switcher/issues"
+    },
+    "galleryBanner": {
+        "color": "#090d16",
+        "theme": "dark"
+    },
     "engines": {
         "vscode": "^1.95.0"
     },
     "categories": [
-        "Other"
+        "Other",
+        "Machine Learning"
     ],
     "activationEvents": [
         "onCommand:boygr.antigravityAccountSwitcher.diagnose",
@@ -216,8 +227,6 @@
         "esbuild": "^0.28.2",
         "typescript": "^5.9.0"
     },
-    "license": "UNLICENSED",
-    "private": true,
     "keywords": [
         "antigravity",
         "google",

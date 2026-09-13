@@ -1,8 +1,12 @@
 # Antigravity Account Switcher
 
+<p align="center">
+  <img src="media/icon.png" width="128" height="128" alt="Antigravity Account Switcher Logo" />
+</p>
+
 A Visual Studio Code extension for managing, monitoring quota, and switching Google accounts used by Google Antigravity.
 
-Developed by [BoyGR](https://boygr.com).
+Developed by [Boy Gilang Ramadhan](https://boygr.com).
 
 ---
 
@@ -145,6 +149,6 @@ npm run package:vsix
 
 ## License & Credits
 
-- **Developer**: [BoyGR](https://boygr.com)
-- **License**: Private / Internal Use
+- **Developer**: [Boy Gilang Ramadhan](https://boygr.com)
+- **License**: [MIT License](LICENSE)
 - **Disclaimer**: Not affiliated with or endorsed by Google. Google Antigravity is a trademark of Google LLC.
