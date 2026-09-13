@@ -184,6 +184,11 @@ export class AntigravityAccountWebviewProvider
         private readonly context: vscode.ExtensionContext,
         private readonly statusBarManager?: AntigravityStatusBarManager,
     ) {
+        this.snapshot = {
+            accounts: getManagedAccounts(this.context),
+            usageSnapshots: getManagedAccountUsageSnapshots(this.context),
+        };
+
         const prefs = this.getStoredPreferences();
         this.quotaMonitor = new QuotaMonitorService(
             this.context,
@@ -274,7 +279,7 @@ export class AntigravityAccountWebviewProvider
             webviewView.onDidChangeVisibility(
                 () => {
                     if (webviewView.visible) {
-                        void this.refresh();
+                        void this.refresh(true);
                     }
                 },
             );
@@ -311,18 +316,21 @@ export class AntigravityAccountWebviewProvider
             type: "openSettings",
         });
     }
-    async refresh(): Promise<void> {
+
+    async refresh(background = false): Promise<void> {
         this.resetRetry();
         this.quotaMonitor?.clearDeduplicationCache();
 
-        await this.postState(true);
+        if (!background) {
+            await this.postState(true);
+        }
 
         const success =
             await this.loadAndPostState(
-                true,
+                !background,
             );
 
-        if (!success) {
+        if (!success && !background) {
             this.scheduleRetry();
         }
     }
@@ -602,8 +610,12 @@ export class AntigravityAccountWebviewProvider
     ): Promise<void> {
         switch (message.type) {
             case "ready":
+                await this.postState(this.snapshot.current === undefined);
+                void this.refresh(this.snapshot.current !== undefined);
+                return;
+
             case "refresh":
-                await this.refresh();
+                await this.refresh(false);
                 return;
 
             case "addAccount":

@@ -14,11 +14,11 @@
 
     let state = {
         loading: true,
-        current: null,
-        accounts: [],
-        runtime: null,
-        usage: null,
-        usageSnapshots: {},
+        current: persisted.current || null,
+        accounts: Array.isArray(persisted.accounts) ? persisted.accounts : [],
+        runtime: persisted.runtime || null,
+        usage: persisted.usage || null,
+        usageSnapshots: persisted.usageSnapshots || {},
         usageError: null,
         error: null,
         preferences: {
@@ -151,6 +151,12 @@
 
             loadingAccount:
                 "Loading account…",
+
+            loadingSavedAccounts:
+                "Loading saved accounts…",
+
+            updatingQuota:
+                "Updating quota…",
 
             checkingAccount:
                 "Checking Antigravity account state…",
@@ -488,6 +494,12 @@
 
             loadingAccount:
                 "Memuat akun…",
+
+            loadingSavedAccounts:
+                "Memuat akun tersimpan…",
+
+            updatingQuota:
+                "Memperbarui kuota…",
 
             checkingAccount:
                 "Memeriksa status akun Antigravity…",
@@ -981,6 +993,20 @@
             usageCollapsed:
                 ui.usageCollapsed,
 
+            accounts:
+                state.accounts,
+
+            current:
+                state.current,
+
+            runtime:
+                state.runtime,
+
+            usage:
+                state.usage,
+
+            usageSnapshots:
+                state.usageSnapshots,
         });
     }
     function setOperation(
@@ -2552,7 +2578,8 @@
 
         const checking =
             Boolean(
-                state.loading
+                state.loading &&
+                (!state.accounts || state.accounts.length === 0)
             );
 
         const snapshot =
@@ -2717,6 +2744,26 @@
         `;
     }
     function renderSavedList() {
+        if (state.loading && (!state.accounts || state.accounts.length === 0)) {
+            return `
+                <div class="saved-loading-panel" role="status" aria-live="polite">
+                    <div class="saved-loading-spinner-row">
+                        <span class="loading-spin-icon">${icon("refresh")}</span>
+                        <strong>${escapeHtml(t("loadingSavedAccounts"))}</strong>
+                    </div>
+                    <div class="saved-skeleton-container">
+                        <div class="saved-skeleton-row">
+                            <div class="skeleton-avatar"></div>
+                            <div class="skeleton-lines">
+                                <div class="loading-line wide"></div>
+                                <div class="loading-line short"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         const accounts =
             filteredAccounts();
 
@@ -2762,8 +2809,7 @@
     function renderSaved() {
         if (
             !state.preferences
-                ?.showSaved ||
-            state.loading
+                ?.showSaved
         ) {
             return "";
         }
@@ -2774,15 +2820,39 @@
         const hasManyAccounts =
             (state.accounts?.length || 0) > 3;
 
+        const isInitialLoading =
+            Boolean(state.loading) && (!state.accounts || state.accounts.length === 0);
+
+        const isRefreshing =
+            Boolean(state.loading) && (state.accounts?.length || 0) > 0;
+
         const countText =
-            ui.search.trim()
-                ? `${filteredCount}/${state.accounts.length}`
-                : String(
-                    state.accounts.length
-                );
+            isInitialLoading
+                ? "…"
+                : ui.search.trim()
+                    ? `${filteredCount}/${state.accounts.length}`
+                    : String(
+                        state.accounts.length
+                    );
 
         const headerActions = `
             <div class="saved-header-actions">
+                ${
+                    isRefreshing
+                        ? `
+                            <span
+                                class="refreshing-indicator"
+                                title="${escapeHtml(t("updatingQuota"))}"
+                                aria-label="${escapeHtml(t("updatingQuota"))}"
+                            >
+                                <span class="loading-spin-icon">
+                                    ${icon("refresh")}
+                                </span>
+                            </span>
+                        `
+                        : ""
+                }
+
                 <span
                     id="account-count"
                     class="count"
@@ -4343,6 +4413,8 @@
 
             state =
                 message.state;
+
+            persistUi();
 
             clearOperation();
 
