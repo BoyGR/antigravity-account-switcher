@@ -3,6 +3,9 @@ import * as vscode from "vscode";
 import {
     switchAntigravityAccount,
 } from "../antigravity/account-switcher";
+import { getManagedAccounts } from "../antigravity/account-registry";
+import { getAntigravityCurrentAccount } from "../antigravity/hub-auth-client";
+import { syncAntigravityUi } from "../antigravity/ui-sync";
 
 export const SWITCH_ACCOUNT_COMMAND_ID =
     "boygr.antigravityAccountSwitcher.switchAccount";
@@ -34,22 +37,54 @@ export function registerSwitchAccountCommand(
                 argument?: SwitchAccountCommandArgument,
             ) => {
                 try {
+                    let targetAccount = argument;
+
                     if (
-                        !argument ||
-                        typeof argument.email !== "string" ||
-                        !argument.email.trim()
+                        !targetAccount ||
+                        typeof targetAccount.email !== "string" ||
+                        !targetAccount.email.trim()
                     ) {
-                        throw new Error(
-                            "No target Antigravity account was provided.",
-                        );
+                        const savedAccounts = getManagedAccounts(context);
+                        if (savedAccounts.length === 0) {
+                            vscode.window.showInformationMessage(
+                                "No saved Antigravity accounts found. Use 'Add / Switch Google Account' first.",
+                            );
+                            return;
+                        }
+
+                        const currentAccount = await getAntigravityCurrentAccount().catch(() => undefined);
+                        const items = savedAccounts.map(account => {
+                            const isCurrent =
+                                currentAccount?.email?.toLowerCase() === account.email.toLowerCase();
+                            return {
+                                label: account.label
+                                    ? `${account.label} (${account.email})`
+                                    : account.email,
+                                description: isCurrent ? "(Active)" : undefined,
+                                account: {
+                                    email: account.email,
+                                    label: account.label,
+                                },
+                            };
+                        });
+
+                        const selected = await vscode.window.showQuickPick(items, {
+                            placeHolder: "Select an Antigravity account to switch to",
+                        });
+
+                        if (!selected) {
+                            return;
+                        }
+
+                        targetAccount = selected.account;
                     }
 
                     const targetEmail =
-                        argument.email.trim();
+                        targetAccount.email.trim();
 
                     const displayName =
                         getDisplayName({
-                            ...argument,
+                            ...targetAccount,
                             email: targetEmail,
                         });
 
@@ -80,19 +115,30 @@ export function registerSwitchAccountCommand(
                         );
                     }
 
+                    const syncResult = await syncAntigravityUi();
+
                     if (!result.changed) {
                         vscode.window.showInformationMessage(
                             `${displayName} is already the active Antigravity account.`,
                         );
-                    } else {
+                    } else if (syncResult.syncedOfficialPanel) {
                         vscode.window.showInformationMessage(
                             `Antigravity switched to ${displayName}.`,
                         );
-                    }
+                    } else {
+                        const choice =
+                            await vscode.window.showInformationMessage(
+                                `Antigravity switched to ${displayName}. Reload window to update the official Antigravity panel?`,
+                                "Reload Window",
+                                "Later",
+                            );
 
-                    await vscode.commands.executeCommand(
-                        "boygr.antigravityAccountSwitcher.refreshAccountsView",
-                    );
+                        if (choice === "Reload Window") {
+                            await vscode.commands.executeCommand(
+                                "workbench.action.reloadWindow",
+                            );
+                        }
+                    }
                 } catch (error) {
                     const message =
                         error instanceof Error
@@ -103,9 +149,11 @@ export function registerSwitchAccountCommand(
                         `Antigravity Account Switcher: ${message}`,
                     );
 
-                    await vscode.commands.executeCommand(
-                        "boygr.antigravityAccountSwitcher.refreshAccountsView",
-                    );
+                    try {
+                        await syncAntigravityUi();
+                    } catch {
+                        // Safely ignore secondary sync issues on failure path
+                    }
                 }
             },
         );

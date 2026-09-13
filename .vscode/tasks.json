@@ -10,6 +10,17 @@
         "reveal": "never"
       },
       "group": {
+        "kind": "build"
+      }
+    },
+    {
+      "type": "npm",
+      "script": "compile",
+      "problemMatcher": "$tsc",
+      "presentation": {
+        "reveal": "silent"
+      },
+      "group": {
         "kind": "build",
         "isDefault": true
       }

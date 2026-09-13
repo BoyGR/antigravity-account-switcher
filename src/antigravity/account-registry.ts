@@ -2,10 +2,14 @@ import * as vscode from "vscode";
 
 import {
     AntigravityCurrentAccount,
+    AntigravityQuotaSnapshot,
 } from "./hub-auth-client";
 
 const STORAGE_KEY =
     "boygr.antigravity.accounts.v1";
+
+const QUOTA_STORAGE_KEY =
+    "boygr.antigravity.quotaSnapshots.v1";
 
 export interface ManagedAntigravityAccount {
     email: string;
@@ -206,4 +210,175 @@ export async function updateManagedAccountLabel(
 
     return updated;
 }
+/*
+ * Quota snapshots intentionally contain only non-secret runtime
+ * metadata. They never contain Google credentials, cookies,
+ * OAuth tokens, CSRF values, or profile-picture URLs.
+ */
+export interface ManagedAccountQuotaSnapshot
+    extends AntigravityQuotaSnapshot {
+    email: string;
+}
 
+interface AccountQuotaSnapshotState {
+    version: 1;
+    accounts: Record<
+        string,
+        ManagedAccountQuotaSnapshot
+    >;
+}
+
+function emptyQuotaSnapshotState():
+    AccountQuotaSnapshotState {
+    return {
+        version: 1,
+        accounts: {},
+    };
+}
+
+export function getManagedAccountQuotaSnapshots(
+    context: vscode.ExtensionContext,
+): Record<string, ManagedAccountQuotaSnapshot> {
+    const stored =
+        context.globalState.get<AccountQuotaSnapshotState>(
+            QUOTA_STORAGE_KEY,
+        );
+
+    if (
+        !stored ||
+        stored.version !== 1
+    ) {
+        return {};
+    }
+
+    return {
+        ...stored.accounts,
+    };
+}
+
+export function getManagedAccountQuotaSnapshot(
+    context: vscode.ExtensionContext,
+    email: string,
+): ManagedAccountQuotaSnapshot | undefined {
+    const normalized =
+        normalizeEmail(email);
+
+    return getManagedAccountQuotaSnapshots(
+        context,
+    )[normalized];
+}
+
+export async function saveManagedAccountQuotaSnapshot(
+    context: vscode.ExtensionContext,
+    email: string,
+    snapshot: AntigravityQuotaSnapshot,
+): Promise<ManagedAccountQuotaSnapshot> {
+    const normalized =
+        normalizeEmail(email);
+
+    if (!normalized) {
+        throw new Error(
+            "Cannot save an Antigravity quota snapshot without an email.",
+        );
+    }
+
+    const existing =
+        context.globalState.get<AccountQuotaSnapshotState>(
+            QUOTA_STORAGE_KEY,
+        );
+
+    const state:
+        AccountQuotaSnapshotState =
+        existing?.version === 1
+            ? {
+                  version: 1,
+                  accounts: {
+                      ...existing.accounts,
+                  },
+              }
+            : emptyQuotaSnapshotState();
+
+    const stored:
+        ManagedAccountQuotaSnapshot = {
+        email: normalized,
+
+        fetchedAt:
+            snapshot.fetchedAt,
+
+        profilePictureAvailable:
+            snapshot.profilePictureAvailable,
+
+        modelConfigCount:
+            snapshot.modelConfigCount,
+
+        quotaModelCount:
+            snapshot.quotaModelCount,
+
+        models:
+            snapshot.models.map(
+                model => ({
+                    index:
+                        model.index,
+
+                    modelId:
+                        model.modelId,
+
+                    model:
+                        model.model,
+
+                    remainingFraction:
+                        model.remainingFraction,
+
+                    resetTime:
+                        model.resetTime,
+                }),
+            ),
+    };
+
+    state.accounts[normalized] =
+        stored;
+
+    await context.globalState.update(
+        QUOTA_STORAGE_KEY,
+        state,
+    );
+
+    return stored;
+}
+
+export async function removeManagedAccountQuotaSnapshot(
+    context: vscode.ExtensionContext,
+    email: string,
+): Promise<boolean> {
+    const normalized =
+        normalizeEmail(email);
+
+    const existing =
+        context.globalState.get<AccountQuotaSnapshotState>(
+            QUOTA_STORAGE_KEY,
+        );
+
+    if (
+        !existing ||
+        existing.version !== 1 ||
+        !existing.accounts[normalized]
+    ) {
+        return false;
+    }
+
+    const accounts = {
+        ...existing.accounts,
+    };
+
+    delete accounts[normalized];
+
+    await context.globalState.update(
+        QUOTA_STORAGE_KEY,
+        {
+            version: 1,
+            accounts,
+        } satisfies AccountQuotaSnapshotState,
+    );
+
+    return true;
+}

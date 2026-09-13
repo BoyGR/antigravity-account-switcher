@@ -52,6 +52,7 @@ export function activate(
         );
 
     context.subscriptions.push(
+        diagnoseCommand,
         refreshCommand,
     );
 }

@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerSignOutCommand = registerSignOutCommand;
 const vscode = __importStar(require("vscode"));
 const hub_auth_client_1 = require("../antigravity/hub-auth-client");
+const ui_sync_1 = require("../antigravity/ui-sync");
 const COMMAND_ID = "boygr.antigravityAccountSwitcher.signOut";
 const OUTPUT_CHANNEL = "Antigravity Sign Out";
 function registerSignOutCommand(context) {
@@ -128,6 +129,18 @@ function registerSignOutCommand(context) {
                 output.appendLine("=== AuthLogout returned but token is still present ===");
                 vscode.window.showWarningMessage("Antigravity AuthLogout returned, but authentication is still present.");
             }
+            try {
+                const syncResult = await (0, ui_sync_1.syncAntigravityUi)();
+                if (!syncResult.syncedOfficialPanel) {
+                    const choice = await vscode.window.showInformationMessage("Antigravity sign-out completed. Reload window to update the official Antigravity panel?", "Reload Window", "Later");
+                    if (choice === "Reload Window") {
+                        await vscode.commands.executeCommand("workbench.action.reloadWindow");
+                    }
+                }
+            }
+            catch {
+                // Safely ignore sync failure
+            }
         }
         catch (error) {
             const message = error instanceof Error
@@ -138,6 +151,12 @@ function registerSignOutCommand(context) {
             output.appendLine("");
             output.appendLine(message);
             vscode.window.showErrorMessage(`Antigravity Sign Out failed: ${message}`);
+            try {
+                await (0, ui_sync_1.syncAntigravityUi)();
+            }
+            catch {
+                // Safely ignore secondary sync error
+            }
         }
     });
     context.subscriptions.push(disposable);

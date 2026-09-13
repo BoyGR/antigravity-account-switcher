@@ -38,6 +38,8 @@ exports.signInToAntigravity = signInToAntigravity;
 exports.reauthenticateAntigravity = reauthenticateAntigravity;
 exports.signOutFromAntigravity = signOutFromAntigravity;
 exports.getAntigravityCurrentAccount = getAntigravityCurrentAccount;
+exports.getAntigravityQuotaSnapshot = getAntigravityQuotaSnapshot;
+exports.getAntigravityQuotaSummary = getAntigravityQuotaSummary;
 const http = __importStar(require("node:http"));
 const https = __importStar(require("node:https"));
 const node_child_process_1 = require("node:child_process");
@@ -515,6 +517,215 @@ async function getAntigravityCurrentAccount() {
     }
     finally {
         // Never retain the runtime CSRF value longer than needed.
+        csrfToken = "";
+    }
+}
+function normalizeAntigravityTimestamp(value) {
+    if (typeof value === "string") {
+        const parsed = new Date(value);
+        if (Number.isFinite(parsed.getTime())) {
+            return parsed.toISOString();
+        }
+        return undefined;
+    }
+    if (!value ||
+        typeof value !== "object") {
+        return undefined;
+    }
+    const seconds = typeof value.seconds === "string"
+        ? Number(value.seconds)
+        : value.seconds;
+    if (typeof seconds !== "number" ||
+        !Number.isFinite(seconds)) {
+        return undefined;
+    }
+    const nanos = typeof value.nanos === "number" &&
+        Number.isFinite(value.nanos)
+        ? value.nanos
+        : 0;
+    const milliseconds = seconds * 1000 +
+        Math.trunc(nanos / 1_000_000);
+    const parsed = new Date(milliseconds);
+    if (!Number.isFinite(parsed.getTime())) {
+        return undefined;
+    }
+    return parsed.toISOString();
+}
+/**
+ * Reads Antigravity's current per-model quota metadata from
+ * GetUserStatus.
+ *
+ * This function intentionally returns only quota metadata and a
+ * boolean indicating whether a Google profile picture exists.
+ *
+ * It does NOT return:
+ * - account email
+ * - profile-picture URL
+ * - OAuth credentials
+ * - tokens
+ * - cookies
+ * - CSRF values
+ */
+async function getAntigravityQuotaSnapshot() {
+    const current = await getAntigravityAuthStatus();
+    if (!current.hasToken ||
+        current.hasValidAuth !== true) {
+        throw new Error("Antigravity does not currently have valid authentication.");
+    }
+    const hub = await requestHttpText(new URL(`http://127.0.0.1:${current.hubPort}/`));
+    if (hub.statusCode < 200 ||
+        hub.statusCode >= 300) {
+        throw new Error(`Antigravity Hub returned HTTP ${hub.statusCode}.`);
+    }
+    let csrfToken = extractCsrfToken(hub.body);
+    try {
+        const response = await invokeConnectJson(current.lsPort, "GetUserStatus", csrfToken, {});
+        const userStatus = response.userStatus;
+        if (!userStatus) {
+            throw new Error("Antigravity GetUserStatus returned no userStatus.");
+        }
+        const configs = Array.isArray(userStatus
+            .cascadeModelConfigData
+            ?.clientModelConfigs)
+            ? userStatus
+                .cascadeModelConfigData
+                .clientModelConfigs
+            : [];
+        const models = [];
+        for (let index = 0; index < configs.length; index += 1) {
+            const config = configs[index];
+            if (!config) {
+                continue;
+            }
+            const quota = config.quotaInfo;
+            if (!quota) {
+                continue;
+            }
+            const remainingFraction = typeof quota.remainingFraction ===
+                "number" &&
+                Number.isFinite(quota.remainingFraction)
+                ? quota.remainingFraction
+                : undefined;
+            const modelId = typeof config.modelId === "string"
+                ? config.modelId.trim() ||
+                    undefined
+                : undefined;
+            const model = typeof config.modelOrAlias?.model ===
+                "string" ||
+                typeof config.modelOrAlias?.model ===
+                    "number"
+                ? config.modelOrAlias.model
+                : undefined;
+            models.push({
+                index,
+                modelId,
+                model,
+                remainingFraction,
+                resetTime: normalizeAntigravityTimestamp(quota.resetTime),
+            });
+        }
+        return {
+            fetchedAt: new Date().toISOString(),
+            profilePictureAvailable: Boolean(userStatus
+                .profilePictureUrl
+                ?.trim()),
+            modelConfigCount: configs.length,
+            quotaModelCount: models.length,
+            models,
+        };
+    }
+    finally {
+        /*
+         * Sensitive runtime value is never retained after the
+         * read-only request.
+         */
+        csrfToken = "";
+    }
+}
+function normalizeQuotaSummaryString(value) {
+    return typeof value === "string"
+        ? value.trim() || undefined
+        : undefined;
+}
+function normalizeQuotaSummaryNumber(value) {
+    if (typeof value === "number" &&
+        Number.isFinite(value)) {
+        return value;
+    }
+    if (typeof value === "string" &&
+        /^-?\d+(?:\.\d+)?$/.test(value)) {
+        return value;
+    }
+    return undefined;
+}
+function normalizeQuotaSummaryBucket(value) {
+    if (!value ||
+        typeof value !== "object" ||
+        Array.isArray(value)) {
+        return undefined;
+    }
+    const bucket = value;
+    const remainingFraction = typeof bucket.remainingFraction === "number" &&
+        Number.isFinite(bucket.remainingFraction)
+        ? bucket.remainingFraction
+        : undefined;
+    return {
+        bucketId: normalizeQuotaSummaryString(bucket.bucketId),
+        displayName: normalizeQuotaSummaryString(bucket.displayName),
+        description: normalizeQuotaSummaryString(bucket.description),
+        window: normalizeQuotaSummaryString(bucket.window),
+        remainingFraction,
+        remainingAmount: normalizeQuotaSummaryNumber(bucket.remainingAmount),
+        disabled: typeof bucket.disabled === "boolean"
+            ? bucket.disabled
+            : undefined,
+        resetTime: normalizeAntigravityTimestamp(bucket.resetTime),
+    };
+}
+async function getAntigravityQuotaSummary(forceRefresh = true) {
+    const current = await getAntigravityAuthStatus();
+    if (!current.hasToken ||
+        current.hasValidAuth !== true) {
+        throw new Error("Antigravity does not currently have valid authentication.");
+    }
+    const hub = await requestHttpText(new URL(`http://127.0.0.1:${current.hubPort}/`));
+    if (hub.statusCode < 200 ||
+        hub.statusCode >= 300) {
+        throw new Error(`Antigravity Hub returned HTTP ${hub.statusCode}.`);
+    }
+    let csrfToken = extractCsrfToken(hub.body);
+    try {
+        const envelope = await invokeConnectJson(current.lsPort, "RetrieveUserQuotaSummary", csrfToken, {
+            forceRefresh,
+        });
+        const response = envelope.response;
+        if (!response) {
+            throw new Error("Antigravity RetrieveUserQuotaSummary returned no response.");
+        }
+        const buckets = Array.isArray(response.buckets)
+            ? response.buckets
+                .map(normalizeQuotaSummaryBucket)
+                .filter((bucket) => Boolean(bucket))
+            : [];
+        const groups = Array.isArray(response.groups)
+            ? response.groups.map(group => ({
+                displayName: normalizeQuotaSummaryString(group.displayName),
+                description: normalizeQuotaSummaryString(group.description),
+                buckets: Array.isArray(group.buckets)
+                    ? group.buckets
+                        .map(normalizeQuotaSummaryBucket)
+                        .filter((bucket) => Boolean(bucket))
+                    : [],
+            }))
+            : [];
+        return {
+            fetchedAt: new Date().toISOString(),
+            description: normalizeQuotaSummaryString(response.description),
+            buckets,
+            groups,
+        };
+    }
+    finally {
         csrfToken = "";
     }
 }

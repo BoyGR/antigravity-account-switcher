@@ -1,191 +1,150 @@
 # Antigravity Account Switcher
 
-A private Visual Studio Code extension for managing and switching the Google account used by Google Antigravity.
+A Visual Studio Code extension for managing, monitoring quota, and switching Google accounts used by Google Antigravity.
 
-## Status
+Developed by [BoyGR](https://boygr.com).
 
-Version: 0.1.0
+---
 
-Tested with:
+## Overview
 
-- Visual Studio Code on Windows
-- Google Antigravity extension 1.3.0
-- AGY backend 1.2.2
+**Antigravity Account Switcher** extends the official Google Antigravity experience with an interactive sidebar dashboard, real-time quota tracking, background low-quota alerts, instant UI synchronization, and effortless switching between multiple Google accounts.
 
-This extension is currently intended for private/internal use.
+### Status
 
-## Features
+- **Version**: `0.4.0`
+- **Supported Platforms**: Windows, macOS, Linux
+- **Compatibility**: Visual Studio Code, Google Antigravity extension `1.3.0+`, AGY backend `1.2.2+`
 
-- Detect the installed Google Antigravity extension.
-- Detect the running AGY backend dynamically.
-- Discover the Antigravity Hub and Language Server without hardcoded ports.
-- Read Antigravity authentication status.
-- Detect the currently active Google account.
-- Save non-secret account metadata locally.
-- Assign local labels to saved accounts.
-- Manage saved Antigravity accounts.
-- Add or switch Google accounts through Antigravity's existing Google authentication flow.
-- Verify the resulting account after authentication.
-- Detect wrong-account and no-change switching outcomes.
+---
 
-## Account Manager
+## Key Features
 
-Open the Visual Studio Code Command Palette and run:
+### 1. Interactive Sidebar Dashboard (Activity Bar)
+- **Runtime Status Indicator**: Live status pill showing Antigravity connection health, PID, Hub port, and Language Server port in a detailed modal.
+- **Current Account Card**: Displays the active Google account, profile avatar, display name, email, and quick actions (Re-auth, Sign Out, Add Account).
+- **Quota & Usage Monitor**:
+  - Visual progress bars for **5-Hour Limit** and **Weekly Limit**.
+  - Remaining percentage indicators and exact reset countdown times.
+  - Expandable model quota breakdown.
+- **Saved Accounts List**:
+  - Dedicated scrollable container designed for multiple accounts without overflowing the sidebar.
+  - Real-time search and filter with matched account counters.
+  - Clear status badges: `Active` badge for the current account and action badges for quick switching.
+  - Inline label editing and secure account removal dialogs.
+  - Skeleton loading screen on initial startup.
+- **Footer**: Developer attribution and links with safe external browser navigation.
 
-    Antigravity Account Switcher: Manage Accounts
+### 2. Auto-Refresh Quota & Low Quota Reminders
+- **Background Quota Monitoring**: Automatically polls and refreshes active account quota at customizable intervals (e.g. 1m, 5m, 15m, 30m, 1h).
+- **Low Quota Notification Alert**: Displays warning notifications when quota drops below threshold (e.g. 20%) with quick action buttons:
+  - `[Switch Account]`: Opens interactive account switcher.
+  - `[View Details]`: Opens the account switcher dashboard.
+- **Smart Deduplication**: Prevents alert spam by tracking notification state per reset cycle.
 
-The Account Manager shows:
+### 3. Antigravity UI Synchronization (No Window Reload)
+- **Instant Official Panel Sync**: Automatically reconnects and refreshes the official Google Antigravity sidebar (`google.google-antigravity`) upon account switch, sign-out, or re-authentication via internal RPC hooks (`antigravity.reconnect` / `antigravity.triggerUpdate`).
+- **Zero Disruptions**: Eliminates the need to reload the VS Code window or lose active editor states.
+- **Safe Fallback**: Provides an optional prompt to reload window only if official auto-sync cannot be confirmed.
 
-- the current Antigravity account;
-- previously saved account metadata;
-- local account labels;
-- an option to add or switch Google accounts;
-- account-management actions.
+### 4. Settings & Personalization Modal
+- Accessible via the gear icon (`⚙`) on the dashboard header:
+  - **Appearance**: Theme selection (*Follow VS Code*, *Dark*, *Light*, *System*) and Bilingual Language support (*English*, *Bahasa Indonesia*, *Automatic*).
+  - **Quota & Reminders**: Enable/disable background auto-refresh, polling interval, and warning threshold (5% - 30%).
+  - **Layout**: Show or hide individual dashboard sections (Antigravity Status, Current Account, Saved Accounts).
+  - **About**: Version, developer info, and website link.
 
-When switching to a saved account, the extension opens Antigravity's existing Google authentication flow.
-
-The user still selects the intended Google account in Google's account chooser.
-
-After authentication, the extension verifies the active account using Antigravity's backend `GetUserStatus` RPC.
-
-A switch is considered successful only when the returned email matches the selected target account.
-
-## Main Commands
-
-- `Antigravity Account Switcher: Manage Accounts`
-- `Antigravity Account Switcher: Current Account`
-- `Antigravity Account Switcher: Status`
-- `Antigravity Account Switcher: Auth Status`
-
-Additional diagnostic and authentication commands are currently retained for development and troubleshooting.
+---
 
 ## Security Model
 
-This extension does not implement Google OAuth itself.
+- **No Credential Interception**: Does not implement independent OAuth or capture Google passwords, access tokens, refresh tokens, or session cookies.
+- **Official Google Auth Reuse**: Leverages Antigravity's built-in OAuth flow (`AuthStartLogin` / `AuthStartReauth`).
+- **Memory-Only CSRF**: Hub CSRF tokens are retained strictly in memory during operation and never written to disk.
+- **Non-Destructive Storage**: Does not alter VS Code's internal database (`state.vscdb`) or tamper with `.gemini` configurations.
+- **Metadata Only**: Local account storage preserves only non-sensitive descriptors (email, custom label, display name, timestamps).
 
-It reuses Antigravity's existing authentication flow.
+---
 
-The local account registry stores only non-secret metadata such as:
+## Commands
 
-- email address;
-- optional local label;
-- display name;
-- first-seen timestamp;
-- last-seen timestamp.
+Access these commands via the VS Code Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`):
 
-The extension does not intentionally persist:
+| Command | Title | Description |
+| :--- | :--- | :--- |
+| `boygr.antigravityAccountSwitcher.refreshAccountsView` | **Refresh** | Refresh runtime status, active account, quota, and saved accounts |
+| `boygr.antigravityAccountSwitcher.switchAccount` | **Switch Account** | Switch to a saved account (opens QuickPick if called without arguments) |
+| `boygr.antigravityAccountSwitcher.addAccount` | **Add / Switch Google Account** | Initiate login to register a new Google account |
+| `boygr.antigravityAccountSwitcher.manageAccounts` | **Manage Accounts** | QuickPick-based account manager menu |
+| `boygr.antigravityAccountSwitcher.openSettings` | **Settings** | Open dashboard settings modal |
+| `boygr.antigravityAccountSwitcher.currentAccount` | **Current Account** | Show active account information |
+| `boygr.antigravityAccountSwitcher.authStatus` | **Auth Status** | Inspect current authentication status |
+| `boygr.antigravityAccountSwitcher.reAuth` | **Re-auth** | Re-authenticate active Antigravity session |
+| `boygr.antigravityAccountSwitcher.signOut` | **Sign Out** | Safely log out active Antigravity account |
+| `boygr.antigravityAccountSwitcher.diagnose` | **Diagnose Antigravity** | Run diagnostics on backend connectivity |
+| `boygr.antigravityAccountSwitcher.inspectBridge` | **Inspect Bridge** | Inspect Language Server / Hub bridge |
 
-- Google passwords;
-- access tokens;
-- refresh tokens;
-- ID tokens;
-- Google cookies;
-- Antigravity credentials;
-- CSRF values;
-- authentication/session blobs.
+---
 
-CSRF values required for local Antigravity RPC calls are kept in memory only for the duration of the operation.
+## Configuration Settings
 
-The extension does not switch accounts by modifying `state.vscdb` and does not snapshot or restore the `.gemini` directory.
+Customize behavior via VS Code Settings (`settings.json`):
 
-## How Switching Works
+```json
+{
+  // Auto-refresh quota interval in minutes (0 = manual only, default: 5)
+  "boygr.antigravityAccountSwitcher.autoRefreshIntervalMinutes": 5,
 
-The switching flow is:
+  // Show notification alert when remaining quota is low (default: true)
+  "boygr.antigravityAccountSwitcher.enableLowQuotaReminder": true,
 
-    Select saved account
-        |
-        v
-    Read current account
-        |
-        v
-    Start Antigravity Re-auth/Login
-        |
-        v
-    Google account chooser
-        |
-        v
-    User selects target account
-        |
-        v
-    Rediscover AGY runtime if necessary
-        |
-        v
-    GetUserStatus
-        |
-        v
-    Verify returned email == target email
+  // Remaining quota threshold percentage for low quota warnings (default: 20)
+  "boygr.antigravityAccountSwitcher.lowQuotaThresholdPercent": 20,
 
-This means account switching is target-aware and verified, but it is not silent.
+  // Automatically sync official Antigravity UI on account changes (default: true)
+  "boygr.antigravityAccountSwitcher.autoSyncOfficialUi": true
+}
+```
 
-## Runtime Discovery
-
-AGY process IDs and ports are not hardcoded.
-
-The extension discovers the active Antigravity runtime and identifies the relevant loopback listeners dynamically.
-
-This allows the extension to continue working when AGY restarts and receives new runtime ports.
-
-## Compatibility
-
-The current implementation has been tested against:
-
-- Google Antigravity extension: 1.3.0
-- AGY backend: 1.2.2
-
-The extension relies on internal Antigravity/AGY behavior that is not a public compatibility contract.
-
-A future Google Antigravity update may change:
-
-- RPC service or method definitions;
-- authentication behavior;
-- Hub bootstrap behavior;
-- Language Server transport;
-- runtime process structure.
-
-If this happens, the extension may require an update.
-
-## Limitations
-
-- Account switching still requires interaction with Google's official account chooser.
-- The extension does not maintain independent Google authentication sessions.
-- It does not provide silent or instant account switching.
-- Saved accounts are metadata targets, not stored credentials or sessions.
-- Compatibility with future Antigravity versions is not guaranteed.
-
-## Requirements
-
-- Visual Studio Code
-- Official Google Antigravity extension
-- A working Antigravity installation and authentication session
+---
 
 ## Installation
 
-Install the generated VSIX using Visual Studio Code:
+### From VSIX Package
 
-    Extensions
-    -> ...
-    -> Install from VSIX...
+1. Download or locate `boygr-antigravity-account-switcher-0.4.0.vsix`.
+2. In VS Code:
+   - Go to **Extensions** (`Ctrl+Shift+X` / `Cmd+Shift+X`).
+   - Click the `...` menu (top right of Extensions view).
+   - Select **Install from VSIX...**.
+   - Choose the file.
+3. Or install via terminal:
+   ```powershell
+   code --install-extension boygr-antigravity-account-switcher-0.4.0.vsix
+   ```
 
-Or from the command line:
+---
 
-    code --install-extension boygr-antigravity-account-switcher-0.2.0.vsix
+## Development & Building
 
-## Development
+```powershell
+# Install dependencies
+npm install
 
-Compile:
+# Compile TypeScript
+npm run compile
 
-    npm run compile
+# Run in development mode (Press F5 in VS Code)
+# Launches Extension Development Host with synchronous compilation preLaunchTask
 
-Preview VSIX contents:
+# Build production VSIX package
+npm run package:vsix
+```
 
-    npx @vscode/vsce ls
+---
 
-Package:
+## License & Credits
 
-    npm run package:vsix
-
-## Project
-
-Antigravity Account Switcher
-
-Private/internal tooling by BoyGR.
+- **Developer**: [BoyGR](https://boygr.com)
+- **License**: Private / Internal Use
+- **Disclaimer**: Not affiliated with or endorsed by Google. Google Antigravity is a trademark of Google LLC.
