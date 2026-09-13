@@ -197,3 +197,20 @@ export async function removeManagedAccountUsageSnapshot(
 
     return true;
 }
+
+export function getAccountRemainingPercent(
+    snapshot?: ManagedAccountUsageSnapshot,
+): number | undefined {
+    if (!snapshot || !Array.isArray(snapshot.buckets) || snapshot.buckets.length === 0) {
+        return undefined;
+    }
+    let minFraction: number | undefined;
+    for (const b of snapshot.buckets) {
+        if (typeof b.remainingFraction === "number" && !b.disabled) {
+            if (minFraction === undefined || b.remainingFraction < minFraction) {
+                minFraction = b.remainingFraction;
+            }
+        }
+    }
+    return minFraction !== undefined ? Math.max(0, Math.min(100, Math.round(minFraction * 100))) : undefined;
+}

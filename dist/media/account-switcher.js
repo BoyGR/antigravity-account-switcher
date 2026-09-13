@@ -1,4 +1,4 @@
-"use strict";(()=>{const f=acquireVsCodeApi(),w=document.getElementById("app");if(!w)return;const m=f.getState()||{};let o={loading:!0,current:m.current||null,accounts:Array.isArray(m.accounts)?m.accounts:[],runtime:m.runtime||null,usage:m.usage||null,usageSnapshots:m.usageSnapshots||{},usageError:null,error:null,preferences:{version:1,theme:"vscode",language:"auto",effectiveLanguage:"en",showCurrent:!0,showSaved:!0,showRuntime:!0,autoRefreshIntervalMinutes:5,enableLowQuotaReminder:!0,lowQuotaThresholdPercent:20},meta:{version:"0.5.1",developer:"Boy Gilang Ramadhan",website:"https://boygr.com",iconUri:""}},r={search:typeof m.search=="string"?m.search:"",currentCollapsed:!!m.currentCollapsed,savedCollapsed:!!m.savedCollapsed,runtimeCollapsed:m.runtimeCollapsed!==!1,usageCollapsed:!!m.usageCollapsed,settingsOpen:!1,settingsDraft:null,editingEmail:null,editValue:"",removeCandidate:null,runtimeModalOpen:!1},h=null,b=null,$=null;const C={en:{appName:"Antigravity Account Switcher",accountManager:"Google account manager",settings:"Settings",currentAccount:"Current account",savedAccounts:"Saved accounts",antigravityStatus:"Antigravity status",refresh:"Refresh",connected:"Connected",active:"Active",switch:"Switch",reauth:"Re-auth",signout:"Sign out",addGoogleAccount:"Add Google Account",addGoogleAccountHint:"Sign in or switch account",saveCurrentAccount:"Save Current Account",unavailable:"Antigravity account unavailable",waiting:"Waiting for Antigravity...",checking:"Checking\u2026",loadingAccount:"Loading account\u2026",loadingSavedAccounts:"Loading saved accounts\u2026",updatingQuota:"Updating quota\u2026",checkingAccount:"Checking Antigravity account state\u2026",checkingExtension:"Checking extension status\u2026",checkingBackend:"Checking backend status\u2026",checkingHub:"Checking hub connection\u2026",noSaved:"No saved accounts",noSavedHint:"Save the current Antigravity account or add another Google account.",noMatches:"No matching accounts",noMatchesHint:"Try another label, display name, or email.",searchPlaceholder:"Search accounts",editLabel:"Edit label",save:"Save",cancel:"Cancel",removeLabel:"Clear label",accountActions:"Account actions",appearance:"Appearance",theme:"Theme",language:"Language",layout:"Layout",followVsCode:"Follow VS Code",light:"Light",dark:"Dark",system:"System",automatic:"Auto",english:"English",indonesian:"Bahasa Indonesia",showCurrent:"Show current account",showSaved:"Show saved accounts",showRuntime:"Show Antigravity status",quotaAndReminders:"Quota & Reminders",autoRefreshQuota:"Auto-refresh quota",autoRefreshOff:"Off (Manual only)",every1Minute:"Every 1 minute",every5Minutes:"Every 5 minutes (Recommended)",every15Minutes:"Every 15 minutes",every30Minutes:"Every 30 minutes",every1Hour:"Every 1 hour",lowQuotaReminder:"Low quota notification",reminderThreshold:"Warning threshold",percentRemaining:"% remaining",settingsHint:"Changes apply only after Save.",googleExtension:"Google Extension",officialExtension:"Official Antigravity extension",agyBackend:"AGY Backend",localBackend:"Local Antigravity backend",hub:"Hub",localHub:"Local Hub",hubConnection:"Antigravity hub connection",running:"Running",stopped:"Stopped",ready:"Ready",disconnected:"Unavailable",version:"Version",refreshing:"Refreshing account state...",adding:"Opening Google account flow...",saving:"Saving current account...",reauthenticating:"Re-authenticating...",signingOut:"Signing out...",switching:"Switching account...",updatingLabel:"Updating account label...",savingSettings:"Saving settings...",stateUpdated:"Account state updated.",labelUpdated:"Account label updated.",settingsSaved:"Settings saved.",collapse:"Collapse section",expand:"Expand section",currentAccountLabel:"Current account",developedBy:"Developed by",about:"About",developer:"Developer",website:"Website",removeSavedAccount:"Remove saved account",removeSavedQuestion:"Remove saved account?",removeSavedExplanation:"This only removes local Account Switcher metadata. It does not sign you out, delete your Google account, or remove Google credentials.",remove:"Remove",accountRemoved:"Saved account removed.",usage:"Usage",weeklyLimit:"Weekly limit",fiveHourLimit:"5-hour limit",weeklyShort:"Weekly",fiveHourShort:"5h",updated:"Updated",models:"models",remaining:"remaining",resetsIn:"Resets in",resetDue:"Reset due",lastUpdated:"Last updated",quotaSnapshot:"Quota snapshot",showAllModels:"Show all models",showLess:"Show less",justNow:"just now",ago:"ago",quotaUnavailable:"Usage unavailable",quotaUnavailableHint:"Antigravity did not return current quota information."},id:{appName:"Antigravity Account Switcher",accountManager:"Pengelola akun Google",settings:"Pengaturan",currentAccount:"Akun saat ini",savedAccounts:"Akun tersimpan",antigravityStatus:"Status Antigravity",refresh:"Segarkan",connected:"Terhubung",active:"Aktif",switch:"Ganti",reauth:"Autentikasi ulang",signout:"Keluar",addGoogleAccount:"Tambah Akun Google",addGoogleAccountHint:"Masuk atau ganti akun",saveCurrentAccount:"Simpan Akun Saat Ini",unavailable:"Akun Antigravity tidak tersedia",waiting:"Menunggu Antigravity...",checking:"Memeriksa\u2026",loadingAccount:"Memuat akun\u2026",loadingSavedAccounts:"Memuat akun tersimpan\u2026",updatingQuota:"Memperbarui kuota\u2026",checkingAccount:"Memeriksa status akun Antigravity\u2026",checkingExtension:"Memeriksa status ekstensi\u2026",checkingBackend:"Memeriksa status backend\u2026",checkingHub:"Memeriksa koneksi hub\u2026",noSaved:"Belum ada akun tersimpan",noSavedHint:"Simpan akun Antigravity saat ini atau tambahkan akun Google lain.",noMatches:"Tidak ada akun yang cocok",noMatchesHint:"Coba label, nama, atau email lainnya.",searchPlaceholder:"Cari akun",editLabel:"Edit label",save:"Simpan",cancel:"Batal",removeLabel:"Hapus label",accountActions:"Tindakan akun",appearance:"Tampilan",theme:"Tema",language:"Bahasa",layout:"Tata letak",followVsCode:"Ikuti VS Code",light:"Terang",dark:"Gelap",system:"Sistem",automatic:"Otomatis",english:"English",indonesian:"Bahasa Indonesia",showCurrent:"Tampilkan akun saat ini",showSaved:"Tampilkan akun tersimpan",showRuntime:"Tampilkan status Antigravity",quotaAndReminders:"Kuota & Pengingat",autoRefreshQuota:"Auto-refresh kuota",autoRefreshOff:"Nonaktif (Hanya manual)",every1Minute:"Setiap 1 menit",every5Minutes:"Setiap 5 menit (Disarankan)",every15Minutes:"Setiap 15 menit",every30Minutes:"Setiap 30 menit",every1Hour:"Setiap 1 jam",lowQuotaReminder:"Pemberitahuan kuota menipis",reminderThreshold:"Batas peringatan",percentRemaining:"% tersisa",settingsHint:"Perubahan baru diterapkan setelah Simpan.",googleExtension:"Ekstensi Google",officialExtension:"Ekstensi resmi Antigravity",agyBackend:"Backend AGY",localBackend:"Backend lokal Antigravity",hub:"Hub",localHub:"Hub Lokal",hubConnection:"Koneksi hub Antigravity",running:"Berjalan",stopped:"Berhenti",ready:"Siap",disconnected:"Tidak tersedia",version:"Versi",refreshing:"Menyegarkan status akun...",adding:"Membuka alur akun Google...",saving:"Menyimpan akun saat ini...",reauthenticating:"Melakukan autentikasi ulang...",signingOut:"Keluar dari akun...",switching:"Mengganti akun...",updatingLabel:"Memperbarui label akun...",savingSettings:"Menyimpan pengaturan...",stateUpdated:"Status akun diperbarui.",labelUpdated:"Label akun diperbarui.",settingsSaved:"Pengaturan disimpan.",collapse:"Ciutkan bagian",expand:"Buka bagian",currentAccountLabel:"Akun saat ini",developedBy:"Dikembangkan oleh",about:"Tentang",developer:"Developer",website:"Situs",removeSavedAccount:"Hapus akun tersimpan",removeSavedQuestion:"Hapus akun tersimpan?",removeSavedExplanation:"Ini hanya menghapus metadata lokal Account Switcher. Tindakan ini tidak mengeluarkan akun, menghapus akun Google, atau menghapus kredensial Google.",remove:"Hapus",accountRemoved:"Akun tersimpan dihapus.",usage:"Penggunaan",weeklyLimit:"Batas mingguan",fiveHourLimit:"Batas 5 jam",weeklyShort:"Mingguan",fiveHourShort:"5j",updated:"Diperbarui",models:"model",remaining:"tersisa",resetsIn:"Reset dalam",resetDue:"Waktunya reset",lastUpdated:"Terakhir diperbarui",quotaSnapshot:"Snapshot kuota",showAllModels:"Tampilkan semua model",showLess:"Tampilkan lebih sedikit",justNow:"baru saja",ago:"yang lalu",quotaUnavailable:"Penggunaan tidak tersedia",quotaUnavailableHint:"Antigravity tidak mengembalikan informasi kuota saat ini."}};function M(){return o.preferences?.effectiveLanguage==="id"?"id":"en"}function a(e){return C[M()]?.[e]??C.en[e]??e}function t(e){return String(e??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}function d(e,n="ui-icon"){const s=`class="${t(n)}" viewBox="0 0 16 16" fill="none" aria-hidden="true"`;return{refresh:`
+"use strict";(()=>{const f=acquireVsCodeApi(),S=document.getElementById("app");if(!S)return;const v=f.getState()||{};let r={loading:!0,current:v.current||null,accounts:Array.isArray(v.accounts)?v.accounts:[],runtime:v.runtime||null,usage:v.usage||null,usageSnapshots:v.usageSnapshots||{},usageError:null,error:null,preferences:{version:1,theme:"vscode",language:"auto",effectiveLanguage:"en",showCurrent:!0,showSaved:!0,showRuntime:!0,autoRefreshIntervalMinutes:5,enableLowQuotaReminder:!0,lowQuotaThresholdPercent:20},meta:{version:"0.5.1",developer:"Boy Gilang Ramadhan",website:"https://boygr.com",iconUri:""}},o={search:typeof v.search=="string"?v.search:"",sortBy:typeof v.sortBy=="string"?v.sortBy:"quota",currentCollapsed:!!v.currentCollapsed,savedCollapsed:!!v.savedCollapsed,runtimeCollapsed:v.runtimeCollapsed!==!1,usageCollapsed:!!v.usageCollapsed,settingsOpen:!1,settingsDraft:null,editingEmail:null,editValue:"",removeCandidate:null,runtimeModalOpen:!1},$=null,k=null,w=null;const C={en:{appName:"Antigravity Account Switcher",accountManager:"Google account manager",settings:"Settings",currentAccount:"Current account",savedAccounts:"Saved accounts",antigravityStatus:"Antigravity status",refresh:"Refresh",connected:"Connected",active:"Active",switch:"Switch",reauth:"Re-auth",signout:"Sign out",addGoogleAccount:"Add Google Account",addGoogleAccountHint:"Sign in or switch account",saveCurrentAccount:"Save Current Account",unavailable:"Antigravity account unavailable",waiting:"Waiting for Antigravity...",checking:"Checking\u2026",loadingAccount:"Loading account\u2026",loadingSavedAccounts:"Loading saved accounts\u2026",updatingQuota:"Updating quota\u2026",checkingAccount:"Checking Antigravity account state\u2026",checkingExtension:"Checking extension status\u2026",checkingBackend:"Checking backend status\u2026",checkingHub:"Checking hub connection\u2026",noSaved:"No saved accounts",noSavedHint:"Save the current Antigravity account or add another Google account.",noMatches:"No matching accounts",noMatchesHint:"Try another label, display name, or email.",searchPlaceholder:"Search accounts",sortBy:"Sort by",sortQuota:"Highest quota",sortName:"Name (A-Z)",sortRecent:"Recently used",editLabel:"Edit label",save:"Save",cancel:"Cancel",removeLabel:"Clear label",accountActions:"Account actions",appearance:"Appearance",theme:"Theme",language:"Language",layout:"Layout",followVsCode:"Follow VS Code",light:"Light",dark:"Dark",system:"System",automatic:"Auto",english:"English",indonesian:"Bahasa Indonesia",showCurrent:"Show current account",showSaved:"Show saved accounts",showRuntime:"Show Antigravity status",quotaAndReminders:"Quota & Reminders",autoRefreshQuota:"Auto-refresh quota",autoRefreshOff:"Off (Manual only)",every1Minute:"Every 1 minute",every5Minutes:"Every 5 minutes (Recommended)",every15Minutes:"Every 15 minutes",every30Minutes:"Every 30 minutes",every1Hour:"Every 1 hour",lowQuotaReminder:"Low quota notification",reminderThreshold:"Warning threshold",percentRemaining:"% remaining",smartQuotaFallback:"Smart Quota Fallback (1-click switch)",backupAndRestore:"Backup & Restore",backupDesc:"Export saved accounts metadata to JSON or restore them on another machine.",exportAccounts:"Export Accounts",importAccounts:"Import Accounts",reconnectHub:"Reconnect Hub",restartBackend:"Restart Backend",processRecovery:"Process Recovery",settingsHint:"Changes apply only after Save.",googleExtension:"Google Extension",officialExtension:"Official Antigravity extension",agyBackend:"AGY Backend",localBackend:"Local Antigravity backend",hub:"Hub",localHub:"Local Hub",hubConnection:"Antigravity hub connection",running:"Running",stopped:"Stopped",ready:"Ready",disconnected:"Unavailable",version:"Version",refreshing:"Refreshing account state...",adding:"Opening Google account flow...",saving:"Saving current account...",reauthenticating:"Re-authenticating...",signingOut:"Signing out...",switching:"Switching account...",updatingLabel:"Updating account label...",savingSettings:"Saving settings...",stateUpdated:"Account state updated.",labelUpdated:"Account label updated.",settingsSaved:"Settings saved.",collapse:"Collapse section",expand:"Expand section",currentAccountLabel:"Current account",developedBy:"Developed by",about:"About",developer:"Developer",website:"Website",removeSavedAccount:"Remove saved account",removeSavedQuestion:"Remove saved account?",removeSavedExplanation:"This only removes local Account Switcher metadata. It does not sign you out, delete your Google account, or remove Google credentials.",remove:"Remove",accountRemoved:"Saved account removed.",usage:"Usage",weeklyLimit:"Weekly limit",fiveHourLimit:"5-hour limit",weeklyShort:"Weekly",fiveHourShort:"5h",updated:"Updated",models:"models",remaining:"remaining",resetsIn:"Resets in",resetDue:"Reset due",lastUpdated:"Last updated",quotaSnapshot:"Quota snapshot",showAllModels:"Show all models",showLess:"Show less",justNow:"just now",ago:"ago",quotaUnavailable:"Usage unavailable",quotaUnavailableHint:"Antigravity did not return current quota information."},id:{appName:"Antigravity Account Switcher",accountManager:"Pengelola akun Google",settings:"Pengaturan",currentAccount:"Akun saat ini",savedAccounts:"Akun tersimpan",antigravityStatus:"Status Antigravity",refresh:"Segarkan",connected:"Terhubung",active:"Aktif",switch:"Ganti",reauth:"Autentikasi ulang",signout:"Keluar",addGoogleAccount:"Tambah Akun Google",addGoogleAccountHint:"Masuk atau ganti akun",saveCurrentAccount:"Simpan Akun Saat Ini",unavailable:"Akun Antigravity tidak tersedia",waiting:"Menunggu Antigravity...",checking:"Memeriksa\u2026",loadingAccount:"Memuat akun\u2026",loadingSavedAccounts:"Memuat akun tersimpan\u2026",updatingQuota:"Memperbarui kuota\u2026",checkingAccount:"Memeriksa status akun Antigravity\u2026",checkingExtension:"Memeriksa status ekstensi\u2026",checkingBackend:"Memeriksa status backend\u2026",checkingHub:"Memeriksa koneksi hub\u2026",noSaved:"Belum ada akun tersimpan",noSavedHint:"Simpan akun Antigravity saat ini atau tambahkan akun Google lain.",noMatches:"Tidak ada akun yang cocok",noMatchesHint:"Coba label, nama, atau email lainnya.",searchPlaceholder:"Cari akun",sortBy:"Urutkan",sortQuota:"Sisa kuota",sortName:"Nama (A-Z)",sortRecent:"Terakhir dipakai",editLabel:"Edit label",save:"Simpan",cancel:"Batal",removeLabel:"Hapus label",accountActions:"Tindakan akun",appearance:"Tampilan",theme:"Tema",language:"Bahasa",layout:"Tata letak",followVsCode:"Ikuti VS Code",light:"Terang",dark:"Gelap",system:"Sistem",automatic:"Otomatis",english:"English",indonesian:"Bahasa Indonesia",showCurrent:"Tampilkan akun saat ini",showSaved:"Tampilkan akun tersimpan",showRuntime:"Tampilkan status Antigravity",quotaAndReminders:"Kuota & Pengingat",autoRefreshQuota:"Auto-refresh kuota",autoRefreshOff:"Nonaktif (Hanya manual)",every1Minute:"Setiap 1 menit",every5Minutes:"Setiap 5 menit (Disarankan)",every15Minutes:"Setiap 15 menit",every30Minutes:"Setiap 30 menit",every1Hour:"Setiap 1 jam",lowQuotaReminder:"Pemberitahuan kuota menipis",reminderThreshold:"Batas peringatan",percentRemaining:"% tersisa",smartQuotaFallback:"Peralihan Cepat saat Kuota Menipis",backupAndRestore:"Cadangan & Pemulihan",backupDesc:"Ekspor metadata akun tersimpan ke JSON atau pulihkan di perangkat lain.",exportAccounts:"Ekspor Akun",importAccounts:"Impor Akun",reconnectHub:"Sambungkan Ulang Hub",restartBackend:"Mulai Ulang Backend",processRecovery:"Pemulihan Proses",settingsHint:"Perubahan baru diterapkan setelah Simpan.",googleExtension:"Ekstensi Google",officialExtension:"Ekstensi resmi Antigravity",agyBackend:"Backend AGY",localBackend:"Backend lokal Antigravity",hub:"Hub",localHub:"Hub Lokal",hubConnection:"Koneksi hub Antigravity",running:"Berjalan",stopped:"Berhenti",ready:"Siap",disconnected:"Tidak tersedia",version:"Versi",refreshing:"Menyegarkan status akun...",adding:"Membuka alur akun Google...",saving:"Menyimpan akun saat ini...",reauthenticating:"Melakukan autentikasi ulang...",signingOut:"Keluar dari akun...",switching:"Mengganti akun...",updatingLabel:"Memperbarui label akun...",savingSettings:"Menyimpan pengaturan...",stateUpdated:"Status akun diperbarui.",labelUpdated:"Label akun diperbarui.",settingsSaved:"Pengaturan disimpan.",collapse:"Ciutkan bagian",expand:"Buka bagian",currentAccountLabel:"Akun saat ini",developedBy:"Dikembangkan oleh",about:"Tentang",developer:"Developer",website:"Situs",removeSavedAccount:"Hapus akun tersimpan",removeSavedQuestion:"Hapus akun tersimpan?",removeSavedExplanation:"Ini hanya menghapus metadata lokal Account Switcher. Tindakan ini tidak mengeluarkan akun, menghapus akun Google, atau menghapus kredensial Google.",remove:"Hapus",accountRemoved:"Akun tersimpan dihapus.",usage:"Penggunaan",weeklyLimit:"Batas mingguan",fiveHourLimit:"Batas 5 jam",weeklyShort:"Mingguan",fiveHourShort:"5j",updated:"Diperbarui",models:"model",remaining:"tersisa",resetsIn:"Reset dalam",resetDue:"Waktunya reset",lastUpdated:"Terakhir diperbarui",quotaSnapshot:"Snapshot kuota",showAllModels:"Tampilkan semua model",showLess:"Tampilkan lebih sedikit",justNow:"baru saja",ago:"yang lalu",quotaUnavailable:"Penggunaan tidak tersedia",quotaUnavailableHint:"Antigravity tidak mengembalikan informasi kuota saat ini."}};function R(){return r.preferences?.effectiveLanguage==="id"?"id":"en"}function a(e){return C[R()]?.[e]??C.en[e]??e}function t(e){return String(e??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}function p(e,n="ui-icon"){const s=`class="${t(n)}" viewBox="0 0 16 16" fill="none" aria-hidden="true"`;return{refresh:`
                 <svg ${s}>
                     <path
                         d="M13 4.5V1.8M13 1.8h-2.7M13 1.8A6 6 0 1 0 13.65 8"
@@ -112,7 +112,7 @@
                         stroke-linejoin="round"
                     />
                 </svg>
-            `}[e]||""}function p(e){return String(e??"").trim().toLowerCase()}function k(){f.setState({search:r.search,currentCollapsed:r.currentCollapsed,savedCollapsed:r.savedCollapsed,runtimeCollapsed:r.runtimeCollapsed,usageCollapsed:r.usageCollapsed,accounts:o.accounts,current:o.current,runtime:o.runtime,usage:o.usage,usageSnapshots:o.usageSnapshots})}function L(e){h=e,g()}function ee(){h=null}function E(e,n="info"){b={message:e,kind:n},$&&clearTimeout($),$=setTimeout(()=>{b=null,$=null,g()},2600),g()}function te(){return h?{refresh:a("refreshing"),add:a("adding"),save:a("saving"),reauth:a("reauthenticating"),signout:a("signingOut"),switch:a("switching"),label:a("updatingLabel"),settings:a("savingSettings"),remove:a("removeSavedAccount")}[h.type]||"Working...":""}function v(){return!!h}function U(e,n){const s=String(e||"").trim()||String(n||"").split("@")[0],i=s.split(/\s+/).filter(Boolean);return i.length>=2?(i[0][0]+i[i.length-1][0]).toUpperCase():s.slice(0,2).toUpperCase()||"A"}function P(){if(!o.current)return null;const e=p(o.current.email);return o.accounts.find(n=>p(n.email)===e)||null}function x(e){const n=p(e);return o.accounts.find(s=>p(s.email)===n)}function B(e){return e.label||e.displayName||e.email}function Q(){const e=r.search.trim().toLowerCase();return e?o.accounts.filter(n=>[n.label,n.displayName,n.email].filter(Boolean).join(" ").toLowerCase().includes(e)):o.accounts}function I(){const e=document.documentElement,n=o.preferences?.theme||"vscode";if(e.removeAttribute("data-ag-theme"),n==="light"||n==="dark"){e.setAttribute("data-ag-theme",n);return}if(n==="system"){const s=window.matchMedia("(prefers-color-scheme: dark)").matches;e.setAttribute("data-ag-theme",s?"dark":"light")}}function ae(){return h?`
+            `}[e]||""}function d(e){return String(e??"").trim().toLowerCase()}function A(){f.setState({search:o.search,sortBy:o.sortBy,currentCollapsed:o.currentCollapsed,savedCollapsed:o.savedCollapsed,runtimeCollapsed:o.runtimeCollapsed,usageCollapsed:o.usageCollapsed,accounts:r.accounts,current:r.current,runtime:r.runtime,usage:r.usage,usageSnapshots:r.usageSnapshots})}function M(e){$=e,g()}function ae(){$=null}function x(e,n="info"){k={message:e,kind:n},w&&clearTimeout(w),w=setTimeout(()=>{k=null,w=null,g()},2600),g()}function ne(){return $?{refresh:a("refreshing"),add:a("adding"),save:a("saving"),reauth:a("reauthenticating"),signout:a("signingOut"),switch:a("switching"),label:a("updatingLabel"),settings:a("savingSettings"),remove:a("removeSavedAccount")}[$.type]||"Working...":""}function m(){return!!$}function N(e,n){const s=String(e||"").trim()||String(n||"").split("@")[0],i=s.split(/\s+/).filter(Boolean);return i.length>=2?(i[0][0]+i[i.length-1][0]).toUpperCase():s.slice(0,2).toUpperCase()||"A"}function G(){if(!r.current)return null;const e=d(r.current.email);return r.accounts.find(n=>d(n.email)===e)||null}function T(e){const n=d(e);return r.accounts.find(s=>d(s.email)===n)}function H(e){return e.label||e.displayName||e.email}function U(e){const n=d(e.email),s=r.usageSnapshots?.[n];if(!s||!Array.isArray(s.buckets)||s.buckets.length===0)return;let i;for(const c of s.buckets)typeof c.remainingFraction=="number"&&!c.disabled&&(i===void 0||c.remainingFraction<i)&&(i=c.remainingFraction);return i!==void 0?Math.round(i*100):void 0}function Q(){const e=o.search.trim().toLowerCase();let n=e?r.accounts.filter(i=>[i.label,i.displayName,i.email].filter(Boolean).join(" ").toLowerCase().includes(e)):r.accounts.slice();const s=d(r.current?.email);return n.sort((i,c)=>{const l=d(i.email)===s,u=d(c.email)===s;if(l!==u)return l?-1:1;const y=o.sortBy||"quota";if(y==="quota"){const h=U(i),b=U(c);if(h!==void 0&&b!==void 0){if(b!==h)return b-h}else{if(h!==void 0)return-1;if(b!==void 0)return 1}}else if(y==="recent"){const h=i.lastSeenAt?new Date(i.lastSeenAt).getTime():0,b=c.lastSeenAt?new Date(c.lastSeenAt).getTime():0;if(b!==h)return b-h}return(i.label||i.displayName||i.email).localeCompare(c.label||c.displayName||c.email)}),n}function I(){const e=document.documentElement,n=r.preferences?.theme||"vscode";if(e.removeAttribute("data-ag-theme"),n==="light"||n==="dark"){e.setAttribute("data-ag-theme",n);return}if(n==="system"){const s=window.matchMedia("(prefers-color-scheme: dark)").matches;e.setAttribute("data-ag-theme",s?"dark":"light")}}function se(){return $?`
                 <div
                     class="toast-host"
                     aria-live="polite"
@@ -128,33 +128,33 @@
                         ></span>
 
                         <span class="toast-message">
-                            ${t(te())}
+                            ${t(ne())}
                         </span>
                     </div>
                 </div>
-            `:b?`
+            `:k?`
             <div
                 class="toast-host"
                 aria-live="polite"
                 aria-atomic="true"
             >
                 <div
-                    class="toast ${t(b.kind)}"
+                    class="toast ${t(k.kind)}"
                     role="status"
                 >
                     <span
                         class="toast-symbol"
                         aria-hidden="true"
                     >
-                        ${b.kind==="error"?"!":"\u2713"}
+                        ${k.kind==="error"?"!":"\u2713"}
                     </span>
 
                     <span class="toast-message">
-                        ${t(b.message)}
+                        ${t(k.message)}
                     </span>
                 </div>
             </div>
-        `:""}function ne(e,n,s,i=""){return`
+        `:""}function ie(e,n,s,i=""){return`
             <div class="section-header">
                 <button
                     type="button"
@@ -167,7 +167,7 @@
                         class="chevron"
                         aria-hidden="true"
                     >
-                        ${d(s?"chevronRight":"chevronDown")}
+                        ${p(s?"chevronRight":"chevronDown")}
                     </span>
 
                     <span class="section-title">
@@ -194,7 +194,7 @@
                     <div class="loading-line"></div>
                 </section>
             </div>
-        `}function N(e){return`
+        `}function O(e){return`
             <div
                 class="label-editor"
                 data-editor-email="${t(e.email)}"
@@ -202,7 +202,7 @@
                 <input
                     class="label-input"
                     type="text"
-                    value="${t(r.editValue)}"
+                    value="${t(o.editValue)}"
                     data-role="label-input"
                     data-email="${t(e.email)}"
                     maxlength="80"
@@ -217,7 +217,7 @@
                     title="${t(a("save"))}"
                     aria-label="${t(a("save"))}"
                 >
-                    ${d("check")}
+                    ${p("check")}
                 </button>
 
                 <button
@@ -228,12 +228,12 @@
                     title="${t(a("cancel"))}"
                     aria-label="${t(a("cancel"))}"
                 >
-                    ${d("close")}
+                    ${p("close")}
                 </button>
             </div>
-        `}function se(e){if(typeof e!="string")return"";try{const n=new URL(e),s=n.hostname.toLowerCase();return n.protocol!=="https:"||!(s==="googleusercontent.com"||s.endsWith(".googleusercontent.com"))?"":n.toString()}catch{return""}}function ie(e,n,s,i=""){const c=se(s),l=`
+        `}function oe(e){if(typeof e!="string")return"";try{const n=new URL(e),s=n.hostname.toLowerCase();return n.protocol!=="https:"||!(s==="googleusercontent.com"||s.endsWith(".googleusercontent.com"))?"":n.toString()}catch{return""}}function re(e,n,s,i=""){const c=oe(s),l=`
             <span class="avatar-fallback">
-                ${t(U(e,n))}
+                ${t(N(e,n))}
             </span>
         `;return`
             <div
@@ -252,7 +252,7 @@
                             >
                         `:""}
             </div>
-        `}function O(e){return typeof e!="number"||!Number.isFinite(e)?null:Math.max(0,Math.min(100,e*100))}function j(e){const n=O(e);if(n===null)return"\u2014";const s=Math.round(n*100)/100;return(Number.isInteger(s)?String(s):s.toFixed(2))+"%"}function V(e){const n=Math.max(0,Math.floor(e/6e4));if(n<1)return"<1m";const s=Math.floor(n/1440),i=Math.floor(n%1440/60),c=n%60,l=[];return s>0&&l.push(`${s}d`),i>0&&l.push(`${i}h`),s===0&&c>0&&l.push(`${c}m`),l.slice(0,2).join(" ")||"<1m"}function T(e){if(!e)return"";const n=new Date(e).getTime();if(!Number.isFinite(n))return"";const s=n-Date.now();if(s<=0){const i=new Date(e),c=String(i.getHours()).padStart(2,"0"),l=String(i.getMinutes()).padStart(2,"0"),y=i.toDateString()===new Date().toDateString()?`${c}:${l}`:`${i.getDate()}/${i.getMonth()+1} ${c}:${l}`;return`${a("resetDue")} (${y})`}return`${a("resetsIn")} `+V(s)}function q(e){if(!e)return"";const n=new Date(e).getTime();if(!Number.isFinite(n))return"";const s=Math.max(0,Date.now()-n);return s<6e4?a("justNow"):`${V(s)} `+a("ago")}function oe(e){const n=String(e?.window||"").trim().toLowerCase();return n==="weekly"?a("weeklyLimit"):n==="5h"?a("fiveHourLimit"):e?.displayName||e?.window||"Quota"}function re(e){const n={weekly:0,"5h":1};return[...Array.isArray(e)?e:[]].sort((s,i)=>{const c=String(s?.window||"").toLowerCase(),l=String(i?.window||"").toLowerCase();return(n[c]??99)-(n[l]??99)})}function ce(e){const n=O(e.remainingFraction),s=j(e.remainingFraction),i=T(e.resetTime),c=oe(e),l=t(c).replace(/\s+/,"<br>");return`
+        `}function F(e){return typeof e!="number"||!Number.isFinite(e)?null:Math.max(0,Math.min(100,e*100))}function j(e){const n=F(e);if(n===null)return"\u2014";const s=Math.round(n*100)/100;return(Number.isInteger(s)?String(s):s.toFixed(2))+"%"}function V(e){const n=Math.max(0,Math.floor(e/6e4));if(n<1)return"<1m";const s=Math.floor(n/1440),i=Math.floor(n%1440/60),c=n%60,l=[];return s>0&&l.push(`${s}d`),i>0&&l.push(`${i}h`),s===0&&c>0&&l.push(`${c}m`),l.slice(0,2).join(" ")||"<1m"}function B(e){if(!e)return"";const n=new Date(e).getTime();if(!Number.isFinite(n))return"";const s=n-Date.now();if(s<=0){const i=new Date(e),c=String(i.getHours()).padStart(2,"0"),l=String(i.getMinutes()).padStart(2,"0"),y=i.toDateString()===new Date().toDateString()?`${c}:${l}`:`${i.getDate()}/${i.getMonth()+1} ${c}:${l}`;return`${a("resetDue")} (${y})`}return`${a("resetsIn")} `+V(s)}function q(e){if(!e)return"";const n=new Date(e).getTime();if(!Number.isFinite(n))return"";const s=Math.max(0,Date.now()-n);return s<6e4?a("justNow"):`${V(s)} `+a("ago")}function ce(e){const n=String(e?.window||"").trim().toLowerCase();return n==="weekly"?a("weeklyLimit"):n==="5h"?a("fiveHourLimit"):e?.displayName||e?.window||"Quota"}function le(e){const n={weekly:0,"5h":1};return[...Array.isArray(e)?e:[]].sort((s,i)=>{const c=String(s?.window||"").toLowerCase(),l=String(i?.window||"").toLowerCase();return(n[c]??99)-(n[l]??99)})}function ue(e){const n=F(e.remainingFraction),s=j(e.remainingFraction),i=B(e.resetTime),c=ce(e),l=t(c).replace(/\s+/,"<br>");return`
             <div
                 class="quota-bucket ${e.disabled?"disabled":""}"
                 data-window="${t(e.window||"")}"
@@ -289,7 +289,7 @@
                             `:""}
                 </div>
             </div>
-        `}function F(e){const n=String(e?.displayName||"").trim(),s=n.toLowerCase();return s==="gemini models"||s==="gemini"?"Gemini":s==="claude and gpt models"||s==="claude and gpt"?"Claude and GPT":n||"Quota"}function le(e){const n=re(e.buckets),s=F(e),i=String(e?.description||"").trim();return`
+        `}function W(e){const n=String(e?.displayName||"").trim(),s=n.toLowerCase();return s==="gemini models"||s==="gemini"?"Gemini":s==="claude and gpt models"||s==="claude and gpt"?"Claude and GPT":n||"Quota"}function de(e){const n=le(e.buckets),s=W(e),i=String(e?.description||"").trim();return`
             <div class="quota-group">
                 <div class="quota-group-heading">
                     <span
@@ -312,10 +312,10 @@
                 </div>
 
                 <div class="quota-buckets">
-                    ${n.map(ce).join("")}
+                    ${n.map(ue).join("")}
                 </div>
             </div>
-        `}function ue(){const e=o.usage,n=Array.isArray(e?.groups)?e.groups:[],s=e?.fetchedAt?q(e.fetchedAt):"";return`
+        `}function pe(){const e=r.usage,n=Array.isArray(e?.groups)?e.groups:[],s=e?.fetchedAt?q(e.fetchedAt):"";return`
             <div class="usage-section">
                 <div class="usage-heading">
                     <span class="usage-title">
@@ -335,15 +335,15 @@
 
                 ${n.length>0?`
                             <div class="usage-body">
-                                ${n.map(le).join("")}
+                                ${n.map(de).join("")}
                             </div>
                         `:`
                             <div class="usage-empty secondary-text">
-                                ${t(o.usageError||a("quotaUnavailable"))}
+                                ${t(r.usageError||a("quotaUnavailable"))}
                             </div>
                         `}
             </div>
-        `}function de(){document.querySelectorAll(".avatar-image").forEach(e=>{e.addEventListener("error",()=>{e.hidden=!0,e.closest(".avatar")?.classList.remove("has-image")},{once:!0})})}function W(){document.querySelectorAll("[data-reset-at]").forEach(e=>{const n=T(e.dataset.resetAt),s=e.dataset.resetPrefix||"";e.textContent=n?s+n:""}),document.querySelectorAll("[data-usage-fetched-at]").forEach(e=>{e.textContent=q(e.dataset.usageFetchedAt)}),document.querySelectorAll("[data-snapshot-fetched-at]").forEach(e=>{e.textContent=q(e.dataset.snapshotFetchedAt)})}function ge(){if(!o.preferences?.showCurrent)return"";const e=!!o.loading,n=`
+        `}function ge(){document.querySelectorAll(".avatar-image").forEach(e=>{e.addEventListener("error",()=>{e.hidden=!0,e.closest(".avatar")?.classList.remove("has-image")},{once:!0})})}function K(){document.querySelectorAll("[data-reset-at]").forEach(e=>{const n=B(e.dataset.resetAt),s=e.dataset.resetPrefix||"";e.textContent=n?s+n:""}),document.querySelectorAll("[data-usage-fetched-at]").forEach(e=>{e.textContent=q(e.dataset.usageFetchedAt)}),document.querySelectorAll("[data-snapshot-fetched-at]").forEach(e=>{e.textContent=q(e.dataset.snapshotFetchedAt)})}function ve(){if(!r.preferences?.showCurrent)return"";const e=!!r.loading,n=`
             <div class="section-header current-static-header">
                 <div class="section-static-title">
                     <span class="section-title">
@@ -351,7 +351,7 @@
                     </span>
                 </div>
             </div>
-        `;if(!o.current)return`
+        `;if(!r.current)return`
                 <section class="section current-section">
                     ${n}
 
@@ -365,11 +365,11 @@
                         </strong>
 
                         <div class="secondary-text">
-                            ${t(e?a("checkingAccount"):o.error||a("waiting"))}
+                            ${t(e?a("checkingAccount"):r.error||a("waiting"))}
                         </div>
                     </div>
                 </section>
-            `;const s=P(),i=o.current.displayName||s?.displayName||o.current.email,c=s&&p(r.editingEmail)===p(s.email),l=s?.label||a("currentAccountLabel"),u=`
+            `;const s=G(),i=r.current.displayName||s?.displayName||r.current.email,c=s&&d(o.editingEmail)===d(s.email),l=s?.label||a("currentAccountLabel"),u=`
             <span class="connection-state inline ${e?"checking":""}">
                 <span class="status-dot"></span>
 
@@ -384,7 +384,7 @@
                     aria-label="${t(a("currentAccount"))}"
                 >
                     <div class="identity-row current-identity-row">
-                        ${ie(i,o.current.email,o.current.profilePictureUrl,"current-avatar")}
+                        ${re(i,r.current.email,r.current.profilePictureUrl,"current-avatar")}
 
                         <div class="identity">
                             <div class="identity-heading">
@@ -398,14 +398,14 @@
 
                             <div
                                 class="identity-email"
-                                title="${t(o.current.email)}"
+                                title="${t(r.current.email)}"
                             >
-                                ${t(o.current.email)}
+                                ${t(r.current.email)}
                             </div>
 
                             ${s&&c?`
                                         <div class="current-label-editor">
-                                            ${N(s)}
+                                            ${O(s)}
                                         </div>
 
                                         <div class="current-status-row">
@@ -426,9 +426,9 @@
                                                                 data-email="${t(s.email)}"
                                                                 title="${t(a("editLabel"))}"
                                                                 aria-label="${t(a("editLabel"))}"
-                                                                ${v()?"disabled":""}
+                                                                ${m()?"disabled":""}
                                                             >
-                                                                ${d("edit")}
+                                                                ${p("edit")}
                                                             </button>
                                                         `:""}
                                             </div>
@@ -444,7 +444,7 @@
                             type="button"
                             class="btn"
                             data-action="reauth"
-                            ${e||v()?"disabled":""}
+                            ${e||m()?"disabled":""}
                         >
                             ${t(a("reauth"))}
                         </button>
@@ -453,16 +453,16 @@
                             type="button"
                             class="btn subtle-danger"
                             data-action="signout"
-                            ${e||v()?"disabled":""}
+                            ${e||m()?"disabled":""}
                         >
                             ${t(a("signout"))}
                         </button>
                     </div>
 
-                    ${ue()}
+                    ${pe()}
                 </div>
             </section>
-        `}function K(e,n){return(Array.isArray(e?.groups)?e.groups:[]).find(i=>n(String(i.displayName||"").toLowerCase()))}function z(e,n){return(Array.isArray(e?.buckets)?e.buckets:[]).find(s=>String(s.window||"").toLowerCase()===n)}function ve(e){return j(e?.remainingFraction)}function Y(e,n){if(!n)return"";const s=z(n,"weekly"),i=z(n,"5h"),c=T(s?.resetTime),l=T(i?.resetTime),u=(y,S,A,R)=>`
+        `}function z(e,n){return(Array.isArray(e?.groups)?e.groups:[]).find(i=>n(String(i.displayName||"").toLowerCase()))}function Z(e,n){return(Array.isArray(e?.buckets)?e.buckets:[]).find(s=>String(s.window||"").toLowerCase()===n)}function me(e){return j(e?.remainingFraction)}function J(e,n){if(!n)return"";const s=Z(n,"weekly"),i=Z(n,"5h"),c=B(s?.resetTime),l=B(i?.resetTime),u=(y,h,b,E)=>`
                 <div class="saved-quota-pair">
                     <div class="saved-usage-metric">
                         <span class="saved-usage-metric-label">
@@ -470,17 +470,17 @@
                         </span>
 
                         <span class="saved-usage-metric-value">
-                            ${t(ve(S))}
+                            ${t(me(h))}
                         </span>
                     </div>
 
-                    ${A?`
+                    ${b?`
                                 <div
-                                    class="saved-quota-reset ${t(R)}"
-                                    data-reset-at="${t(S?.resetTime||"")}"
+                                    class="saved-quota-reset ${t(E)}"
+                                    data-reset-at="${t(h?.resetTime||"")}"
                                     data-reset-prefix=""
                                 >
-                                    ${t(A)}
+                                    ${t(b)}
                                 </div>
                             `:""}
                 </div>
@@ -496,13 +496,13 @@
                     ${u(a("fiveHourShort"),i,l,"saved-five-hour-reset")}
                 </div>
             </div>
-        `}function pe(e){if(!e)return"";const n=K(e,i=>i.includes("gemini")),s=K(e,i=>i.includes("claude")||i.includes("gpt"));return!n&&!s?"":`
+        `}function he(e){if(!e)return"";const n=z(e,i=>i.includes("gemini")),s=z(e,i=>i.includes("claude")||i.includes("gpt"));return!n&&!s?"":`
             <div class="saved-usage-summary">
-                ${Y("Gemini",n)}
+                ${J("Gemini",n)}
 
-                ${Y("Claude + GPT",s)}
+                ${J("Claude + GPT",s)}
             </div>
-        `}function me(e){const n=p(o.current?.email),s=!!n&&p(e.email)===n,i=p(r.editingEmail)===p(e.email),c=!!(o.loading&&(!o.accounts||o.accounts.length===0)),l=o.usageSnapshots?.[p(e.email)],u=l?.fetchedAt?q(l.fetchedAt):"";return`
+        `}function fe(e){const n=d(r.current?.email),s=!!n&&d(e.email)===n,i=d(o.editingEmail)===d(e.email),c=!!(r.loading&&(!r.accounts||r.accounts.length===0)),l=r.usageSnapshots?.[d(e.email)],u=l?.fetchedAt?q(l.fetchedAt):"";return`
             <article
                 class="account-row saved-account-row ${s?"active":""}"
                 data-email="${t(e.email)}"
@@ -513,7 +513,7 @@
                         class="avatar small"
                         aria-hidden="true"
                     >
-                        ${t(U(e.displayName||e.label,e.email))}
+                        ${t(N(e.displayName||e.label,e.email))}
 
                         ${s?`
                                     <span
@@ -539,7 +539,7 @@
                                     data-email="${t(e.email)}"
                                     title="${t(a("switch"))}"
                                     aria-label="${t(a("switch"))}"
-                                    ${c||v()?"disabled":""}
+                                    ${c||m()?"disabled":""}
                                 >
                                     <span
                                         class="badge-icon"
@@ -552,13 +552,13 @@
                             `}
                 </div>
                 <div class="identity saved-account-identity">
-                    ${i?N(e):`
+                    ${i?O(e):`
                                 <div class="saved-title-row">
                                     <div
                                         class="identity-name saved-label"
-                                        title="${t(B(e))}"
+                                        title="${t(H(e))}"
                                     >
-                                        ${t(B(e))}
+                                        ${t(H(e))}
                                     </div>
 
                                     <div class="saved-title-actions">
@@ -570,9 +570,9 @@
                                             data-email="${t(e.email)}"
                                             title="${t(a("editLabel"))}"
                                             aria-label="${t(a("editLabel"))}"
-                                            ${v()?"disabled":""}
+                                            ${m()?"disabled":""}
                                         >
-                                            ${d("edit")}
+                                            ${p("edit")}
                                         </button>
 
                                         <button
@@ -582,9 +582,9 @@
                                             data-email="${t(e.email)}"
                                             title="${t(a("removeSavedAccount"))}"
                                             aria-label="${t(a("removeSavedAccount"))}"
-                                            ${v()?"disabled":""}
+                                            ${m()?"disabled":""}
                                         >
-                                            ${d("trash")}
+                                            ${p("trash")}
                                         </button>
                                     </div>
                                 </div>
@@ -615,13 +615,13 @@
                 </div>
 
                 <div class="saved-account-quota-area">
-                    ${pe(l)}
+                    ${he(l)}
                 </div>
             </article>
-        `}function Z(){if(o.loading&&(!o.accounts||o.accounts.length===0))return`
+        `}function Y(){if(r.loading&&(!r.accounts||r.accounts.length===0))return`
                 <div class="saved-loading-panel" role="status" aria-live="polite">
                     <div class="saved-loading-spinner-row">
-                        <span class="loading-spin-icon">${d("refresh")}</span>
+                        <span class="loading-spin-icon">${p("refresh")}</span>
                         <strong>${t(a("loadingSavedAccounts"))}</strong>
                     </div>
                     <div class="saved-skeleton-container">
@@ -634,7 +634,7 @@
                         </div>
                     </div>
                 </div>
-            `;const e=Q();return o.accounts.length===0?`
+            `;const e=Q();return r.accounts.length===0?`
                 <div class="empty-panel">
                     <strong>
                         ${t(a("noSaved"))}
@@ -654,7 +654,7 @@
                         ${t(a("noMatchesHint"))}
                     </div>
                 </div>
-            `:e.map(me).join("")}function he(){if(!o.preferences?.showSaved)return"";const e=Q().length,n=(o.accounts?.length||0)>3,s=!!o.loading&&(!o.accounts||o.accounts.length===0),i=!!o.loading&&(o.accounts?.length||0)>0,c=s?"\u2026":r.search.trim()?`${e}/${o.accounts.length}`:String(o.accounts.length),l=`
+            `:e.map(fe).join("")}function be(){if(!r.preferences?.showSaved)return"";const e=Q().length,n=(r.accounts?.length||0)>3,s=!!r.loading&&(!r.accounts||r.accounts.length===0),i=!!r.loading&&(r.accounts?.length||0)>0,c=s?"\u2026":o.search.trim()?`${e}/${r.accounts.length}`:String(r.accounts.length),l=`
             <div class="saved-header-actions">
                 ${i?`
                             <span
@@ -663,7 +663,7 @@
                                 aria-label="${t(a("updatingQuota"))}"
                             >
                                 <span class="loading-spin-icon">
-                                    ${d("refresh")}
+                                    ${p("refresh")}
                                 </span>
                             </span>
                         `:""}
@@ -682,45 +682,61 @@
                     data-action="add"
                     title="${t(a("addGoogleAccount"))}"
                     aria-label="${t(a("addGoogleAccount"))}"
-                    ${v()?"disabled":""}
+                    ${m()?"disabled":""}
                 >
-                    ${d("plus")}
+                    ${p("plus")}
                 </button>
             </div>
         `;return`
             <section class="section saved-section">
-                ${ne(a("savedAccounts"),"toggle-saved",r.savedCollapsed,l)}
+                ${ie(a("savedAccounts"),"toggle-saved",o.savedCollapsed,l)}
 
-                ${r.savedCollapsed?"":`
+                ${o.savedCollapsed?"":`
                             <div class="saved-body">
                                 <div class="saved-controls">
-                                    ${(o.accounts?.length||0)>0?`
-                                                <div class="search-wrap">
-                                                    <span
-                                                        class="search-icon"
-                                                        aria-hidden="true"
-                                                    >
-                                                        ${d("search")}
-                                                    </span>
+                                    ${(r.accounts?.length||0)>0?`
+                                                <div class="saved-filter-row">
+                                                    <div class="search-wrap">
+                                                        <span
+                                                            class="search-icon"
+                                                            aria-hidden="true"
+                                                        >
+                                                            ${p("search")}
+                                                        </span>
 
-                                                    <input
-                                                        id="account-search"
-                                                        class="search-input"
-                                                        type="search"
-                                                        value="${t(r.search)}"
-                                                        placeholder="${t(a("searchPlaceholder"))}"
-                                                        autocomplete="off"
-                                                        spellcheck="false"
-                                                    >
+                                                        <input
+                                                            id="account-search"
+                                                            class="search-input"
+                                                            type="search"
+                                                            value="${t(o.search)}"
+                                                            placeholder="${t(a("searchPlaceholder"))}"
+                                                            autocomplete="off"
+                                                            spellcheck="false"
+                                                        >
+                                                    </div>
+
+                                                    <div class="sort-wrap">
+                                                        <select
+                                                            id="account-sort"
+                                                            class="sort-select"
+                                                            data-action="change-sort"
+                                                            aria-label="${t(a("sortBy"))}"
+                                                            title="${t(a("sortBy"))}"
+                                                        >
+                                                            <option value="quota" ${o.sortBy==="quota"?"selected":""}>${t(a("sortQuota"))}</option>
+                                                            <option value="name" ${o.sortBy==="name"?"selected":""}>${t(a("sortName"))}</option>
+                                                            <option value="recent" ${o.sortBy==="recent"?"selected":""}>${t(a("sortRecent"))}</option>
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             `:""}
 
-                                    ${o.current&&!P()?`
+                                    ${r.current&&!G()?`
                                                 <button
                                                     type="button"
                                                     class="btn block"
                                                     data-action="save"
-                                                    ${v()?"disabled":""}
+                                                    ${m()?"disabled":""}
                                                 >
                                                     ${t(a("saveCurrentAccount"))}
                                                 </button>
@@ -732,12 +748,12 @@
                                     class="account-list"
                                     tabindex="0"
                                 >
-                                    ${Z()}
+                                    ${Y()}
                                 </div>
                             </div>
                         `}
             </section>
-        `}function G(e,n,s,i,c){return`
+        `}function D(e,n,s,i,c){return`
             <div class="runtime-row">
                 <div
                     class="runtime-symbol"
@@ -763,21 +779,21 @@
                     ${t(c)}
                 </div>
             </div>
-        `}function fe(){if(!o.preferences?.showRuntime)return"";const e=!!o.loading,n=o.runtime||{},s=n.extension||{},i=n.process||null,c=n.health||null,l=!!s.installed,u=!!i,y=!!c?.reachable,S=l&&u&&y,A=e?"checking":S?"healthy":"warning",R=a(e?"checking":S?"ready":"disconnected");return`
+        `}function $e(){if(!r.preferences?.showRuntime)return"";const e=!!r.loading,n=r.runtime||{},s=n.extension||{},i=n.process||null,c=n.health||null,l=!!s.installed,u=!!i,y=!!c?.reachable,h=l&&u&&y,b=e?"checking":h?"healthy":"warning",E=a(e?"checking":h?"ready":"disconnected");return`
             <div class="runtime-status-bar">
                 <button
                     type="button"
-                    class="runtime-status-pill ${t(A)}"
+                    class="runtime-status-pill ${t(b)}"
                     data-action="open-runtime-modal"
-                    title="${t(a("antigravityStatus"))} \xB7 ${t(R)}"
+                    title="${t(a("antigravityStatus"))} \xB7 ${t(E)}"
                     aria-label="${t(a("antigravityStatus"))}"
                 >
                     <span class="status-dot"></span>
                     <span class="runtime-status-pill-label">Antigravity:</span>
-                    <span class="runtime-status-pill-value">${t(R)}</span>
+                    <span class="runtime-status-pill-value">${t(E)}</span>
                 </button>
             </div>
-        `}function be(){if(!r.runtimeModalOpen)return"";const e=!!o.loading,n=o.runtime||{},s=n.extension||{},i=n.process||null,c=n.health||null,l=!!s.installed,u=!!i,y=!!c?.reachable,S=l&&u&&y,A=e?"checking":S?"healthy":"warning",R=a(e?"checking":S?"ready":"disconnected");return`
+        `}function ye(){if(!o.runtimeModalOpen)return"";const e=!!r.loading,n=r.runtime||{},s=n.extension||{},i=n.process||null,c=n.health||null,l=!!s.installed,u=!!i,y=!!c?.reachable,h=l&&u&&y,b=e?"checking":h?"healthy":"warning",E=a(e?"checking":h?"ready":"disconnected");return`
             <div
                 class="runtime-modal-backdrop"
                 data-action="runtime-modal-backdrop"
@@ -790,7 +806,7 @@
                 >
                     <header class="runtime-modal-header">
                         <div class="runtime-modal-title">
-                            <span class="status-dot ${t(A)}"></span>
+                            <span class="status-dot ${t(b)}"></span>
                             <h2>${t(a("antigravityStatus"))}</h2>
                         </div>
 
@@ -801,22 +817,44 @@
                             aria-label="${t(a("cancel")||"Close")}"
                             title="${t(a("cancel")||"Close")}"
                         >
-                            ${d("close")}
+                            ${p("close")}
                         </button>
                     </header>
 
                     <div class="runtime-modal-body">
                         <div class="runtime-panel">
-                            ${G("G",a("googleExtension"),e?a("checkingExtension"):s.version?`${a("version")} ${s.version}`:a("officialExtension"),e?"checking":l?"healthy":"error",a(e?"checking":l?"connected":"disconnected"))}
+                            ${D("G",a("googleExtension"),e?a("checkingExtension"):s.version?`${a("version")} ${s.version}`:a("officialExtension"),e?"checking":l?"healthy":"error",a(e?"checking":l?"connected":"disconnected"))}
 
-                            ${G("A",a("agyBackend"),e?a("checkingBackend"):n.agyVersion?`${a("version")} ${n.agyVersion}`:a("localBackend"),e?"checking":u?"healthy":"error",a(e?"checking":u?"running":"stopped"))}
+                            ${D("A",a("agyBackend"),e?a("checkingBackend"):n.agyVersion?`${a("version")} ${n.agyVersion}`:a("localBackend"),e?"checking":u?"healthy":"error",a(e?"checking":u?"running":"stopped"))}
 
-                            ${G("H",a("hub"),a(e?"checkingHub":y?"localHub":"hubConnection"),e?"checking":y?"healthy":"error",a(e?"checking":y?"connected":"disconnected"))}
+                            ${D("H",a("hub"),a(e?"checkingHub":y?"localHub":"hubConnection"),e?"checking":y?"healthy":"error",a(e?"checking":y?"connected":"disconnected"))}
+                        </div>
+
+                        <div class="runtime-actions-panel">
+                            <h3>${t(a("processRecovery"))}</h3>
+                            <div class="runtime-actions-row">
+                                <button
+                                    type="button"
+                                    class="btn"
+                                    data-action="reconnect-hub"
+                                    ${e?"disabled":""}
+                                >
+                                    ${t(a("reconnectHub"))}
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn danger-btn"
+                                    data-action="restart-backend"
+                                    ${e?"disabled":""}
+                                >
+                                    ${t(a("restartBackend"))}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </section>
             </div>
-        `}function $e(){if(!r.settingsOpen||!r.settingsDraft)return"";const e=r.settingsDraft;return`
+        `}function ke(){if(!o.settingsOpen||!o.settingsDraft)return"";const e=o.settingsDraft;return`
             <div
                 class="settings-backdrop"
                 data-action="settings-backdrop"
@@ -971,7 +1009,7 @@
                                 </select>
                             </label>
 
-                            ${H("enableLowQuotaReminder",a("lowQuotaReminder"),e.enableLowQuotaReminder)}
+                            ${L("enableLowQuotaReminder",a("lowQuotaReminder"),e.enableLowQuotaReminder)}
 
                             ${e.enableLowQuotaReminder?`
                                         <label class="field subfield">
@@ -1021,6 +1059,8 @@
                                             </select>
                                         </label>
                                     `:""}
+
+                            ${L("smartQuotaFallback",a("smartQuotaFallback"),e.smartQuotaFallback!==!1)}
                         </div>
 
                         <div class="settings-group">
@@ -1028,11 +1068,36 @@
                                 ${t(a("layout"))}
                             </h3>
 
-                            ${H("showRuntime",a("showRuntime"),e.showRuntime)}
+                            ${L("showRuntime",a("showRuntime"),e.showRuntime)}
 
-                            ${H("showCurrent",a("showCurrent"),e.showCurrent)}
+                            ${L("showCurrent",a("showCurrent"),e.showCurrent)}
 
-                            ${H("showSaved",a("showSaved"),e.showSaved)}
+                            ${L("showSaved",a("showSaved"),e.showSaved)}
+                        </div>
+
+                        <div class="settings-group">
+                            <h3>
+                                ${t(a("backupAndRestore"))}
+                            </h3>
+                            <p class="settings-desc">
+                                ${t(a("backupDesc"))}
+                            </p>
+                            <div class="settings-actions-row">
+                                <button
+                                    type="button"
+                                    class="btn block"
+                                    data-action="export-accounts"
+                                >
+                                    ${t(a("exportAccounts"))}
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn block"
+                                    data-action="import-accounts"
+                                >
+                                    ${t(a("importAccounts"))}
+                                </button>
+                            </div>
                         </div>
 
                         <div class="settings-group about-group">
@@ -1040,9 +1105,9 @@
                                 ${t(a("about"))}
                             </h3>
 
-                            ${o.meta?.iconUri?`
+                            ${r.meta?.iconUri?`
                             <div style="text-align: center; margin: 8px 0 16px 0;">
-                                <img src="${t(o.meta.iconUri)}" width="64" height="64" style="border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.35); vertical-align: middle;" alt="Logo" />
+                                <img src="${t(r.meta.iconUri)}" width="64" height="64" style="border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.35); vertical-align: middle;" alt="Logo" />
                             </div>`:""}
 
                             <div class="about-row">
@@ -1051,7 +1116,7 @@
                                 </span>
 
                                 <span>
-                                    v${t(o.meta?.version||"0.4.1")}
+                                    v${t(r.meta?.version||"0.6.0")}
                                 </span>
                             </div>
 
@@ -1061,7 +1126,7 @@
                                 </span>
 
                                 <strong>
-                                    ${t(o.meta?.developer||"Boy Gilang Ramadhan")}
+                                    ${t(r.meta?.developer||"Boy Gilang Ramadhan")}
                                 </strong>
                             </div>
 
@@ -1071,8 +1136,8 @@
                                 </span>
 
                                 <a
-                                    href="${t(o.meta?.website||"https://boygr.com")}"
-                                    data-external-url="${t(o.meta?.website||"https://boygr.com")}"
+                                    href="${t(r.meta?.website||"https://boygr.com")}"
+                                    data-external-url="${t(r.meta?.website||"https://boygr.com")}"
                                 >
                                     boygr.com
                                 </a>
@@ -1097,14 +1162,14 @@
                             type="button"
                             class="btn primary"
                             data-action="save-settings"
-                            ${v()?"disabled":""}
+                            ${m()?"disabled":""}
                         >
                             ${t(a("save"))}
                         </button>
                     </footer>
                 </section>
             </div>
-        `}function H(e,n,s){return`
+        `}function L(e,n,s){return`
             <label class="check-row">
                 <input
                     type="checkbox"
@@ -1116,7 +1181,7 @@
                     ${t(n)}
                 </span>
             </label>
-        `}function ye(){const e=o.meta||{},n=e.developer||"Boy Gilang Ramadhan",s=e.website||"https://boygr.com",i=e.version||"0.5.1";return`
+        `}function we(){const e=r.meta||{},n=e.developer||"Boy Gilang Ramadhan",s=e.website||"https://boygr.com",i=e.version||"0.5.1";return`
             <footer class="developer-footer">
                 <div class="developer-footer-copy">
                     <span class="footer-prefix">${t(a("developedBy"))}</span>
@@ -1134,7 +1199,7 @@
                     v${t(i)}
                 </span>
             </footer>
-        `}function ke(){const e=r.removeCandidate;return e?`
+        `}function Ae(){const e=o.removeCandidate;return e?`
             <div
                 class="dialog-backdrop"
                 data-action="cancel-remove"
@@ -1160,7 +1225,7 @@
                             </h2>
 
                             <div class="confirm-account-name">
-                                ${t(B(e))}
+                                ${t(H(e))}
                             </div>
 
                             <div class="confirm-account-email">
@@ -1195,22 +1260,22 @@
                     </footer>
                 </section>
             </div>
-        `:""}function g(){I(),document.documentElement.lang=M(),w.innerHTML=`
+        `:""}function g(){I(),document.documentElement.lang=R(),S.innerHTML=`
             <div
                 class="app"
-                aria-busy="${o.loading||v()?"true":"false"}"
+                aria-busy="${r.loading||m()?"true":"false"}"
             >
                 <div class="content-shell">
-                    ${ae()}
-                    ${fe()}
-                    ${ge()}
-                    ${he()}
+                    ${se()}
+                    ${$e()}
+                    ${ve()}
+                    ${be()}
                 </div>
 
-                ${ye()}
+                ${we()}
             </div>
 
-            ${$e()}
             ${ke()}
-            ${be()}
-        `,de(),W(),r.editingEmail&&window.requestAnimationFrame(()=>{const e=document.querySelector('[data-role="label-input"]');e&&(e.focus(),e.setSelectionRange(e.value.length,e.value.length))})}function we(){const e=document.getElementById("saved-account-list");e&&(e.innerHTML=Z());const n=document.getElementById("account-count");if(n){const s=Q().length;n.textContent=r.search.trim()?`${s}/${o.accounts.length}`:String(o.accounts.length)}}function Se(e){const n=x(e);n&&(r.editingEmail=n.email,r.editValue=n.label||"",g())}function J(){r.editingEmail=null,r.editValue="",g()}function X(e){const n=x(e);n&&(L({type:"label",email:n.email}),f.postMessage({type:"updateLabel",email:n.email,label:r.editValue}))}function _(){const e=o.preferences||{};r.settingsDraft={theme:e.theme||"vscode",language:e.language||"auto",showCurrent:e.showCurrent!==!1,showSaved:e.showSaved!==!1,showRuntime:e.showRuntime!==!1,autoRefreshIntervalMinutes:typeof e.autoRefreshIntervalMinutes=="number"?e.autoRefreshIntervalMinutes:5,enableLowQuotaReminder:e.enableLowQuotaReminder!==!1,lowQuotaThresholdPercent:typeof e.lowQuotaThresholdPercent=="number"?e.lowQuotaThresholdPercent:20},r.settingsOpen=!0,g()}function D(){r.settingsOpen=!1,r.settingsDraft=null,g()}function Ae(){r.settingsDraft&&(L({type:"settings"}),f.postMessage({type:"saveSettings",preferences:{...r.settingsDraft}}))}w.addEventListener("input",e=>{const n=e.target;if(n instanceof HTMLInputElement&&n.id==="account-search"){r.search=n.value,k(),we();return}n instanceof HTMLInputElement&&n.dataset.role==="label-input"&&(r.editValue=n.value)}),w.addEventListener("change",e=>{const n=e.target;if(!r.settingsDraft||!(n instanceof HTMLInputElement||n instanceof HTMLSelectElement))return;const s=n.dataset.setting;if(s){if(n instanceof HTMLInputElement&&n.type==="checkbox"){r.settingsDraft[s]=n.checked,s==="enableLowQuotaReminder"&&g();return}if(s==="autoRefreshIntervalMinutes"||s==="lowQuotaThresholdPercent"){r.settingsDraft[s]=Number.parseInt(n.value,10);return}r.settingsDraft[s]=n.value}}),w.addEventListener("click",e=>{const n=e.target;if(!(n instanceof Element))return;const s=n.closest("[data-action]");if(!s)return;const i=s.dataset.action,c=s.dataset.email;if(i==="open-settings"){_();return}if(i==="cancel-settings"){D();return}if(i==="settings-backdrop"&&n===s){D();return}if(i==="save-settings"){v()||Ae();return}if(i==="toggle-current"){r.currentCollapsed=!r.currentCollapsed,k(),g();return}if(i==="toggle-saved"){r.savedCollapsed=!r.savedCollapsed,k(),g();return}if(i==="open-runtime-modal"){r.runtimeModalOpen=!0,g();return}if(i==="close-runtime-modal"||i==="runtime-modal-backdrop"&&n===s){r.runtimeModalOpen=!1,g();return}if(i==="edit-label"){v()||Se(c);return}if(i==="cancel-label"){J();return}if(i==="save-label"){v()||X(c);return}if(i==="remove-account"){const u=x(c);u&&!v()&&(r.removeCandidate=u,g());return}if(i==="cancel-remove"){r.removeCandidate=null,g();return}if(i==="confirm-remove"){const u=r.removeCandidate;u&&!v()&&(L({type:"remove",email:u.email}),f.postMessage({type:"removeAccount",email:u.email}));return}if(v())return;if(i==="switch"){const u=x(c);u&&(L({type:"switch",email:u.email}),f.postMessage({type:"switchAccount",account:u}));return}const l={add:"addAccount",save:"saveCurrent",refresh:"refresh",reauth:"reauth",signout:"signout"};l[i]&&(L({type:{add:"add",save:"save",refresh:"refresh",reauth:"reauth",signout:"signout"}[i]}),f.postMessage({type:l[i]}))}),window.addEventListener("keydown",e=>{if(e.key==="Escape"){if(r.runtimeModalOpen){r.runtimeModalOpen=!1,g();return}if(r.settingsOpen){D();return}if(r.editingEmail&&!h){J();return}b&&!h&&(b=null,$&&(clearTimeout($),$=null),g());return}if(e.key==="Enter"&&r.editingEmail&&!h){const n=document.activeElement;n instanceof HTMLInputElement&&n.dataset.role==="label-input"&&(e.preventDefault(),X(r.editingEmail))}}),w.addEventListener("click",e=>{const n=e.target;if(!(n instanceof Element))return;const s=n.closest("[data-external-url]");if(!s)return;e.preventDefault();const i=s.dataset.externalUrl;i&&f.postMessage({type:"openExternal",url:i})}),window.addEventListener("message",e=>{const n=e.data;if(!n)return;if(n.type==="openSettings"){_();return}if(n.type!=="state")return;const s=h;if(o=n.state,k(),ee(),s?.type==="remove"){r.removeCandidate=null,E(a("accountRemoved"),"success");return}if(s?.type==="label"){r.editingEmail=null,r.editValue="",E(a("labelUpdated"),"success");return}if(s?.type==="settings"){r.settingsOpen=!1,r.settingsDraft=null,E(a("settingsSaved"),"success");return}if(s&&s.type!=="refresh"){E(a("stateUpdated"),"success");return}g()}),window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{o.preferences?.theme==="system"&&I()}),window.setInterval(()=>{W()},3e4),g(),f.postMessage({type:"ready"})})();function enhanceSavedQuotaMetrics(f=document){const w=f.querySelectorAll(".saved-account-quota-area");for(const m of w){const o=m.querySelectorAll([".saved-family-metric",".saved-usage-metric",".saved-quota-metric",".saved-metric-row",".saved-usage-row"].join(","));for(const r of o){const h=r.querySelector(".saved-quota-main"),b=r.querySelector(".saved-quota-value");if(!h||!b)continue;const $=b.textContent?.trim()??"",C=$.match(/(-?\d+(?:\.\d+)?)\s*%/);if(!C)continue;const M=Number(C[1]);if(!Number.isFinite(M))continue;const a=Math.max(0,Math.min(100,M));let t=r.querySelector(":scope > .saved-quota-progress");if(!t){t=document.createElement("div"),t.className="saved-quota-progress",t.setAttribute("aria-hidden","true");const k=document.createElement("span");k.className="saved-quota-progress-fill",t.append(k),h.insertAdjacentElement("afterend",t)}t.style.setProperty("--saved-quota-percent",`${a}%`);let d=r.querySelector(":scope > .saved-quota-remaining");d||(d=document.createElement("div"),d.className="saved-quota-remaining",t.insertAdjacentElement("afterend",d)),d.textContent=`${$} remaining`;const p=r.querySelector([".saved-quota-reset",".saved-usage-reset",".saved-metric-reset"].join(","));if(p){const k=p.textContent?.trim()??"";p.textContent=k.replace(/^Resets\s+in\s+/i,"Reset ").replace(/^Reset\s+in\s+/i,"Reset ")}}}}let savedQuotaEnhancementQueued=!1;function queueSavedQuotaEnhancement(){savedQuotaEnhancementQueued||(savedQuotaEnhancementQueued=!0,queueMicrotask(()=>{savedQuotaEnhancementQueued=!1,enhanceSavedQuotaMetrics(document)}))}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",()=>{enhanceSavedQuotaMetrics(document)},{once:!0}):enhanceSavedQuotaMetrics(document);const savedQuotaObserver=new MutationObserver(()=>{queueSavedQuotaEnhancement()});savedQuotaObserver.observe(document.documentElement,{childList:!0,subtree:!0});
+            ${Ae()}
+            ${ye()}
+        `,ge(),K(),o.editingEmail&&window.requestAnimationFrame(()=>{const e=document.querySelector('[data-role="label-input"]');e&&(e.focus(),e.setSelectionRange(e.value.length,e.value.length))})}function X(){const e=document.getElementById("saved-account-list");e&&(e.innerHTML=Y());const n=document.getElementById("account-count");if(n){const s=Q().length;n.textContent=o.search.trim()?`${s}/${r.accounts.length}`:String(r.accounts.length)}}function Se(e){const n=T(e);n&&(o.editingEmail=n.email,o.editValue=n.label||"",g())}function _(){o.editingEmail=null,o.editValue="",g()}function ee(e){const n=T(e);n&&(M({type:"label",email:n.email}),f.postMessage({type:"updateLabel",email:n.email,label:o.editValue}))}function te(){const e=r.preferences||{};o.settingsDraft={theme:e.theme||"vscode",language:e.language||"auto",showCurrent:e.showCurrent!==!1,showSaved:e.showSaved!==!1,showRuntime:e.showRuntime!==!1,autoRefreshIntervalMinutes:typeof e.autoRefreshIntervalMinutes=="number"?e.autoRefreshIntervalMinutes:5,enableLowQuotaReminder:e.enableLowQuotaReminder!==!1,lowQuotaThresholdPercent:typeof e.lowQuotaThresholdPercent=="number"?e.lowQuotaThresholdPercent:20,smartQuotaFallback:e.smartQuotaFallback!==!1},o.settingsOpen=!0,g()}function P(){o.settingsOpen=!1,o.settingsDraft=null,g()}function Me(){o.settingsDraft&&(M({type:"settings"}),f.postMessage({type:"saveSettings",preferences:{...o.settingsDraft}}))}S.addEventListener("input",e=>{const n=e.target;if(n instanceof HTMLInputElement&&n.id==="account-search"){o.search=n.value,A(),X();return}n instanceof HTMLInputElement&&n.dataset.role==="label-input"&&(o.editValue=n.value)}),S.addEventListener("change",e=>{const n=e.target;if(n instanceof HTMLSelectElement&&n.dataset.action==="change-sort"){o.sortBy=n.value,A(),X();return}if(!o.settingsDraft||!(n instanceof HTMLInputElement||n instanceof HTMLSelectElement))return;const s=n.dataset.setting;if(s){if(n instanceof HTMLInputElement&&n.type==="checkbox"){o.settingsDraft[s]=n.checked,s==="enableLowQuotaReminder"&&g();return}if(s==="autoRefreshIntervalMinutes"||s==="lowQuotaThresholdPercent"){o.settingsDraft[s]=Number.parseInt(n.value,10);return}o.settingsDraft[s]=n.value}}),S.addEventListener("click",e=>{const n=e.target;if(!(n instanceof Element))return;const s=n.closest("[data-action]");if(!s)return;const i=s.dataset.action,c=s.dataset.email;if(i==="open-settings"){te();return}if(i==="cancel-settings"){P();return}if(i==="settings-backdrop"&&n===s){P();return}if(i==="save-settings"){m()||Me();return}if(i==="toggle-current"){o.currentCollapsed=!o.currentCollapsed,A(),g();return}if(i==="toggle-saved"){o.savedCollapsed=!o.savedCollapsed,A(),g();return}if(i==="open-runtime-modal"){o.runtimeModalOpen=!0,g();return}if(i==="close-runtime-modal"||i==="runtime-modal-backdrop"&&n===s){o.runtimeModalOpen=!1,g();return}if(i==="export-accounts"){f.postMessage({type:"exportAccounts"});return}if(i==="import-accounts"){f.postMessage({type:"importAccounts"});return}if(i==="reconnect-hub"){o.runtimeModalOpen=!1,M({type:"refresh"}),f.postMessage({type:"reconnectHub"});return}if(i==="restart-backend"){o.runtimeModalOpen=!1,M({type:"refresh"}),f.postMessage({type:"restartBackend"});return}if(i==="edit-label"){m()||Se(c);return}if(i==="cancel-label"){_();return}if(i==="save-label"){m()||ee(c);return}if(i==="remove-account"){const u=T(c);u&&!m()&&(o.removeCandidate=u,g());return}if(i==="cancel-remove"){o.removeCandidate=null,g();return}if(i==="confirm-remove"){const u=o.removeCandidate;u&&!m()&&(M({type:"remove",email:u.email}),f.postMessage({type:"removeAccount",email:u.email}));return}if(m())return;if(i==="switch"){const u=T(c);u&&(M({type:"switch",email:u.email}),f.postMessage({type:"switchAccount",account:u}));return}const l={add:"addAccount",save:"saveCurrent",refresh:"refresh",reauth:"reauth",signout:"signout"};l[i]&&(M({type:{add:"add",save:"save",refresh:"refresh",reauth:"reauth",signout:"signout"}[i]}),f.postMessage({type:l[i]}))}),window.addEventListener("keydown",e=>{if(e.key==="Escape"){if(o.runtimeModalOpen){o.runtimeModalOpen=!1,g();return}if(o.settingsOpen){P();return}if(o.editingEmail&&!$){_();return}k&&!$&&(k=null,w&&(clearTimeout(w),w=null),g());return}if(e.key==="Enter"&&o.editingEmail&&!$){const n=document.activeElement;n instanceof HTMLInputElement&&n.dataset.role==="label-input"&&(e.preventDefault(),ee(o.editingEmail))}}),S.addEventListener("click",e=>{const n=e.target;if(!(n instanceof Element))return;const s=n.closest("[data-external-url]");if(!s)return;e.preventDefault();const i=s.dataset.externalUrl;i&&f.postMessage({type:"openExternal",url:i})}),window.addEventListener("message",e=>{const n=e.data;if(!n)return;if(n.type==="openSettings"){te();return}if(n.type!=="state")return;const s=$;if(r=n.state,A(),ae(),s?.type==="remove"){o.removeCandidate=null,x(a("accountRemoved"),"success");return}if(s?.type==="label"){o.editingEmail=null,o.editValue="",x(a("labelUpdated"),"success");return}if(s?.type==="settings"){o.settingsOpen=!1,o.settingsDraft=null,x(a("settingsSaved"),"success");return}if(s&&s.type!=="refresh"){x(a("stateUpdated"),"success");return}g()}),window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{r.preferences?.theme==="system"&&I()}),window.setInterval(()=>{K()},3e4),g(),f.postMessage({type:"ready"})})();function enhanceSavedQuotaMetrics(f=document){const S=f.querySelectorAll(".saved-account-quota-area");for(const v of S){const r=v.querySelectorAll([".saved-family-metric",".saved-usage-metric",".saved-quota-metric",".saved-metric-row",".saved-usage-row"].join(","));for(const o of r){const $=o.querySelector(".saved-quota-main"),k=o.querySelector(".saved-quota-value");if(!$||!k)continue;const w=k.textContent?.trim()??"",C=w.match(/(-?\d+(?:\.\d+)?)\s*%/);if(!C)continue;const R=Number(C[1]);if(!Number.isFinite(R))continue;const a=Math.max(0,Math.min(100,R));let t=o.querySelector(":scope > .saved-quota-progress");if(!t){t=document.createElement("div"),t.className="saved-quota-progress",t.setAttribute("aria-hidden","true");const A=document.createElement("span");A.className="saved-quota-progress-fill",t.append(A),$.insertAdjacentElement("afterend",t)}t.style.setProperty("--saved-quota-percent",`${a}%`);let p=o.querySelector(":scope > .saved-quota-remaining");p||(p=document.createElement("div"),p.className="saved-quota-remaining",t.insertAdjacentElement("afterend",p)),p.textContent=`${w} remaining`;const d=o.querySelector([".saved-quota-reset",".saved-usage-reset",".saved-metric-reset"].join(","));if(d){const A=d.textContent?.trim()??"";d.textContent=A.replace(/^Resets\s+in\s+/i,"Reset ").replace(/^Reset\s+in\s+/i,"Reset ")}}}}let savedQuotaEnhancementQueued=!1;function queueSavedQuotaEnhancement(){savedQuotaEnhancementQueued||(savedQuotaEnhancementQueued=!0,queueMicrotask(()=>{savedQuotaEnhancementQueued=!1,enhanceSavedQuotaMetrics(document)}))}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",()=>{enhanceSavedQuotaMetrics(document)},{once:!0}):enhanceSavedQuotaMetrics(document);const savedQuotaObserver=new MutationObserver(()=>{queueSavedQuotaEnhancement()});savedQuotaObserver.observe(document.documentElement,{childList:!0,subtree:!0});

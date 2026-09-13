@@ -6,12 +6,17 @@ import {
     getAntigravityQuotaSummary,
 } from "./hub-auth-client";
 import { getManagedAccounts } from "./account-registry";
-import { saveManagedAccountUsageSnapshot } from "./quota-summary-store";
+import {
+    getAccountRemainingPercent,
+    getManagedAccountUsageSnapshots,
+    saveManagedAccountUsageSnapshot,
+} from "./quota-summary-store";
 
 export interface QuotaMonitorConfig {
     intervalMinutes: number;
     reminderEnabled: boolean;
     thresholdPercent: number;
+    smartQuotaFallback?: boolean;
 }
 
 /**
@@ -147,26 +152,83 @@ export class QuotaMonitorService implements vscode.Disposable {
                     this.notifiedDeduplicationKeys.add(dedupKey);
 
                     const windowLabel = bucket.window || bucket.description || "Window";
-                    const alertMsg = `Antigravity Quota Alert: ${bucketIdentifier} (${windowLabel}) is low (${remainingPercent}% remaining).`;
+                    const isSmartFallbackEnabled = this.config.smartQuotaFallback !== false;
 
-                    void vscode.window
-                        .showWarningMessage(
-                            alertMsg,
-                            "Switch Account",
-                            "View Details",
-                            "Dismiss",
-                        )
-                        .then(selection => {
-                            if (selection === "Switch Account") {
-                                void vscode.commands.executeCommand(
-                                    "boygr.antigravityAccountSwitcher.switchAccount",
-                                );
-                            } else if (selection === "View Details") {
-                                void vscode.commands.executeCommand(
-                                    "boygr.antigravityAccountSwitcher.accountsView.focus",
-                                );
+                    let bestCandidate: { email: string; label?: string; percent: number } | undefined;
+                    if (isSmartFallbackEnabled) {
+                        const savedAccounts = getManagedAccounts(this.context);
+                        const usageSnapshots = getManagedAccountUsageSnapshots(this.context);
+                        const otherAccounts = savedAccounts.filter(
+                            acc => acc.email.toLowerCase() !== email.toLowerCase(),
+                        );
+
+                        let maxPercent = -1;
+                        for (const candidate of otherAccounts) {
+                            const candidatePercent = getAccountRemainingPercent(
+                                usageSnapshots[candidate.email.toLowerCase()],
+                            );
+                            if (typeof candidatePercent === "number" && candidatePercent > remainingPercent) {
+                                if (candidatePercent > maxPercent) {
+                                    maxPercent = candidatePercent;
+                                    bestCandidate = {
+                                        email: candidate.email,
+                                        label: candidate.label,
+                                        percent: candidatePercent,
+                                    };
+                                }
                             }
-                        });
+                        }
+                    }
+
+                    if (bestCandidate) {
+                        const candidateName = bestCandidate.label || bestCandidate.email;
+                        const alertMsg = `Antigravity Quota Low: ${bucketIdentifier} (${windowLabel}) is at ${remainingPercent}%. Switch to ${candidateName} (${bestCandidate.percent}% quota)?`;
+                        const switchBtn = `Switch to ${candidateName}`;
+
+                        void vscode.window
+                            .showWarningMessage(
+                                alertMsg,
+                                switchBtn,
+                                "Choose Another",
+                                "Dismiss",
+                            )
+                            .then(selection => {
+                                if (selection === switchBtn) {
+                                    void vscode.commands.executeCommand(
+                                        "boygr.antigravityAccountSwitcher.switchAccount",
+                                        {
+                                            email: bestCandidate!.email,
+                                            label: bestCandidate!.label,
+                                        },
+                                    );
+                                } else if (selection === "Choose Another") {
+                                    void vscode.commands.executeCommand(
+                                        "boygr.antigravityAccountSwitcher.switchAccount",
+                                    );
+                                }
+                            });
+                    } else {
+                        const alertMsg = `Antigravity Quota Alert: ${bucketIdentifier} (${windowLabel}) is low (${remainingPercent}% remaining).`;
+
+                        void vscode.window
+                            .showWarningMessage(
+                                alertMsg,
+                                "Switch Account",
+                                "View Details",
+                                "Dismiss",
+                            )
+                            .then(selection => {
+                                if (selection === "Switch Account") {
+                                    void vscode.commands.executeCommand(
+                                        "boygr.antigravityAccountSwitcher.switchAccount",
+                                    );
+                                } else if (selection === "View Details") {
+                                    void vscode.commands.executeCommand(
+                                        "boygr.antigravityAccountSwitcher.accountsView.focus",
+                                    );
+                                }
+                            });
+                    }
                 }
             } else {
                 // If quota is above threshold, clear previous deduplication key for this bucket
@@ -190,6 +252,7 @@ export class QuotaMonitorService implements vscode.Disposable {
                 typeof config.thresholdPercent === "number" && config.thresholdPercent > 0
                     ? Math.min(100, config.thresholdPercent)
                     : 20,
+            smartQuotaFallback: config.smartQuotaFallback !== false,
         };
     }
 

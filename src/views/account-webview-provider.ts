@@ -59,6 +59,8 @@ interface AccountSwitcherPreferences {
     enableLowQuotaReminder: boolean;
 
     lowQuotaThresholdPercent: number;
+
+    smartQuotaFallback: boolean;
 }
 
 interface ResolvedAccountSwitcherPreferences
@@ -90,6 +92,10 @@ type WebviewMessage =
           email: string;
           label: string;
       }
+    | { type: "exportAccounts" }
+    | { type: "importAccounts" }
+    | { type: "reconnectHub" }
+    | { type: "restartBackend" }
     | {
           type: "saveSettings";
           preferences: {
@@ -101,6 +107,7 @@ type WebviewMessage =
               autoRefreshIntervalMinutes?: number;
               enableLowQuotaReminder?: boolean;
               lowQuotaThresholdPercent?: number;
+              smartQuotaFallback?: boolean;
           };
       };
 
@@ -153,6 +160,7 @@ const DEFAULT_PREFERENCES: AccountSwitcherPreferences = {
     autoRefreshIntervalMinutes: 5,
     enableLowQuotaReminder: true,
     lowQuotaThresholdPercent: 20,
+    smartQuotaFallback: true,
 };
 
 export class AntigravityAccountWebviewProvider
@@ -196,6 +204,7 @@ export class AntigravityAccountWebviewProvider
                 intervalMinutes: prefs.autoRefreshIntervalMinutes,
                 reminderEnabled: prefs.enableLowQuotaReminder,
                 thresholdPercent: prefs.lowQuotaThresholdPercent,
+                smartQuotaFallback: prefs.smartQuotaFallback,
             },
             async usage => {
                 this.snapshot = {
@@ -712,6 +721,33 @@ export class AntigravityAccountWebviewProvider
 
                 await this.postState(false);
                 return;
+
+            case "exportAccounts":
+                await vscode.commands.executeCommand(
+                    "boygr.antigravityAccountSwitcher.exportAccounts",
+                );
+                return;
+
+            case "importAccounts":
+                await vscode.commands.executeCommand(
+                    "boygr.antigravityAccountSwitcher.importAccounts",
+                );
+                await this.refreshLocalAccounts();
+                return;
+
+            case "reconnectHub":
+                await vscode.commands.executeCommand(
+                    "boygr.antigravityAccountSwitcher.reconnectHub",
+                );
+                await this.refresh();
+                return;
+
+            case "restartBackend":
+                await vscode.commands.executeCommand(
+                    "boygr.antigravityAccountSwitcher.restartBackend",
+                );
+                await this.refresh();
+                return;
         }
     }
 
@@ -825,6 +861,11 @@ export class AntigravityAccountWebviewProvider
                 ? input.lowQuotaThresholdPercent
                 : DEFAULT_PREFERENCES.lowQuotaThresholdPercent;
 
+        const smartQuotaFallback =
+            typeof input.smartQuotaFallback === "boolean"
+                ? input.smartQuotaFallback
+                : DEFAULT_PREFERENCES.smartQuotaFallback;
+
         return {
             version: 1,
             theme,
@@ -844,6 +885,7 @@ export class AntigravityAccountWebviewProvider
             autoRefreshIntervalMinutes,
             enableLowQuotaReminder,
             lowQuotaThresholdPercent,
+            smartQuotaFallback,
         };
     }
 
@@ -887,6 +929,7 @@ export class AntigravityAccountWebviewProvider
             autoRefreshIntervalMinutes?: number;
             enableLowQuotaReminder?: boolean;
             lowQuotaThresholdPercent?: number;
+            smartQuotaFallback?: boolean;
         },
     ): Promise<void> {
         const preferences =
@@ -904,6 +947,7 @@ export class AntigravityAccountWebviewProvider
             intervalMinutes: preferences.autoRefreshIntervalMinutes,
             reminderEnabled: preferences.enableLowQuotaReminder,
             thresholdPercent: preferences.lowQuotaThresholdPercent,
+            smartQuotaFallback: preferences.smartQuotaFallback,
         });
     }
 

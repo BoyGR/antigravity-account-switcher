@@ -382,3 +382,57 @@ export async function removeManagedAccountQuotaSnapshot(
 
     return true;
 }
+
+export async function importManagedAccounts(
+    context: vscode.ExtensionContext,
+    accountsToImport: Array<{
+        email: string;
+        label?: string;
+        displayName?: string;
+        firstSeenAt?: string;
+        lastSeenAt?: string;
+    }>,
+): Promise<{ added: number; updated: number }> {
+    const existingState =
+        context.globalState.get<AccountRegistryState>(STORAGE_KEY);
+    const state: AccountRegistryState =
+        existingState?.version === 1
+            ? {
+                  version: 1,
+                  accounts: { ...existingState.accounts },
+              }
+            : emptyRegistry();
+
+    let added = 0;
+    let updated = 0;
+    const now = new Date().toISOString();
+
+    for (const item of accountsToImport) {
+        if (!item || typeof item.email !== "string" || !item.email.trim()) {
+            continue;
+        }
+        const email = normalizeEmail(item.email);
+        const existing = state.accounts[email];
+        if (existing) {
+            state.accounts[email] = {
+                ...existing,
+                label: item.label !== undefined ? item.label.trim() || undefined : existing.label,
+                displayName: item.displayName !== undefined ? item.displayName.trim() || undefined : existing.displayName,
+                lastSeenAt: item.lastSeenAt || existing.lastSeenAt || now,
+            };
+            updated++;
+        } else {
+            state.accounts[email] = {
+                email,
+                label: item.label?.trim() || undefined,
+                displayName: item.displayName?.trim() || undefined,
+                firstSeenAt: item.firstSeenAt || now,
+                lastSeenAt: item.lastSeenAt || now,
+            };
+            added++;
+        }
+    }
+
+    await context.globalState.update(STORAGE_KEY, state);
+    return { added, updated };
+}

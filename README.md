@@ -14,7 +14,7 @@ A Visual Studio Code extension for managing, monitoring quota, and switching Goo
 
 ### Status
 
-- **Version**: `0.5.1`
+- **Version**: `0.6.0`
 - **Supported Platforms**: Windows, macOS, Linux
 - **Compatibility**: Visual Studio Code, Google Antigravity extension `1.3.0+`, AGY backend `1.2.2+`
 
@@ -79,20 +79,24 @@ A Visual Studio Code extension for managing, monitoring quota, and switching Goo
 
 Access these commands via the VS Code Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`):
 
-| Command | Title | Description |
-| :--- | :--- | :--- |
-| `boygr.antigravityAccountSwitcher.refreshAccountsView` | **Refresh** | Refresh runtime status, active account, quota, and saved accounts |
-| `boygr.antigravityAccountSwitcher.statusBarMenu` | **Status Bar Menu** | Open QuickPick menu to switch accounts or manage session directly from status bar |
-| `boygr.antigravityAccountSwitcher.switchAccount` | **Switch Account** | Switch to a saved account (opens QuickPick if called without arguments) |
-| `boygr.antigravityAccountSwitcher.addAccount` | **Add / Switch Google Account** | Initiate login to register a new Google account |
-| `boygr.antigravityAccountSwitcher.manageAccounts` | **Manage Accounts** | QuickPick-based account manager menu |
-| `boygr.antigravityAccountSwitcher.openSettings` | **Settings** | Open dashboard settings modal |
-| `boygr.antigravityAccountSwitcher.currentAccount` | **Current Account** | Show active account information |
-| `boygr.antigravityAccountSwitcher.authStatus` | **Auth Status** | Inspect current authentication status |
-| `boygr.antigravityAccountSwitcher.reAuth` | **Re-auth** | Re-authenticate active Antigravity session |
-| `boygr.antigravityAccountSwitcher.signOut` | **Sign Out** | Safely log out active Antigravity account |
-| `boygr.antigravityAccountSwitcher.diagnose` | **Diagnose Antigravity** | Run diagnostics on backend connectivity |
-| `boygr.antigravityAccountSwitcher.inspectBridge` | **Inspect Bridge** | Inspect Language Server / Hub bridge |
+| Command | Title | Shortcut | Description |
+| :--- | :--- | :--- | :--- |
+| `boygr.antigravityAccountSwitcher.statusBarMenu` | **Status Bar Menu** | `Alt+A` (`Cmd+Alt+A`) | Open QuickPick menu to switch accounts sorted by quota |
+| `boygr.antigravityAccountSwitcher.refreshAccountsView` | **Refresh** | `Alt+Shift+A` (`Cmd+Alt+Shift+A`) | Refresh runtime status, active account, quota, and saved accounts |
+| `boygr.antigravityAccountSwitcher.switchAccount` | **Switch Account** | | Switch to a saved account directly or via QuickPick |
+| `boygr.antigravityAccountSwitcher.exportAccounts` | **Export Saved Accounts...** | | Export saved accounts metadata to JSON file |
+| `boygr.antigravityAccountSwitcher.importAccounts` | **Import Saved Accounts...** | | Import and merge saved accounts from JSON file |
+| `boygr.antigravityAccountSwitcher.reconnectHub` | **Reconnect Antigravity Hub** | | Force re-establish connection to local hub process |
+| `boygr.antigravityAccountSwitcher.restartBackend` | **Restart Backend Process** | | Terminate stuck `agy` backend process and reload |
+| `boygr.antigravityAccountSwitcher.addAccount` | **Add / Switch Google Account** | | Initiate login to register a new Google account |
+| `boygr.antigravityAccountSwitcher.manageAccounts` | **Manage Accounts** | | QuickPick-based account manager menu |
+| `boygr.antigravityAccountSwitcher.openSettings` | **Settings** | | Open dashboard settings modal |
+| `boygr.antigravityAccountSwitcher.currentAccount` | **Current Account** | | Show active account information |
+| `boygr.antigravityAccountSwitcher.authStatus` | **Auth Status** | | Inspect current authentication status |
+| `boygr.antigravityAccountSwitcher.reAuth` | **Re-auth** | | Re-authenticate active Antigravity session |
+| `boygr.antigravityAccountSwitcher.signOut` | **Sign Out** | | Safely log out active Antigravity account |
+| `boygr.antigravityAccountSwitcher.diagnose` | **Diagnose Antigravity** | | Run diagnostics on backend connectivity |
+| `boygr.antigravityAccountSwitcher.inspectBridge` | **Inspect Bridge** | | Inspect Language Server / Hub bridge |
 
 ---
 
@@ -117,6 +121,9 @@ Customize behavior via VS Code Settings (`settings.json`):
   // Remaining quota threshold percentage for low quota warnings (default: 20)
   "boygr.antigravityAccountSwitcher.lowQuotaThresholdPercent": 20,
 
+  // Suggest 1-click switch to backup account with highest quota when low (default: true)
+  "boygr.antigravityAccountSwitcher.smartQuotaFallback": true,
+
   // Automatically sync official Antigravity UI on account changes (default: true)
   "boygr.antigravityAccountSwitcher.autoSyncOfficialUi": true
 }
@@ -128,7 +135,7 @@ Customize behavior via VS Code Settings (`settings.json`):
 
 ### From VSIX Package
 
-1. Download or locate `antigravity-account-switcher-0.5.1.vsix`.
+1. Download or locate `release/antigravity-account-switcher-0.6.0.vsix`.
 2. In VS Code:
    - Go to **Extensions** (`Ctrl+Shift+X` / `Cmd+Shift+X`).
    - Click the `...` menu (top right of Extensions view).
@@ -136,7 +143,7 @@ Customize behavior via VS Code Settings (`settings.json`):
    - Choose the file.
 3. Or install via terminal:
    ```powershell
-   code --install-extension antigravity-account-switcher-0.5.1.vsix
+   code --install-extension release/antigravity-account-switcher-0.6.0.vsix
    ```
 
 ---

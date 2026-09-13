@@ -2,7 +2,7 @@
     "name": "antigravity-account-switcher",
     "displayName": "Antigravity Account Switcher",
     "description": "Manage and switch Google accounts used by Google Antigravity in Visual Studio Code through Antigravity's existing authentication flow.",
-    "version": "0.5.1",
+    "version": "0.6.0",
     "publisher": "boygr",
     "author": {
         "name": "Boy Gilang Ramadhan",
@@ -134,6 +134,30 @@
                 "command": "boygr.antigravityAccountSwitcher.statusBarMenu",
                 "title": "Status Bar Menu",
                 "category": "Antigravity Account Switcher"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.exportAccounts",
+                "title": "Export Saved Accounts...",
+                "category": "Antigravity Account Switcher",
+                "icon": "$(export)"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.importAccounts",
+                "title": "Import Saved Accounts...",
+                "category": "Antigravity Account Switcher",
+                "icon": "$(import)"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.reconnectHub",
+                "title": "Reconnect Antigravity Hub",
+                "category": "Antigravity Account Switcher",
+                "icon": "$(plug)"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.restartBackend",
+                "title": "Restart Backend Process",
+                "category": "Antigravity Account Switcher",
+                "icon": "$(debug-restart)"
             }
         ],
         "viewsContainers": {
@@ -169,6 +193,18 @@
                 }
             ]
         },
+        "keybindings": [
+            {
+                "command": "boygr.antigravityAccountSwitcher.statusBarMenu",
+                "key": "alt+a",
+                "mac": "cmd+alt+a"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.refreshAccountsView",
+                "key": "alt+shift+a",
+                "mac": "cmd+alt+shift+a"
+            }
+        ],
         "configuration": {
             "title": "Antigravity Account Switcher",
             "properties": {
@@ -210,6 +246,11 @@
                         30
                     ],
                     "description": "Remaining quota percentage threshold that triggers a low quota warning notification."
+                },
+                "boygr.antigravityAccountSwitcher.smartQuotaFallback": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Suggest a 1-click switch to your saved account with the highest remaining quota when active quota is low."
                 },
                 "boygr.antigravityAccountSwitcher.autoSyncOfficialUi": {
                     "type": "boolean",

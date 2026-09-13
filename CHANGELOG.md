@@ -4,6 +4,31 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [0.6.0] - 2026-09-13
+
+### Added
+- **Keyboard Shortcuts & Keybindings**:
+  - `Alt+A` (`Cmd+Alt+A` on macOS) to instantly open the QuickPick Account Switcher from anywhere.
+  - `Alt+Shift+A` (`Cmd+Alt+Shift+A` on macOS) to immediately refresh the Accounts View and sync quota.
+- **Smart Account Sorting**:
+  - Sort saved accounts dynamically by Remaining Quota (highest first), Name (A-Z), or Recently Used.
+  - Dedicated sort dropdown filter integrated right next to the search box in Saved Accounts.
+  - Status Bar QuickPick menu intelligently sorts accounts by remaining quota and shows live quota badges.
+- **Smart Quota Fallback & 1-Click Auto-Switch**:
+  - Automatically identifies the saved backup account with highest available quota when active quota drops low.
+  - Direct 1-click switch notification button to switch accounts seamlessly.
+  - Configurable toggle in Settings modal and `boygr.antigravityAccountSwitcher.smartQuotaFallback`.
+- **Account Backup, Export & Import**:
+  - Export saved accounts metadata to JSON (`boygr.antigravityAccountSwitcher.exportAccounts`).
+  - Import and merge accounts from JSON files (`boygr.antigravityAccountSwitcher.importAccounts`) with deduplication.
+  - 1-click Export and Import buttons inside Settings modal.
+- **Antigravity Process Recovery & Reconnect**:
+  - Reconnect Hub action (`boygr.antigravityAccountSwitcher.reconnectHub`) to recover dropped sessions.
+  - Restart Backend action (`boygr.antigravityAccountSwitcher.restartBackend`) to terminate stuck `agy` processes and re-initialize connection.
+  - Integrated Process Recovery section inside the Antigravity Status modal.
+
+---
+
 ## [0.5.1] - 2026-09-13
 
 ### Fixed

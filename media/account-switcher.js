@@ -48,6 +48,11 @@
                 ? persisted.search
                 : "",
 
+        sortBy:
+            typeof persisted.sortBy === "string"
+                ? persisted.sortBy
+                : "quota",
+
         currentCollapsed:
             Boolean(
                 persisted.currentCollapsed
@@ -185,6 +190,18 @@
             searchPlaceholder:
                 "Search accounts",
 
+            sortBy:
+                "Sort by",
+
+            sortQuota:
+                "Highest quota",
+
+            sortName:
+                "Name (A-Z)",
+
+            sortRecent:
+                "Recently used",
+
             editLabel:
                 "Edit label",
 
@@ -274,6 +291,30 @@
 
             percentRemaining:
                 "% remaining",
+
+            smartQuotaFallback:
+                "Smart Quota Fallback (1-click switch)",
+
+            backupAndRestore:
+                "Backup & Restore",
+
+            backupDesc:
+                "Export saved accounts metadata to JSON or restore them on another machine.",
+
+            exportAccounts:
+                "Export Accounts",
+
+            importAccounts:
+                "Import Accounts",
+
+            reconnectHub:
+                "Reconnect Hub",
+
+            restartBackend:
+                "Restart Backend",
+
+            processRecovery:
+                "Process Recovery",
 
             settingsHint:
                 "Changes apply only after Save.",
@@ -528,6 +569,18 @@
             searchPlaceholder:
                 "Cari akun",
 
+            sortBy:
+                "Urutkan",
+
+            sortQuota:
+                "Sisa kuota",
+
+            sortName:
+                "Nama (A-Z)",
+
+            sortRecent:
+                "Terakhir dipakai",
+
             editLabel:
                 "Edit label",
 
@@ -617,6 +670,30 @@
 
             percentRemaining:
                 "% tersisa",
+
+            smartQuotaFallback:
+                "Peralihan Cepat saat Kuota Menipis",
+
+            backupAndRestore:
+                "Cadangan & Pemulihan",
+
+            backupDesc:
+                "Ekspor metadata akun tersimpan ke JSON atau pulihkan di perangkat lain.",
+
+            exportAccounts:
+                "Ekspor Akun",
+
+            importAccounts:
+                "Impor Akun",
+
+            reconnectHub:
+                "Sambungkan Ulang Hub",
+
+            restartBackend:
+                "Mulai Ulang Backend",
+
+            processRecovery:
+                "Pemulihan Proses",
 
             settingsHint:
                 "Perubahan baru diterapkan setelah Simpan.",
@@ -981,6 +1058,9 @@
             search:
                 ui.search,
 
+            sortBy:
+                ui.sortBy,
+
             currentCollapsed:
                 ui.currentCollapsed,
 
@@ -1183,32 +1263,74 @@
         );
     }
 
+    function getAccountQuotaPercent(account) {
+        const email = normalizeEmail(account.email);
+        const snapshot = state.usageSnapshots?.[email];
+        if (!snapshot || !Array.isArray(snapshot.buckets) || snapshot.buckets.length === 0) {
+            return undefined;
+        }
+        let minFraction = undefined;
+        for (const b of snapshot.buckets) {
+            if (typeof b.remainingFraction === "number" && !b.disabled) {
+                if (minFraction === undefined || b.remainingFraction < minFraction) {
+                    minFraction = b.remainingFraction;
+                }
+            }
+        }
+        return minFraction !== undefined ? Math.round(minFraction * 100) : undefined;
+    }
+
     function filteredAccounts() {
         const query =
             ui.search
                 .trim()
                 .toLowerCase();
 
-        if (!query) {
-            return state.accounts;
-        }
-
-        return state.accounts.filter(
-            account => {
+        let list = query
+            ? state.accounts.filter(account => {
                 const haystack = [
                     account.label,
                     account.displayName,
                     account.email,
-                ]
-                    .filter(Boolean)
-                    .join(" ")
-                    .toLowerCase();
+                ].filter(Boolean).join(" ").toLowerCase();
+                return haystack.includes(query);
+            })
+            : state.accounts.slice();
 
-                return haystack.includes(
-                    query
-                );
+        const currentEmail = normalizeEmail(state.current?.email);
+
+        list.sort((a, b) => {
+            const aIsActive = normalizeEmail(a.email) === currentEmail;
+            const bIsActive = normalizeEmail(b.email) === currentEmail;
+            if (aIsActive !== bIsActive) {
+                return aIsActive ? -1 : 1;
             }
-        );
+
+            const sortBy = ui.sortBy || "quota";
+            if (sortBy === "quota") {
+                const aPercent = getAccountQuotaPercent(a);
+                const bPercent = getAccountQuotaPercent(b);
+                if (aPercent !== undefined && bPercent !== undefined) {
+                    if (bPercent !== aPercent) {
+                        return bPercent - aPercent;
+                    }
+                } else if (aPercent !== undefined) {
+                    return -1;
+                } else if (bPercent !== undefined) {
+                    return 1;
+                }
+            } else if (sortBy === "recent") {
+                const aTime = a.lastSeenAt ? new Date(a.lastSeenAt).getTime() : 0;
+                const bTime = b.lastSeenAt ? new Date(b.lastSeenAt).getTime() : 0;
+                if (bTime !== aTime) {
+                    return bTime - aTime;
+                }
+            }
+
+            return (a.label || a.displayName || a.email).localeCompare(b.label || b.displayName || b.email);
+        });
+
+        return list;
     }
 
     function applyTheme() {
@@ -2894,23 +3016,39 @@
                                     ${
                                         (state.accounts?.length || 0) > 0
                                             ? `
-                                                <div class="search-wrap">
-                                                    <span
-                                                        class="search-icon"
-                                                        aria-hidden="true"
-                                                    >
-                                                        ${icon("search")}
-                                                    </span>
+                                                <div class="saved-filter-row">
+                                                    <div class="search-wrap">
+                                                        <span
+                                                            class="search-icon"
+                                                            aria-hidden="true"
+                                                        >
+                                                            ${icon("search")}
+                                                        </span>
 
-                                                    <input
-                                                        id="account-search"
-                                                        class="search-input"
-                                                        type="search"
-                                                        value="${escapeHtml(ui.search)}"
-                                                        placeholder="${escapeHtml(t("searchPlaceholder"))}"
-                                                        autocomplete="off"
-                                                        spellcheck="false"
-                                                    >
+                                                        <input
+                                                            id="account-search"
+                                                            class="search-input"
+                                                            type="search"
+                                                            value="${escapeHtml(ui.search)}"
+                                                            placeholder="${escapeHtml(t("searchPlaceholder"))}"
+                                                            autocomplete="off"
+                                                            spellcheck="false"
+                                                        >
+                                                    </div>
+
+                                                    <div class="sort-wrap">
+                                                        <select
+                                                            id="account-sort"
+                                                            class="sort-select"
+                                                            data-action="change-sort"
+                                                            aria-label="${escapeHtml(t("sortBy"))}"
+                                                            title="${escapeHtml(t("sortBy"))}"
+                                                        >
+                                                            <option value="quota" ${ui.sortBy === "quota" ? "selected" : ""}>${escapeHtml(t("sortQuota"))}</option>
+                                                            <option value="name" ${ui.sortBy === "name" ? "selected" : ""}>${escapeHtml(t("sortName"))}</option>
+                                                            <option value="recent" ${ui.sortBy === "recent" ? "selected" : ""}>${escapeHtml(t("sortRecent"))}</option>
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             `
                                             : ""
@@ -3218,6 +3356,28 @@
                                 )
                             }
                         </div>
+
+                        <div class="runtime-actions-panel">
+                            <h3>${escapeHtml(t("processRecovery"))}</h3>
+                            <div class="runtime-actions-row">
+                                <button
+                                    type="button"
+                                    class="btn"
+                                    data-action="reconnect-hub"
+                                    ${checking ? "disabled" : ""}
+                                >
+                                    ${escapeHtml(t("reconnectHub"))}
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn danger-btn"
+                                    data-action="restart-backend"
+                                    ${checking ? "disabled" : ""}
+                                >
+                                    ${escapeHtml(t("restartBackend"))}
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </div>
@@ -3449,6 +3609,14 @@
                                     `
                                     : ""
                             }
+
+                            ${
+                                renderCheckbox(
+                                    "smartQuotaFallback",
+                                    t("smartQuotaFallback"),
+                                    draft.smartQuotaFallback !== false
+                                )
+                            }
                         </div>
 
                         <div class="settings-group">
@@ -3481,6 +3649,31 @@
                             }
                         </div>
 
+                        <div class="settings-group">
+                            <h3>
+                                ${escapeHtml(t("backupAndRestore"))}
+                            </h3>
+                            <p class="settings-desc">
+                                ${escapeHtml(t("backupDesc"))}
+                            </p>
+                            <div class="settings-actions-row">
+                                <button
+                                    type="button"
+                                    class="btn block"
+                                    data-action="export-accounts"
+                                >
+                                    ${escapeHtml(t("exportAccounts"))}
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn block"
+                                    data-action="import-accounts"
+                                >
+                                    ${escapeHtml(t("importAccounts"))}
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="settings-group about-group">
                             <h3>
                                 ${escapeHtml(t("about"))}
@@ -3497,7 +3690,7 @@
                                 </span>
 
                                 <span>
-                                    v${escapeHtml(state.meta?.version || "0.4.1")}
+                                    v${escapeHtml(state.meta?.version || "0.6.0")}
                                 </span>
                             </div>
 
@@ -3853,6 +4046,9 @@
                 typeof preferences.lowQuotaThresholdPercent === "number"
                     ? preferences.lowQuotaThresholdPercent
                     : 20,
+
+            smartQuotaFallback:
+                preferences.smartQuotaFallback !== false,
         };
 
         ui.settingsOpen =
@@ -3925,6 +4121,16 @@
         event => {
             const target =
                 event.target;
+
+            if (
+                target instanceof HTMLSelectElement &&
+                target.dataset.action === "change-sort"
+            ) {
+                ui.sortBy = target.value;
+                persistUi();
+                updateSavedListOnly();
+                return;
+            }
 
             if (
                 !ui.settingsDraft ||
@@ -4085,7 +4291,41 @@
                 return;
             }
 
+            if (action === "export-accounts") {
+                vscode.postMessage({
+                    type: "exportAccounts",
+                });
+                return;
+            }
 
+            if (action === "import-accounts") {
+                vscode.postMessage({
+                    type: "importAccounts",
+                });
+                return;
+            }
+
+            if (action === "reconnect-hub") {
+                ui.runtimeModalOpen = false;
+                setOperation({
+                    type: "refresh",
+                });
+                vscode.postMessage({
+                    type: "reconnectHub",
+                });
+                return;
+            }
+
+            if (action === "restart-backend") {
+                ui.runtimeModalOpen = false;
+                setOperation({
+                    type: "refresh",
+                });
+                vscode.postMessage({
+                    type: "restartBackend",
+                });
+                return;
+            }
 
             if (
                 action ===
