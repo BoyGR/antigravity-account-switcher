@@ -35,7 +35,7 @@
         },
 
         meta: {
-            version: "0.7.0",
+            version: "0.8.0",
             developer: "Boy Gilang Ramadhan",
             website: "https://boygr.com",
             iconUri: "",
@@ -85,6 +85,12 @@
 
         editColorTag:
             "",
+
+        editGroup:
+            "",
+
+        groupFilter:
+            "all",
 
         removeCandidate:
             null,
@@ -487,6 +493,9 @@
             quotaHistorySub:
                 "Daily lowest remaining",
 
+            exportAnalytics:
+                "Export Analytics",
+
             workspace:
                 "Workspace",
 
@@ -884,6 +893,9 @@
             quotaHistorySub:
                 "Sisa terendah harian",
 
+            exportAnalytics:
+                "Ekspor Analitik",
+
             workspace:
                 "Workspace",
 
@@ -1075,6 +1087,18 @@
                         d="m6.2 4.2 3.6 3.8-3.6 3.8"
                         stroke="currentColor"
                         stroke-width="1.3"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                </svg>
+            `,
+
+            export: `
+                <svg ${common}>
+                    <path
+                        d="M2.5 10v2.5a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V10M8 2.5v7.5M5 5.5l3-3 3 3"
+                        stroke="currentColor"
+                        stroke-width="1.25"
                         stroke-linecap="round"
                         stroke-linejoin="round"
                     />
@@ -1331,10 +1355,15 @@
                     account.label,
                     account.displayName,
                     account.email,
+                    account.group,
                 ].filter(Boolean).join(" ").toLowerCase();
                 return haystack.includes(query);
             })
             : state.accounts.slice();
+
+        if (ui.groupFilter && ui.groupFilter !== "all") {
+            list = list.filter(account => account.group === ui.groupFilter);
+        }
 
         const currentEmail = normalizeEmail(state.current?.email);
 
@@ -1594,6 +1623,38 @@
                             aria-label="Clear color"
                         >×</button>
                     ` : ""}
+                </div>
+
+                <div class="label-editor-groups">
+                    <span class="label-editor-meta-title">Group:</span>
+                    <div class="group-pills-row">
+                        ${["Personal", "Work", "Client"].map(g => `
+                            <button
+                                type="button"
+                                class="group-tag-btn ${ui.editGroup === g ? "selected" : ""}"
+                                data-action="select-edit-group"
+                                data-group="${g}"
+                            >${g}</button>
+                        `).join("")}
+                        ${ui.editGroup && !["Personal", "Work", "Client"].includes(ui.editGroup) ? `
+                            <button
+                                type="button"
+                                class="group-tag-btn selected"
+                                data-action="select-edit-group"
+                                data-group="${escapeHtml(ui.editGroup)}"
+                            >${escapeHtml(ui.editGroup)}</button>
+                        ` : ""}
+                        ${ui.editGroup ? `
+                            <button
+                                type="button"
+                                class="color-clear-btn"
+                                data-action="select-edit-group"
+                                data-group=""
+                                title="Clear group"
+                                aria-label="Clear group"
+                            >×</button>
+                        ` : ""}
+                    </div>
                 </div>
             </div>
         `;
@@ -2301,8 +2362,14 @@
         return `
             <div class="quota-history-panel">
                 <div class="quota-history-header">
-                    <span class="quota-history-title">${escapeHtml(t("quotaHistory"))}</span>
-                    <span class="quota-history-sub secondary-text">${escapeHtml(t("quotaHistorySub"))}</span>
+                    <div class="quota-history-title-group">
+                        <span class="quota-history-title">${escapeHtml(t("quotaHistory"))}</span>
+                        <span class="quota-history-sub secondary-text">${escapeHtml(t("quotaHistorySub"))}</span>
+                    </div>
+                    <button type="button" class="export-analytics-btn" data-action="export-quota-analytics" title="${escapeHtml(t("exportAnalytics"))}">
+                        ${icon("export", "export-btn-icon")}
+                        <span>${escapeHtml(t("exportAnalytics"))}</span>
+                    </button>
                 </div>
                 <div class="history-bars-container">
                     ${barsHtml}
@@ -2597,6 +2664,16 @@
                                                 <span class="account-label">
                                                     ${escapeHtml(localLabel)}
                                                 </span>
+
+                                                ${
+                                                    managed?.group
+                                                        ? `
+                                                            <span class="group-pill" title="Group: ${escapeHtml(managed.group)}">
+                                                                🏷️ ${escapeHtml(managed.group)}
+                                                            </span>
+                                                        `
+                                                        : ""
+                                                }
 
                                                 ${
                                                     managed
@@ -3025,6 +3102,16 @@
                                     </div>
 
                                     ${
+                                        account.group
+                                            ? `
+                                                <span class="group-pill" title="Group: ${escapeHtml(account.group)}">
+                                                    🏷️ ${escapeHtml(account.group)}
+                                                </span>
+                                            `
+                                            : ""
+                                    }
+
+                                    ${
                                         state.workspace?.linkedEmail &&
                                         normalizeEmail(state.workspace.linkedEmail) === normalizeEmail(account.email)
                                             ? `
@@ -3248,6 +3335,20 @@
                                                         </select>
                                                     </div>
                                                 </div>
+
+                                                ${(() => {
+                                                    const groups = Array.from(new Set((state.accounts || []).map(a => a.group).filter(Boolean)));
+                                                    if (groups.length === 0) return "";
+                                                    return `
+                                                        <div class="saved-group-filter-row">
+                                                            <button type="button" class="group-filter-chip ${ui.groupFilter === "all" ? "active" : ""}" data-action="set-group-filter" data-group="all">All (${state.accounts.length})</button>
+                                                            ${groups.map(g => {
+                                                                const count = state.accounts.filter(a => a.group === g).length;
+                                                                return `<button type="button" class="group-filter-chip ${ui.groupFilter === g ? "active" : ""}" data-action="set-group-filter" data-group="${escapeHtml(g)}">${escapeHtml(g)} (${count})</button>`;
+                                                            }).join("")}
+                                                        </div>
+                                                    `;
+                                                })()}
                                             `
                                             : ""
                                     }
@@ -4175,6 +4276,9 @@
         ui.editColorTag =
             account.colorTag || "";
 
+        ui.editGroup =
+            account.group || "";
+
         render();
     }
 
@@ -4186,6 +4290,9 @@
             "";
 
         ui.editColorTag =
+            "";
+
+        ui.editGroup =
             "";
 
         render();
@@ -4215,6 +4322,8 @@
                 ui.editValue,
             colorTag:
                 ui.editColorTag,
+            group:
+                ui.editGroup,
         });
     }
 
@@ -4537,6 +4646,26 @@
                 const color = target.dataset.color || "";
                 ui.editColorTag = ui.editColorTag === color ? "" : color;
                 render();
+                return;
+            }
+
+            if (action === "select-edit-group") {
+                const group = target.dataset.group || "";
+                ui.editGroup = ui.editGroup === group ? "" : group;
+                render();
+                return;
+            }
+
+            if (action === "set-group-filter") {
+                ui.groupFilter = target.dataset.group || "all";
+                render();
+                return;
+            }
+
+            if (action === "export-quota-analytics") {
+                vscode.postMessage({
+                    type: "exportQuotaAnalytics",
+                });
                 return;
             }
 

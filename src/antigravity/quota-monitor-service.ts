@@ -19,6 +19,7 @@ export interface QuotaMonitorConfig {
     thresholdPercent: number;
     smartQuotaFallback?: boolean;
     notifyQuotaReset?: boolean;
+    autoSwitchOnExhaustion?: boolean;
 }
 
 /**
@@ -155,7 +156,18 @@ export class QuotaMonitorService implements vscode.Disposable {
             const resetKey = bucket.resetTime || "ongoing";
             const dedupKey = `${email.toLowerCase()}:${bucketIdentifier}:${resetKey}`;
 
-            if (remainingPercent <= this.config.thresholdPercent) {
+            if (remainingPercent === 0) {
+                const exhaustKey = `${email.toLowerCase()}:${bucketIdentifier}:exhausted:${resetKey}`;
+                if (!this.notifiedDeduplicationKeys.has(exhaustKey)) {
+                    this.notifiedDeduplicationKeys.add(exhaustKey);
+                    if (this.config.autoSwitchOnExhaustion !== false) {
+                        await this.handleQuotaExhaustion(email, bucketIdentifier, bucket);
+                    }
+                    if (bucket.resetTime) {
+                        this.scheduleResetAlarm(email, bucketIdentifier, bucket.resetTime);
+                    }
+                }
+            } else if (remainingPercent <= this.config.thresholdPercent) {
                 if (!this.notifiedDeduplicationKeys.has(dedupKey)) {
                     this.notifiedDeduplicationKeys.add(dedupKey);
 
@@ -246,6 +258,80 @@ export class QuotaMonitorService implements vscode.Disposable {
                 // If quota is above threshold, clear previous deduplication key for this bucket
                 this.notifiedDeduplicationKeys.delete(dedupKey);
             }
+        }
+    }
+
+    private async handleQuotaExhaustion(
+        email: string,
+        bucketIdentifier: string,
+        bucket: AntigravityQuotaSummaryBucket,
+    ): Promise<void> {
+        const savedAccounts = getManagedAccounts(this.context);
+        const usageSnapshots = getManagedAccountUsageSnapshots(this.context);
+        const otherAccounts = savedAccounts.filter(
+            acc => acc.email.toLowerCase() !== email.toLowerCase(),
+        );
+
+        let bestCandidate: { email: string; label?: string; percent: number } | undefined;
+        let maxPercent = -1;
+        for (const candidate of otherAccounts) {
+            const candidatePercent = getAccountRemainingPercent(
+                usageSnapshots[candidate.email.toLowerCase()],
+            );
+            if (typeof candidatePercent === "number" && candidatePercent > 0) {
+                if (candidatePercent > maxPercent) {
+                    maxPercent = candidatePercent;
+                    bestCandidate = {
+                        email: candidate.email,
+                        label: candidate.label,
+                        percent: candidatePercent,
+                    };
+                }
+            }
+        }
+
+        const windowLabel = bucket.window || bucket.description || "current cycle";
+        if (bestCandidate) {
+            const candidateName = bestCandidate.label || bestCandidate.email;
+            const alertMsg = `⚡ Antigravity Rate Limit: Quota is exhausted (0%) for ${email}! Switch to ${candidateName} (${bestCandidate.percent}% available)?`;
+            const switchBtn = `Switch Now (${candidateName})`;
+
+            void vscode.window
+                .showErrorMessage(
+                    alertMsg,
+                    switchBtn,
+                    "Select Account",
+                    "Dismiss",
+                )
+                .then(selection => {
+                    if (selection === switchBtn) {
+                        void vscode.commands.executeCommand(
+                            "boygr.antigravityAccountSwitcher.switchAccount",
+                            {
+                                email: bestCandidate!.email,
+                                label: bestCandidate!.label,
+                            },
+                        );
+                    } else if (selection === "Select Account") {
+                        void vscode.commands.executeCommand(
+                            "boygr.antigravityAccountSwitcher.switchAccount",
+                        );
+                    }
+                });
+        } else {
+            void vscode.window
+                .showErrorMessage(
+                    `⚡ Antigravity Rate Limit: ${bucketIdentifier} (${windowLabel}) is exhausted (0% remaining).`,
+                    "Add Google Account",
+                    "Dismiss",
+                )
+                .then(selection => {
+                    if (selection === "Add Google Account") {
+                        void vscode.commands.executeCommand(
+                            "boygr.antigravityAccountSwitcher.addAccount",
+                        );
+                    }
+                });
         }
     }
 

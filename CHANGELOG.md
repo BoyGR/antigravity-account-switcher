@@ -4,6 +4,26 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [0.8.0] - 2026-09-13
+
+### Added
+- **Account Grouping & Profiles**:
+  - Categorize accounts into groups (`Personal`, `Work`, `Client`, or custom group tags) directly within the label editor.
+  - Interactive group filter chips above saved accounts to filter view in 1 click.
+  - Visual group badge chips rendered on active and saved accounts.
+  - Search accounts by group name dynamically.
+  - Group metadata preserved during JSON Export and Import.
+- **Rate Limit Auto-Switch Detection**:
+  - Instant failover notification when active account quota drops to 0% (exhaustion / rate limit).
+  - Prominently prompts a 1-click switch to the best available backup account with the highest remaining quota.
+  - Configurable setting `boygr.antigravityAccountSwitcher.autoSwitchOnExhaustion` (enabled by default).
+- **Quota Analytics CSV / JSON Export**:
+  - Export historical quota usage records to CSV or JSON formats for spreadsheet reporting or external telemetry.
+  - New command `boygr.antigravityAccountSwitcher.exportQuotaAnalytics`.
+  - In-dashboard "Export" button right beside the 7-Day Quota Analytics chart header.
+
+---
+
 ## [0.7.0] - 2026-09-13
 
 ### Added

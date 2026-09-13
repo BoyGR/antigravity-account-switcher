@@ -19,6 +19,7 @@ interface AccountsBackupPayload {
         label?: string;
         displayName?: string;
         colorTag?: string;
+        group?: string;
         firstSeenAt?: string;
         lastSeenAt?: string;
     }>;
@@ -63,6 +64,7 @@ export function registerBackupAccountsCommands(
                         label: a.label,
                         displayName: a.displayName,
                         colorTag: a.colorTag,
+                        group: a.group,
                         firstSeenAt: a.firstSeenAt,
                         lastSeenAt: a.lastSeenAt,
                     })),

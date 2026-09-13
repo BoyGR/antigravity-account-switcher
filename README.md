@@ -14,7 +14,7 @@ A Visual Studio Code extension for managing, monitoring quota, and switching Goo
 
 ### Status
 
-- **Version**: `0.7.0`
+- **Version**: `0.8.0`
 - **Supported Platforms**: Windows, macOS, Linux
 - **Compatibility**: Visual Studio Code, Google Antigravity extension `1.3.0+`, AGY backend `1.2.2+`
 
@@ -84,6 +84,23 @@ A Visual Studio Code extension for managing, monitoring quota, and switching Goo
 - Renders an interactive 7-day mini bar chart in the accounts view with color-coded health indicators (Healthy, Warning, Critical).
 - Detailed hover tooltips showing weekday, date, and minimum remaining quota percentage.
 
+### 10. Account Grouping & Profile Filters
+- Categorize accounts into groups (`Personal`, `Work`, `Client`, or custom group tags).
+- Interactive filter chips above Saved Accounts allow 1-click filtering by category.
+- Group badge chips visually displayed on both Current and Saved account cards.
+- Search accounts dynamically by group tag name.
+- Group assignments preserved across JSON backups and imports.
+
+### 11. Rate Limit Auto-Switch Detection
+- Detects complete quota exhaustion (0% remaining / rate limit) immediately upon background refresh or model check.
+- Triggers an instant error modal with a 1-click switch prompt to the best available backup account.
+- Configurable via `boygr.antigravityAccountSwitcher.autoSwitchOnExhaustion`.
+
+### 12. Quota Analytics CSV & JSON Export
+- Export full historical quota records across all accounts to standard `.csv` or formatted `.json`.
+- Direct "Export" button in the 7-Day Quota Analytics dashboard header.
+- Accessible via command `boygr.antigravityAccountSwitcher.exportQuotaAnalytics`.
+
 ---
 
 ## Security Model
@@ -109,6 +126,7 @@ Access these commands via the VS Code Command Palette (`Ctrl+Shift+P` / `Cmd+Shi
 | `boygr.antigravityAccountSwitcher.clearWorkspaceAccount` | **Clear Default Account for Workspace** | | Remove project folder account link |
 | `boygr.antigravityAccountSwitcher.exportAccounts` | **Export Saved Accounts...** | | Export saved accounts metadata to JSON file |
 | `boygr.antigravityAccountSwitcher.importAccounts` | **Import Saved Accounts...** | | Import and merge saved accounts from JSON file |
+| `boygr.antigravityAccountSwitcher.exportQuotaAnalytics` | **Export Quota Analytics (CSV/JSON)...** | | Export historical quota records to CSV or JSON file |
 | `boygr.antigravityAccountSwitcher.reconnectHub` | **Reconnect Antigravity Hub** | | Force re-establish connection to local hub process |
 | `boygr.antigravityAccountSwitcher.restartBackend` | **Restart Backend Process** | | Terminate stuck `agy` backend process and reload |
 | `boygr.antigravityAccountSwitcher.addAccount` | **Add / Switch Google Account** | | Initiate login to register a new Google account |
@@ -147,6 +165,9 @@ Customize behavior via VS Code Settings (`settings.json`):
   // Suggest 1-click switch to backup account with highest quota when low (default: true)
   "boygr.antigravityAccountSwitcher.smartQuotaFallback": true,
 
+  // Suggest immediate 1-click switch to best backup account when quota is 0% exhausted (default: true)
+  "boygr.antigravityAccountSwitcher.autoSwitchOnExhaustion": true,
+
   // Notify when a low or exhausted account's quota reset window has finished (default: true)
   "boygr.antigravityAccountSwitcher.notifyQuotaReset": true,
 
@@ -164,7 +185,7 @@ Customize behavior via VS Code Settings (`settings.json`):
 
 ### From VSIX Package
 
-1. Download or locate `release/antigravity-account-switcher-0.7.0.vsix`.
+1. Download or locate `release/antigravity-account-switcher-0.8.0.vsix`.
 2. In VS Code:
    - Go to **Extensions** (`Ctrl+Shift+X` / `Cmd+Shift+X`).
    - Click the `...` menu (top right of Extensions view).
@@ -172,7 +193,7 @@ Customize behavior via VS Code Settings (`settings.json`):
    - Choose the file.
 3. Or install via terminal:
    ```powershell
-   code --install-extension release/antigravity-account-switcher-0.7.0.vsix
+   code --install-extension release/antigravity-account-switcher-0.8.0.vsix
    ```
 
 ---

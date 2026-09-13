@@ -16,6 +16,7 @@ export interface ManagedAntigravityAccount {
     label?: string;
     displayName?: string;
     colorTag?: string;
+    group?: string;
     firstSeenAt: string;
     lastSeenAt: string;
 }
@@ -165,6 +166,7 @@ export async function updateManagedAccountLabel(
     email: string,
     label?: string,
     colorTag?: string,
+    group?: string,
 ): Promise<ManagedAntigravityAccount> {
     const normalized = normalizeEmail(email);
 
@@ -199,10 +201,16 @@ export async function updateManagedAccountLabel(
             ? (colorTag.trim() || undefined)
             : existing.colorTag;
 
+    const normalizedGroup =
+        group !== undefined
+            ? (group.trim() || undefined)
+            : existing.group;
+
     const updated: ManagedAntigravityAccount = {
         ...existing,
         label: normalizedLabel,
         colorTag: normalizedColorTag,
+        group: normalizedGroup,
     };
 
     await context.globalState.update(
@@ -215,6 +223,43 @@ export async function updateManagedAccountLabel(
             },
         } satisfies AccountRegistryState,
     );
+
+    return updated;
+}
+
+export async function updateManagedAccountGroup(
+    context: vscode.ExtensionContext,
+    email: string,
+    group?: string,
+): Promise<ManagedAntigravityAccount> {
+    const normalized = normalizeEmail(email);
+
+    const existingState =
+        context.globalState.get<AccountRegistryState>(
+            STORAGE_KEY,
+        );
+
+    if (!existingState || existingState.version !== 1) {
+        throw new Error("Antigravity account registry is empty.");
+    }
+
+    const existing = existingState.accounts[normalized];
+    if (!existing) {
+        throw new Error(`Managed Antigravity account not found: ${normalized}`);
+    }
+
+    const updated: ManagedAntigravityAccount = {
+        ...existing,
+        group: group?.trim() || undefined,
+    };
+
+    await context.globalState.update(STORAGE_KEY, {
+        version: 1,
+        accounts: {
+            ...existingState.accounts,
+            [normalized]: updated,
+        },
+    } satisfies AccountRegistryState);
 
     return updated;
 }
@@ -447,6 +492,7 @@ export async function importManagedAccounts(
         label?: string;
         displayName?: string;
         colorTag?: string;
+        group?: string;
         firstSeenAt?: string;
         lastSeenAt?: string;
     }>,
@@ -477,6 +523,7 @@ export async function importManagedAccounts(
                 label: item.label !== undefined ? item.label.trim() || undefined : existing.label,
                 displayName: item.displayName !== undefined ? item.displayName.trim() || undefined : existing.displayName,
                 colorTag: item.colorTag !== undefined ? item.colorTag.trim() || undefined : existing.colorTag,
+                group: item.group !== undefined ? item.group.trim() || undefined : existing.group,
                 lastSeenAt: item.lastSeenAt || existing.lastSeenAt || now,
             };
             updated++;
@@ -486,6 +533,7 @@ export async function importManagedAccounts(
                 label: item.label?.trim() || undefined,
                 displayName: item.displayName?.trim() || undefined,
                 colorTag: item.colorTag?.trim() || undefined,
+                group: item.group?.trim() || undefined,
                 firstSeenAt: item.firstSeenAt || now,
                 lastSeenAt: item.lastSeenAt || now,
             };

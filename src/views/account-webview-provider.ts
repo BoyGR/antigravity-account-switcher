@@ -7,6 +7,7 @@ import {
     removeManagedAccount,
     removeManagedAccountQuotaSnapshot,
     updateManagedAccountColorTag,
+    updateManagedAccountGroup,
     updateManagedAccountLabel,
 } from "../antigravity/account-registry";
 
@@ -102,11 +103,17 @@ type WebviewMessage =
           email: string;
           label: string;
           colorTag?: string;
+          group?: string;
       }
     | {
           type: "updateColorTag";
           email: string;
           colorTag?: string;
+      }
+    | {
+          type: "updateGroup";
+          email: string;
+          group?: string;
       }
     | { type: "exportAccounts" }
     | { type: "importAccounts" }
@@ -114,6 +121,7 @@ type WebviewMessage =
     | { type: "restartBackend" }
     | { type: "setWorkspaceAccount" }
     | { type: "clearWorkspaceAccount" }
+    | { type: "exportQuotaAnalytics" }
     | {
           type: "saveSettings";
           preferences: {
@@ -784,6 +792,7 @@ export class AntigravityAccountWebviewProvider
                     message.email,
                     message.label,
                     message.colorTag,
+                    message.group,
                 );
 
                 await this.refreshLocalAccounts();
@@ -794,6 +803,16 @@ export class AntigravityAccountWebviewProvider
                     this.context,
                     message.email,
                     message.colorTag,
+                );
+
+                await this.refreshLocalAccounts();
+                return;
+
+            case "updateGroup":
+                await updateManagedAccountGroup(
+                    this.context,
+                    message.email,
+                    message.group,
                 );
 
                 await this.refreshLocalAccounts();
@@ -824,6 +843,12 @@ export class AntigravityAccountWebviewProvider
             case "exportAccounts":
                 await vscode.commands.executeCommand(
                     "boygr.antigravityAccountSwitcher.exportAccounts",
+                );
+                return;
+
+            case "exportQuotaAnalytics":
+                await vscode.commands.executeCommand(
+                    "boygr.antigravityAccountSwitcher.exportQuotaAnalytics",
                 );
                 return;
 

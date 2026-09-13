@@ -17,6 +17,7 @@ import { registerSwitchAccountCommand } from "./commands/switch-account";
 import { registerStatusBarMenuCommand } from "./commands/status-bar-menu";
 import { registerBackupAccountsCommands } from "./commands/backup-accounts";
 import { registerRecoveryCommands } from "./commands/recovery";
+import { registerExportAnalyticsCommand } from "./commands/export-analytics";
 import { AntigravityStatusBarManager } from "./status-bar/status-bar-manager";
 import { registerAntigravityAccountWebview } from "./views/account-webview-provider";
 import {
@@ -92,11 +93,14 @@ export function activate(
         },
     );
 
+    const exportAnalyticsCommand = registerExportAnalyticsCommand(context);
+
     context.subscriptions.push(
         statusBarManager,
         statusBarMenuCommand,
         diagnoseCommand,
         refreshCommand,
+        exportAnalyticsCommand,
         ...backupCommands,
         ...recoveryCommands,
         ...workspaceCommands,

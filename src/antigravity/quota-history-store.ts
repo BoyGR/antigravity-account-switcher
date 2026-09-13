@@ -124,3 +124,4 @@ export async function recordUsageSnapshotIfAvailable(
         await recordDailyQuotaSnapshot(context, email, pct);
     }
 }
+
