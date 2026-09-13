@@ -9,5 +9,5 @@ release/
 .env
 .env.*
 
-# Generated source maps
-out/**/*.map
+out/
+dist/**/*.map

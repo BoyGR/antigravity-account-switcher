@@ -1,6 +1,10 @@
 # Development sources
 src/**
 tsconfig.json
+esbuild.js
+out/**
+media/account-switcher.js
+media/account-switcher.css
 
 # Development configuration
 .vscode/**
@@ -17,6 +21,7 @@ diagnostics/**
 node_modules/**
 
 # TypeScript/source-map development artifacts
+dist/**/*.map
 out/**/*.map
 **/*.tsbuildinfo
 

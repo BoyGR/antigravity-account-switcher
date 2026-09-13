@@ -4,6 +4,10 @@
     "description": "Manage and switch Google accounts used by Google Antigravity in Visual Studio Code through Antigravity's existing authentication flow.",
     "version": "0.4.0",
     "publisher": "boygr",
+    "author": {
+        "name": "Boy Gilang Ramadhan",
+        "url": "https://boygr.com"
+    },
     "engines": {
         "vscode": "^1.95.0"
     },
@@ -24,7 +28,7 @@
         "onView:boygr.antigravityAccountSwitcher.accountsView",
         "onCommand:boygr.antigravityAccountSwitcher.addAccount"
     ],
-    "main": "./out/extension.js",
+    "main": "./dist/extension.js",
     "contributes": {
         "commands": [
             {
@@ -146,43 +150,6 @@
                     "when": "view == boygr.antigravityAccountSwitcher.accountsView",
                     "group": "navigation@2"
                 }
-            ],
-            "view/item/context": [
-                {
-                    "command": "boygr.antigravityAccountSwitcher.switchAccount",
-                    "when": "view == boygr.antigravityAccountSwitcher.accountsView && viewItem == antigravity.savedAccount",
-                    "group": "1_switch"
-                },
-                {
-                    "command": "boygr.antigravityAccountSwitcher.editAccountLabel",
-                    "when": "view == boygr.antigravityAccountSwitcher.accountsView && viewItem == antigravity.savedAccount",
-                    "group": "2_manage"
-                },
-                {
-                    "command": "boygr.antigravityAccountSwitcher.editAccountLabel",
-                    "when": "view == boygr.antigravityAccountSwitcher.accountsView && viewItem == antigravity.savedAccount.current",
-                    "group": "2_manage"
-                },
-                {
-                    "command": "boygr.antigravityAccountSwitcher.removeSavedAccount",
-                    "when": "view == boygr.antigravityAccountSwitcher.accountsView && viewItem == antigravity.savedAccount",
-                    "group": "3_remove"
-                },
-                {
-                    "command": "boygr.antigravityAccountSwitcher.removeSavedAccount",
-                    "when": "view == boygr.antigravityAccountSwitcher.accountsView && viewItem == antigravity.savedAccount.current",
-                    "group": "3_remove"
-                }
-            ],
-            "commandPalette": [
-                {
-                    "command": "boygr.antigravityAccountSwitcher.editAccountLabel",
-                    "when": "false"
-                },
-                {
-                    "command": "boygr.antigravityAccountSwitcher.removeSavedAccount",
-                    "when": "false"
-                }
             ]
         },
         "configuration": {
@@ -191,7 +158,14 @@
                 "boygr.antigravityAccountSwitcher.autoRefreshIntervalMinutes": {
                     "type": "integer",
                     "default": 5,
-                    "enum": [0, 1, 5, 15, 30, 60],
+                    "enum": [
+                        0,
+                        1,
+                        5,
+                        15,
+                        30,
+                        60
+                    ],
                     "enumDescriptions": [
                         "Off (Manual only)",
                         "Every 1 minute",
@@ -210,7 +184,14 @@
                 "boygr.antigravityAccountSwitcher.lowQuotaThresholdPercent": {
                     "type": "integer",
                     "default": 20,
-                    "enum": [5, 10, 15, 20, 25, 30],
+                    "enum": [
+                        5,
+                        10,
+                        15,
+                        20,
+                        25,
+                        30
+                    ],
                     "description": "Remaining quota percentage threshold that triggers a low quota warning notification."
                 },
                 "boygr.antigravityAccountSwitcher.autoSyncOfficialUi": {
@@ -222,8 +203,8 @@
         }
     },
     "scripts": {
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
+        "compile": "tsc -p ./ --noEmit && node esbuild.js --production",
+        "watch": "node esbuild.js --watch",
         "package": "vsce package",
         "vscode:prepublish": "npm run compile",
         "package:vsix": "npx --yes @vscode/vsce package"
@@ -232,6 +213,7 @@
         "@types/node": "^24.0.0",
         "@types/vscode": "^1.95.0",
         "@vscode/vsce": "^3.6.0",
+        "esbuild": "^0.28.2",
         "typescript": "^5.9.0"
     },
     "license": "UNLICENSED",

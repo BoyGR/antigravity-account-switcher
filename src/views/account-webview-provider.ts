@@ -1,3 +1,4 @@
+import * as fs from "fs";
 import * as vscode from "vscode";
 
 import {
@@ -217,14 +218,25 @@ export class AntigravityAccountWebviewProvider
         const { webview } =
             webviewView;
 
+        const distMediaUri =
+            vscode.Uri.joinPath(
+                this.context.extensionUri,
+                "dist",
+                "media",
+            );
+
+        const sourceMediaUri =
+            vscode.Uri.joinPath(
+                this.context.extensionUri,
+                "media",
+            );
+
         webview.options = {
             enableScripts: true,
 
             localResourceRoots: [
-                vscode.Uri.joinPath(
-                    this.context.extensionUri,
-                    "media",
-                ),
+                distMediaUri,
+                sourceMediaUri,
             ],
         };
 
@@ -461,7 +473,7 @@ export class AntigravityAccountWebviewProvider
                     ),
 
                 developer:
-                    "BoyGR",
+                    "Boy Gilang Ramadhan",
 
                 website:
                     "https://boygr.com",
@@ -876,11 +888,30 @@ export class AntigravityAccountWebviewProvider
         const nonce =
             getNonce();
 
+        const distJsPath =
+            vscode.Uri.joinPath(
+                this.context.extensionUri,
+                "dist",
+                "media",
+                "account-switcher.js",
+            ).fsPath;
+
+        const mediaBaseUri =
+            fs.existsSync(distJsPath)
+                ? vscode.Uri.joinPath(
+                    this.context.extensionUri,
+                    "dist",
+                    "media",
+                )
+                : vscode.Uri.joinPath(
+                    this.context.extensionUri,
+                    "media",
+                );
+
         const cssUri =
             webview.asWebviewUri(
                 vscode.Uri.joinPath(
-                    this.context.extensionUri,
-                    "media",
+                    mediaBaseUri,
                     "account-switcher.css",
                 ),
             );
@@ -888,8 +919,7 @@ export class AntigravityAccountWebviewProvider
         const scriptUri =
             webview.asWebviewUri(
                 vscode.Uri.joinPath(
-                    this.context.extensionUri,
-                    "media",
+                    mediaBaseUri,
                     "account-switcher.js",
                 ),
             );

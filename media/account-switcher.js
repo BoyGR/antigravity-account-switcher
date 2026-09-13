@@ -36,7 +36,7 @@
 
         meta: {
             version: "0.4.0",
-            developer: "BoyGR",
+            developer: "Boy Gilang Ramadhan",
             website: "https://boygr.com",
             iconUri: "",
         },
@@ -3432,7 +3432,7 @@
                                 </span>
 
                                 <strong>
-                                    ${escapeHtml(state.meta?.developer || "BoyGR")}
+                                    ${escapeHtml(state.meta?.developer || "Boy Gilang Ramadhan")}
                                 </strong>
                             </div>
 
@@ -3504,7 +3504,7 @@
 
         const developer =
             meta.developer ||
-            "BoyGR";
+            "Boy Gilang Ramadhan";
 
         const website =
             meta.website ||
