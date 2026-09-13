@@ -11,12 +11,14 @@ import {
     getManagedAccountUsageSnapshots,
     saveManagedAccountUsageSnapshot,
 } from "./quota-summary-store";
+import { recordUsageSnapshotIfAvailable } from "./quota-history-store";
 
 export interface QuotaMonitorConfig {
     intervalMinutes: number;
     reminderEnabled: boolean;
     thresholdPercent: number;
     smartQuotaFallback?: boolean;
+    notifyQuotaReset?: boolean;
 }
 
 /**
@@ -33,6 +35,7 @@ export class QuotaMonitorService implements vscode.Disposable {
     private isRefreshing = false;
     private config: QuotaMonitorConfig;
     private notifiedDeduplicationKeys = new Set<string>();
+    private resetAlarmTimers = new Map<string, NodeJS.Timeout>();
 
     constructor(
         private readonly context: vscode.ExtensionContext,
@@ -109,6 +112,11 @@ export class QuotaMonitorService implements vscode.Disposable {
                     usage,
                 );
             }
+            await recordUsageSnapshotIfAvailable(
+                this.context,
+                current.email,
+                usage,
+            );
 
             // Notify UI listener
             if (this.onQuotaUpdated) {
@@ -229,12 +237,86 @@ export class QuotaMonitorService implements vscode.Disposable {
                                 }
                             });
                     }
+
+                    if (bucket.resetTime) {
+                        this.scheduleResetAlarm(email, bucketIdentifier, bucket.resetTime);
+                    }
                 }
             } else {
                 // If quota is above threshold, clear previous deduplication key for this bucket
                 this.notifiedDeduplicationKeys.delete(dedupKey);
             }
         }
+    }
+
+    private scheduleResetAlarm(
+        email: string,
+        bucketIdentifier: string,
+        resetTimeStr: string,
+    ): void {
+        if (this.config.notifyQuotaReset === false) {
+            return;
+        }
+
+        const resetMs = new Date(resetTimeStr).getTime();
+        if (isNaN(resetMs)) {
+            return;
+        }
+
+        const diffMs = resetMs - Date.now();
+        const alarmKey = `${email.toLowerCase()}:${bucketIdentifier}:${resetTimeStr}`;
+
+        if (this.resetAlarmTimers.has(alarmKey) || diffMs <= 0) {
+            return;
+        }
+
+        // Delay timer until 2 seconds after reset
+        const timerMs = Math.min(diffMs + 2000, 24 * 60 * 60 * 1000);
+
+        const timer = setTimeout(async () => {
+            this.resetAlarmTimers.delete(alarmKey);
+
+            if (this.config.notifyQuotaReset === false) {
+                return;
+            }
+
+            const current = await getAntigravityCurrentAccount().catch(() => undefined);
+            const currentEmail = current?.email?.toLowerCase();
+            const targetEmail = email.toLowerCase();
+
+            const savedAccounts = getManagedAccounts(this.context);
+            const targetAccount = savedAccounts.find(
+                a => a.email.toLowerCase() === targetEmail,
+            );
+            const displayName = targetAccount?.label || targetAccount?.email || email;
+
+            if (currentEmail !== targetEmail) {
+                const switchBtn = `Switch back to ${displayName}`;
+                void vscode.window
+                    .showInformationMessage(
+                        `Antigravity Quota Restored: ${bucketIdentifier} for ${displayName} has reset! Switch back?`,
+                        switchBtn,
+                        "Dismiss",
+                    )
+                    .then(selection => {
+                        if (selection === switchBtn) {
+                            void vscode.commands.executeCommand(
+                                "boygr.antigravityAccountSwitcher.switchAccount",
+                                {
+                                    email: targetAccount ? targetAccount.email : email,
+                                    label: targetAccount?.label,
+                                },
+                            );
+                        }
+                    });
+            } else {
+                void vscode.window.showInformationMessage(
+                    `Antigravity Quota Restored: ${bucketIdentifier} quota has refreshed.`,
+                );
+            }
+        }, timerMs);
+
+        this.resetAlarmTimers.set(alarmKey, timer);
     }
 
     public clearDeduplicationCache(): void {
@@ -253,11 +335,16 @@ export class QuotaMonitorService implements vscode.Disposable {
                     ? Math.min(100, config.thresholdPercent)
                     : 20,
             smartQuotaFallback: config.smartQuotaFallback !== false,
+            notifyQuotaReset: config.notifyQuotaReset !== false,
         };
     }
 
     public dispose(): void {
         this.stop();
         this.notifiedDeduplicationKeys.clear();
+        for (const timer of this.resetAlarmTimers.values()) {
+            clearTimeout(timer);
+        }
+        this.resetAlarmTimers.clear();
     }
 }

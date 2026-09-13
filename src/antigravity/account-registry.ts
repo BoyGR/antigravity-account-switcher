@@ -15,6 +15,7 @@ export interface ManagedAntigravityAccount {
     email: string;
     label?: string;
     displayName?: string;
+    colorTag?: string;
     firstSeenAt: string;
     lastSeenAt: string;
 }
@@ -163,6 +164,7 @@ export async function updateManagedAccountLabel(
     context: vscode.ExtensionContext,
     email: string,
     label?: string,
+    colorTag?: string,
 ): Promise<ManagedAntigravityAccount> {
     const normalized = normalizeEmail(email);
 
@@ -192,9 +194,64 @@ export async function updateManagedAccountLabel(
     const normalizedLabel =
         label?.trim() || undefined;
 
+    const normalizedColorTag =
+        colorTag !== undefined
+            ? (colorTag.trim() || undefined)
+            : existing.colorTag;
+
     const updated: ManagedAntigravityAccount = {
         ...existing,
         label: normalizedLabel,
+        colorTag: normalizedColorTag,
+    };
+
+    await context.globalState.update(
+        STORAGE_KEY,
+        {
+            version: 1,
+            accounts: {
+                ...existingState.accounts,
+                [normalized]: updated,
+            },
+        } satisfies AccountRegistryState,
+    );
+
+    return updated;
+}
+
+export async function updateManagedAccountColorTag(
+    context: vscode.ExtensionContext,
+    email: string,
+    colorTag?: string,
+): Promise<ManagedAntigravityAccount> {
+    const normalized = normalizeEmail(email);
+
+    const existingState =
+        context.globalState.get<AccountRegistryState>(
+            STORAGE_KEY,
+        );
+
+    if (
+        !existingState ||
+        existingState.version !== 1
+    ) {
+        throw new Error(
+            "Antigravity account registry is empty.",
+        );
+    }
+
+    const existing =
+        existingState.accounts[normalized];
+
+    if (!existing) {
+        throw new Error(
+            `Managed Antigravity account not found: ${normalized}`,
+        );
+    }
+
+    const updated: ManagedAntigravityAccount = {
+        ...existing,
+        colorTag: colorTag?.trim() || undefined,
     };
 
     await context.globalState.update(
@@ -389,6 +446,7 @@ export async function importManagedAccounts(
         email: string;
         label?: string;
         displayName?: string;
+        colorTag?: string;
         firstSeenAt?: string;
         lastSeenAt?: string;
     }>,
@@ -418,6 +476,7 @@ export async function importManagedAccounts(
                 ...existing,
                 label: item.label !== undefined ? item.label.trim() || undefined : existing.label,
                 displayName: item.displayName !== undefined ? item.displayName.trim() || undefined : existing.displayName,
+                colorTag: item.colorTag !== undefined ? item.colorTag.trim() || undefined : existing.colorTag,
                 lastSeenAt: item.lastSeenAt || existing.lastSeenAt || now,
             };
             updated++;
@@ -426,6 +485,7 @@ export async function importManagedAccounts(
                 email,
                 label: item.label?.trim() || undefined,
                 displayName: item.displayName?.trim() || undefined,
+                colorTag: item.colorTag?.trim() || undefined,
                 firstSeenAt: item.firstSeenAt || now,
                 lastSeenAt: item.lastSeenAt || now,
             };

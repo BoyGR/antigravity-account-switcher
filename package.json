@@ -2,7 +2,7 @@
     "name": "antigravity-account-switcher",
     "displayName": "Antigravity Account Switcher",
     "description": "Manage and switch Google accounts used by Google Antigravity in Visual Studio Code through Antigravity's existing authentication flow.",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "publisher": "boygr",
     "author": {
         "name": "Boy Gilang Ramadhan",
@@ -158,6 +158,18 @@
                 "title": "Restart Backend Process",
                 "category": "Antigravity Account Switcher",
                 "icon": "$(debug-restart)"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.setWorkspaceAccount",
+                "title": "Set Default Account for Workspace...",
+                "category": "Antigravity Account Switcher",
+                "icon": "$(folder-active)"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.clearWorkspaceAccount",
+                "title": "Clear Default Account for Workspace",
+                "category": "Antigravity Account Switcher",
+                "icon": "$(folder)"
             }
         ],
         "viewsContainers": {
@@ -251,6 +263,16 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Suggest a 1-click switch to your saved account with the highest remaining quota when active quota is low."
+                },
+                "boygr.antigravityAccountSwitcher.notifyQuotaReset": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Notify when a low or exhausted account's quota reset window has finished and quota is restored."
+                },
+                "boygr.antigravityAccountSwitcher.autoPromptWorkspaceAccount": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically prompt to switch to the linked account when opening a project workspace."
                 },
                 "boygr.antigravityAccountSwitcher.autoSyncOfficialUi": {
                     "type": "boolean",

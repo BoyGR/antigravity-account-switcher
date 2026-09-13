@@ -4,6 +4,29 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [0.7.0] - 2026-09-13
+
+### Added
+- **Quota Reset Alarms & Restoration Notifications**:
+  - Automatically tracks exhausted or low-quota accounts and calculates exact reset completion countdowns.
+  - Fires high-priority desktop notification as soon as the quota reset window completes, allowing immediate resumption of AI tasks.
+  - Configurable setting `boygr.antigravityAccountSwitcher.notifyQuotaReset` (enabled by default).
+- **Account Color Tags & Visual Badges**:
+  - Pick personal color accents for accounts (`Blue`, `Green`, `Purple`, `Amber`, `Rose`, `Teal`) with an interactive palette dot picker in the label editor.
+  - Colored indicator dots rendered next to account labels and colored avatar ring accents on both Current Account and Saved Accounts.
+  - Color tag metadata fully preserved during JSON Export and Import.
+- **Workspace / Project Folder Auto-Switch Association**:
+  - Associate specific VS Code project folders or workspaces with default Antigravity accounts.
+  - Commands `boygr.antigravityAccountSwitcher.setWorkspaceAccount` and `clearWorkspaceAccount`.
+  - Automatic prompt upon opening workspace to switch to the linked account (`autoPromptWorkspaceAccount` setting).
+  - Visual workspace badge and 1-click link/unlink controls in the Accounts view.
+- **7-Day Quota Usage History & Analytics**:
+  - Automatically records daily lowest remaining quota percentages for each account.
+  - Sleek 7-day mini bar chart rendered in the accounts dashboard with color-coded consumption levels (Healthy, Warning, Critical).
+  - Hover tooltip for each day showing weekday, calendar date, and minimum remaining quota percentage.
+
+---
+
 ## [0.6.0] - 2026-09-13
 
 ### Added

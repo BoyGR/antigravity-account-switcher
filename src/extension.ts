@@ -19,6 +19,10 @@ import { registerBackupAccountsCommands } from "./commands/backup-accounts";
 import { registerRecoveryCommands } from "./commands/recovery";
 import { AntigravityStatusBarManager } from "./status-bar/status-bar-manager";
 import { registerAntigravityAccountWebview } from "./views/account-webview-provider";
+import {
+    checkAndPromptWorkspaceAccount,
+    registerWorkspaceAssociationCommands,
+} from "./antigravity/workspace-association";
 
 export function activate(
     context: vscode.ExtensionContext,
@@ -81,6 +85,13 @@ export function activate(
         },
     );
 
+    const workspaceCommands = registerWorkspaceAssociationCommands(
+        context,
+        async () => {
+            await accountWebview.refresh();
+        },
+    );
+
     context.subscriptions.push(
         statusBarManager,
         statusBarMenuCommand,
@@ -88,7 +99,11 @@ export function activate(
         refreshCommand,
         ...backupCommands,
         ...recoveryCommands,
+        ...workspaceCommands,
     );
+
+    // Prompt user if current workspace folder has a linked account
+    void checkAndPromptWorkspaceAccount(context);
 }
 
 export function deactivate(): void {

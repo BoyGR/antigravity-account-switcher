@@ -14,7 +14,7 @@ A Visual Studio Code extension for managing, monitoring quota, and switching Goo
 
 ### Status
 
-- **Version**: `0.6.0`
+- **Version**: `0.7.0`
 - **Supported Platforms**: Windows, macOS, Linux
 - **Compatibility**: Visual Studio Code, Google Antigravity extension `1.3.0+`, AGY backend `1.2.2+`
 
@@ -59,9 +59,30 @@ A Visual Studio Code extension for managing, monitoring quota, and switching Goo
 ### 5. Settings & Personalization Modal
 - Accessible via the gear icon (`⚙`) on the dashboard header:
   - **Appearance**: Theme selection (*Follow VS Code*, *Dark*, *Light*, *System*) and Bilingual Language support (*English*, *Bahasa Indonesia*, *Automatic*).
-  - **Quota & Reminders**: Enable/disable background auto-refresh, polling interval, and warning threshold (5% - 30%).
+  - **Quota & Reminders**: Enable/disable background auto-refresh, polling interval, warning threshold (5% - 30%), and smart fallback.
+  - **Backup & Restore**: 1-click Export and Import of saved accounts metadata with deduplication.
   - **Layout**: Show or hide individual dashboard sections (Antigravity Status, Current Account, Saved Accounts).
   - **About**: Version, developer info, and website link.
+
+### 6. Quota Reset Alarms & Restoration Notifications
+- Automatically monitors exhausted or low-quota accounts and calculates exact reset countdowns.
+- Notifies immediately via desktop popup when an account's quota reset window passes and quota is restored.
+- Configurable via `boygr.antigravityAccountSwitcher.notifyQuotaReset`.
+
+### 7. Account Color Tags & Visual Badges
+- Assign custom color accents (`Blue`, `Green`, `Purple`, `Amber`, `Rose`, `Teal`) to any saved account.
+- Renders colored indicator dots next to account labels and colored avatar ring accents on both Current Account and Saved Accounts cards.
+- Preserves color tags during JSON export and import.
+
+### 8. Workspace / Project Folder Association
+- Link specific project folders or workspaces to preferred Antigravity accounts.
+- Automatic prompt upon opening workspace to switch to the linked account (`boygr.antigravityAccountSwitcher.autoPromptWorkspaceAccount`).
+- Dedicated workspace link banner in the dashboard and workspace badge tags in the Saved Accounts list.
+
+### 9. 7-Day Quota Usage History & Analytics
+- Automatically records daily minimum remaining quota for each account.
+- Renders an interactive 7-day mini bar chart in the accounts view with color-coded health indicators (Healthy, Warning, Critical).
+- Detailed hover tooltips showing weekday, date, and minimum remaining quota percentage.
 
 ---
 
@@ -84,6 +105,8 @@ Access these commands via the VS Code Command Palette (`Ctrl+Shift+P` / `Cmd+Shi
 | `boygr.antigravityAccountSwitcher.statusBarMenu` | **Status Bar Menu** | `Alt+A` (`Cmd+Alt+A`) | Open QuickPick menu to switch accounts sorted by quota |
 | `boygr.antigravityAccountSwitcher.refreshAccountsView` | **Refresh** | `Alt+Shift+A` (`Cmd+Alt+Shift+A`) | Refresh runtime status, active account, quota, and saved accounts |
 | `boygr.antigravityAccountSwitcher.switchAccount` | **Switch Account** | | Switch to a saved account directly or via QuickPick |
+| `boygr.antigravityAccountSwitcher.setWorkspaceAccount` | **Set Default Account for Workspace...** | | Link active project folder to a default Antigravity account |
+| `boygr.antigravityAccountSwitcher.clearWorkspaceAccount` | **Clear Default Account for Workspace** | | Remove project folder account link |
 | `boygr.antigravityAccountSwitcher.exportAccounts` | **Export Saved Accounts...** | | Export saved accounts metadata to JSON file |
 | `boygr.antigravityAccountSwitcher.importAccounts` | **Import Saved Accounts...** | | Import and merge saved accounts from JSON file |
 | `boygr.antigravityAccountSwitcher.reconnectHub` | **Reconnect Antigravity Hub** | | Force re-establish connection to local hub process |
@@ -124,6 +147,12 @@ Customize behavior via VS Code Settings (`settings.json`):
   // Suggest 1-click switch to backup account with highest quota when low (default: true)
   "boygr.antigravityAccountSwitcher.smartQuotaFallback": true,
 
+  // Notify when a low or exhausted account's quota reset window has finished (default: true)
+  "boygr.antigravityAccountSwitcher.notifyQuotaReset": true,
+
+  // Automatically prompt to switch to the linked account when opening a project workspace (default: true)
+  "boygr.antigravityAccountSwitcher.autoPromptWorkspaceAccount": true,
+
   // Automatically sync official Antigravity UI on account changes (default: true)
   "boygr.antigravityAccountSwitcher.autoSyncOfficialUi": true
 }
@@ -135,7 +164,7 @@ Customize behavior via VS Code Settings (`settings.json`):
 
 ### From VSIX Package
 
-1. Download or locate `release/antigravity-account-switcher-0.6.0.vsix`.
+1. Download or locate `release/antigravity-account-switcher-0.7.0.vsix`.
 2. In VS Code:
    - Go to **Extensions** (`Ctrl+Shift+X` / `Cmd+Shift+X`).
    - Click the `...` menu (top right of Extensions view).
@@ -143,7 +172,7 @@ Customize behavior via VS Code Settings (`settings.json`):
    - Choose the file.
 3. Or install via terminal:
    ```powershell
-   code --install-extension release/antigravity-account-switcher-0.6.0.vsix
+   code --install-extension release/antigravity-account-switcher-0.7.0.vsix
    ```
 
 ---

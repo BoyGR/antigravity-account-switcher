@@ -6,6 +6,7 @@ import {
     ManagedAntigravityAccount,
     removeManagedAccount,
     removeManagedAccountQuotaSnapshot,
+    updateManagedAccountColorTag,
     updateManagedAccountLabel,
 } from "../antigravity/account-registry";
 
@@ -29,6 +30,15 @@ import {
 import { QuotaMonitorService } from "../antigravity/quota-monitor-service";
 import { syncAntigravityUi } from "../antigravity/ui-sync";
 import { AntigravityStatusBarManager } from "../status-bar/status-bar-manager";
+import {
+    getCurrentWorkspacePath,
+    getWorkspaceAccount,
+} from "../antigravity/workspace-association";
+import {
+    DailyQuotaRecord,
+    getAllAccountsQuotaHistory,
+    recordUsageSnapshotIfAvailable,
+} from "../antigravity/quota-history-store";
 
 type ThemePreference =
     | "vscode"
@@ -91,11 +101,19 @@ type WebviewMessage =
           type: "updateLabel";
           email: string;
           label: string;
+          colorTag?: string;
+      }
+    | {
+          type: "updateColorTag";
+          email: string;
+          colorTag?: string;
       }
     | { type: "exportAccounts" }
     | { type: "importAccounts" }
     | { type: "reconnectHub" }
     | { type: "restartBackend" }
+    | { type: "setWorkspaceAccount" }
+    | { type: "clearWorkspaceAccount" }
     | {
           type: "saveSettings";
           preferences: {
@@ -129,6 +147,14 @@ interface AccountSwitcherSnapshot {
     usageError?: string;
 
     error?: string;
+
+    workspace?: {
+        folderPath: string;
+        folderName: string;
+        linkedEmail?: string;
+    };
+
+    quotaHistory?: Record<string, DailyQuotaRecord[]>;
 }
 interface AccountSwitcherViewState
     extends AccountSwitcherSnapshot {
@@ -192,9 +218,22 @@ export class AntigravityAccountWebviewProvider
         private readonly context: vscode.ExtensionContext,
         private readonly statusBarManager?: AntigravityStatusBarManager,
     ) {
+        const currentPath = getCurrentWorkspacePath();
+        const workspaceLinkedEmail = currentPath
+            ? getWorkspaceAccount(this.context, currentPath)
+            : undefined;
+
         this.snapshot = {
             accounts: getManagedAccounts(this.context),
             usageSnapshots: getManagedAccountUsageSnapshots(this.context),
+            quotaHistory: getAllAccountsQuotaHistory(this.context, 7),
+            workspace: currentPath
+                ? {
+                      folderPath: currentPath,
+                      folderName: vscode.workspace.name || "Workspace",
+                      linkedEmail: workspaceLinkedEmail,
+                  }
+                : undefined,
         };
 
         const prefs = this.getStoredPreferences();
@@ -210,6 +249,7 @@ export class AntigravityAccountWebviewProvider
                 this.snapshot = {
                     ...this.snapshot,
                     usage,
+                    quotaHistory: getAllAccountsQuotaHistory(this.context, 7),
                 };
                 this.statusBarManager?.update(
                     this.snapshot.current,
@@ -442,6 +482,12 @@ export class AntigravityAccountWebviewProvider
                             this.context,
                         );
                 }
+
+                await recordUsageSnapshotIfAvailable(
+                    this.context,
+                    current.email,
+                    usage,
+                );
             } catch (usageReadError) {
                 usageError =
                     usageReadError instanceof Error
@@ -449,6 +495,11 @@ export class AntigravityAccountWebviewProvider
                         : String(usageReadError);
             }
         }
+
+        const currentPath = getCurrentWorkspacePath();
+        const workspaceLinkedEmail = currentPath
+            ? getWorkspaceAccount(this.context, currentPath)
+            : undefined;
 
         this.snapshot = {
             current,
@@ -458,6 +509,14 @@ export class AntigravityAccountWebviewProvider
             usageSnapshots,
             usageError,
             error,
+            workspace: currentPath
+                ? {
+                      folderPath: currentPath,
+                      folderName: vscode.workspace.name || "Workspace",
+                      linkedEmail: workspaceLinkedEmail,
+                  }
+                : undefined,
+            quotaHistory: getAllAccountsQuotaHistory(this.context, 7),
         };
 
         this.statusBarManager?.update(
@@ -530,6 +589,11 @@ export class AntigravityAccountWebviewProvider
     }
 
     private async refreshLocalAccounts(): Promise<void> {
+        const currentPath = getCurrentWorkspacePath();
+        const workspaceLinkedEmail = currentPath
+            ? getWorkspaceAccount(this.context, currentPath)
+            : undefined;
+
         this.snapshot = {
             ...this.snapshot,
 
@@ -542,6 +606,16 @@ export class AntigravityAccountWebviewProvider
                 getManagedAccountUsageSnapshots(
                     this.context,
                 ),
+
+            quotaHistory: getAllAccountsQuotaHistory(this.context, 7),
+
+            workspace: currentPath
+                ? {
+                      folderPath: currentPath,
+                      folderName: vscode.workspace.name || "Workspace",
+                      linkedEmail: workspaceLinkedEmail,
+                  }
+                : undefined,
         };
 
         await this.postState(
@@ -709,9 +783,34 @@ export class AntigravityAccountWebviewProvider
                     this.context,
                     message.email,
                     message.label,
+                    message.colorTag,
                 );
 
                 await this.refreshLocalAccounts();
+                return;
+
+            case "updateColorTag":
+                await updateManagedAccountColorTag(
+                    this.context,
+                    message.email,
+                    message.colorTag,
+                );
+
+                await this.refreshLocalAccounts();
+                return;
+
+            case "setWorkspaceAccount":
+                await vscode.commands.executeCommand(
+                    "boygr.antigravityAccountSwitcher.setWorkspaceAccount",
+                );
+                await this.refresh(false);
+                return;
+
+            case "clearWorkspaceAccount":
+                await vscode.commands.executeCommand(
+                    "boygr.antigravityAccountSwitcher.clearWorkspaceAccount",
+                );
+                await this.refresh(false);
                 return;
 
             case "saveSettings":

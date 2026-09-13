@@ -35,7 +35,7 @@
         },
 
         meta: {
-            version: "0.5.1",
+            version: "0.7.0",
             developer: "Boy Gilang Ramadhan",
             website: "https://boygr.com",
             iconUri: "",
@@ -81,6 +81,9 @@
             null,
 
         editValue:
+            "",
+
+        editColorTag:
             "",
 
         removeCandidate:
@@ -477,6 +480,24 @@
 
             quotaUnavailableHint:
                 "Antigravity did not return current quota information.",
+
+            quotaHistory:
+                "7-Day Quota Analytics",
+
+            quotaHistorySub:
+                "Daily lowest remaining",
+
+            workspace:
+                "Workspace",
+
+            workspaceLinked:
+                "Workspace linked",
+
+            linkWorkspace:
+                "Link Workspace",
+
+            unlinkWorkspace:
+                "Unlink",
         },
 
         id: {
@@ -856,6 +877,24 @@
 
             quotaUnavailableHint:
                 "Antigravity tidak mengembalikan informasi kuota saat ini.",
+
+            quotaHistory:
+                "Analitik Kuota 7 Hari",
+
+            quotaHistorySub:
+                "Sisa terendah harian",
+
+            workspace:
+                "Workspace",
+
+            workspaceLinked:
+                "Tertaut ke workspace",
+
+            linkWorkspace:
+                "Tautkan Workspace",
+
+            unlinkWorkspace:
+                "Lepas",
         },
     };
 
@@ -1494,42 +1533,68 @@
     function renderLabelEditor(
         account
     ) {
+        const colors = ["blue", "green", "purple", "amber", "rose", "teal"];
         return `
             <div
                 class="label-editor"
                 data-editor-email="${escapeHtml(account.email)}"
             >
-                <input
-                    class="label-input"
-                    type="text"
-                    value="${escapeHtml(ui.editValue)}"
-                    data-role="label-input"
-                    data-email="${escapeHtml(account.email)}"
-                    maxlength="80"
-                    aria-label="${escapeHtml(t("editLabel"))}"
-                >
+                <div class="label-editor-input-row">
+                    <input
+                        class="label-input"
+                        type="text"
+                        value="${escapeHtml(ui.editValue)}"
+                        data-role="label-input"
+                        data-email="${escapeHtml(account.email)}"
+                        maxlength="80"
+                        aria-label="${escapeHtml(t("editLabel"))}"
+                    >
 
-                <button
-                    type="button"
-                    class="icon-btn compact confirm"
-                    data-action="save-label"
-                    data-email="${escapeHtml(account.email)}"
-                    title="${escapeHtml(t("save"))}"
-                    aria-label="${escapeHtml(t("save"))}"
-                >
-                    ${icon("check")}
-                </button>
+                    <button
+                        type="button"
+                        class="icon-btn compact confirm"
+                        data-action="save-label"
+                        data-email="${escapeHtml(account.email)}"
+                        title="${escapeHtml(t("save"))}"
+                        aria-label="${escapeHtml(t("save"))}"
+                    >
+                        ${icon("check")}
+                    </button>
 
-                <button
-                    type="button"
-                    class="icon-btn compact"
-                    data-action="cancel-label"
-                    data-email="${escapeHtml(account.email)}"
-                    title="${escapeHtml(t("cancel"))}"
-                    aria-label="${escapeHtml(t("cancel"))}"
-                >
-                    ${icon("close")}
-                </button>
+                    <button
+                        type="button"
+                        class="icon-btn compact"
+                        data-action="cancel-label"
+                        data-email="${escapeHtml(account.email)}"
+                        title="${escapeHtml(t("cancel"))}"
+                        aria-label="${escapeHtml(t("cancel"))}"
+                    >
+                        ${icon("close")}
+                    </button>
+                </div>
+
+                <div class="label-editor-colors">
+                    ${colors.map(c => `
+                        <button
+                            type="button"
+                            class="color-picker-dot color-${c} ${ui.editColorTag === c ? "selected" : ""}"
+                            data-action="select-color-tag"
+                            data-color="${c}"
+                            title="${c}"
+                            aria-label="${c}"
+                        ></button>
+                    `).join("")}
+                    ${ui.editColorTag ? `
+                        <button
+                            type="button"
+                            class="color-clear-btn"
+                            data-action="select-color-tag"
+                            data-color=""
+                            title="Clear color"
+                            aria-label="Clear color"
+                        >×</button>
+                    ` : ""}
+                </div>
             </div>
         `;
     }
@@ -2185,6 +2250,124 @@
             </div>
         `;
     }
+
+    function getSevenDaysList() {
+        const days = [];
+        const now = new Date();
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(now);
+            d.setDate(d.getDate() - i);
+            const iso = d.toISOString().split("T")[0];
+            const dayName = d.toLocaleDateString(language() === "id" ? "id-ID" : "en-US", { weekday: "short" });
+            days.push({ date: iso, label: dayName });
+        }
+        return days;
+    }
+
+    function renderQuotaHistory(email) {
+        if (!email) {
+            return "";
+        }
+
+        const historyMap = state.quotaHistory || {};
+        const normalized = normalizeEmail(email);
+        const records = historyMap[normalized] || [];
+        const sevenDays = getSevenDaysList();
+
+        const barsHtml = sevenDays.map(day => {
+            const record = records.find(r => r.date === day.date);
+            const hasData = record && typeof record.lowestRemainingPercent === "number";
+            const pct = hasData ? record.lowestRemainingPercent : null;
+            let toneClass = "history-empty";
+            if (hasData) {
+                toneClass = pct <= 15 ? "history-critical" : pct <= 35 ? "history-warn" : "history-healthy";
+            }
+            const height = hasData ? `${Math.max(12, pct)}%` : "4px";
+            const tooltip = hasData
+                ? `${day.label} (${day.date}): ${pct}% ${t("remaining")}`
+                : `${day.label} (${day.date}): -`;
+
+            return `
+                <div class="history-bar-col" title="${escapeHtml(tooltip)}">
+                    <div class="history-bar-track">
+                        <div class="history-bar-fill ${toneClass}" style="height: ${height};"></div>
+                    </div>
+                    <span class="history-bar-label">${escapeHtml(day.label)}</span>
+                    <span class="history-bar-pct">${hasData ? `${pct}%` : "-"}</span>
+                </div>
+            `;
+        }).join("");
+
+        return `
+            <div class="quota-history-panel">
+                <div class="quota-history-header">
+                    <span class="quota-history-title">${escapeHtml(t("quotaHistory"))}</span>
+                    <span class="quota-history-sub secondary-text">${escapeHtml(t("quotaHistorySub"))}</span>
+                </div>
+                <div class="history-bars-container">
+                    ${barsHtml}
+                </div>
+            </div>
+        `;
+    }
+
+    function renderWorkspaceBar() {
+        if (!state.workspace || !state.workspace.folderPath) {
+            return "";
+        }
+
+        const currentEmail = normalizeEmail(state.current?.email || "");
+        const linkedEmail = normalizeEmail(state.workspace.linkedEmail || "");
+        const isLinkedToCurrent = Boolean(linkedEmail && linkedEmail === currentEmail);
+
+        return `
+            <div class="workspace-link-bar ${isLinkedToCurrent ? "linked-active" : ""}">
+                <div class="workspace-link-icon" aria-hidden="true">📁</div>
+                <div class="workspace-link-info">
+                    <div class="workspace-link-name" title="${escapeHtml(state.workspace.folderPath)}">
+                        <strong>${escapeHtml(state.workspace.folderName)}</strong>
+                    </div>
+                    <div class="workspace-link-detail secondary-text">
+                        ${
+                            isLinkedToCurrent
+                                ? `<span class="workspace-linked-tag">✓ ${escapeHtml(t("workspaceLinked"))}</span>`
+                                : linkedEmail
+                                ? `<span>Linked to ${escapeHtml(linkedEmail)}</span>`
+                                : `<span>No account linked</span>`
+                        }
+                    </div>
+                </div>
+                <div class="workspace-link-actions">
+                    ${
+                        isLinkedToCurrent
+                            ? `
+                                <button
+                                    type="button"
+                                    class="btn subtle-btn compact"
+                                    data-action="clearWorkspaceAccount"
+                                    title="${escapeHtml(t("unlinkWorkspace"))}"
+                                    ${isBusy() ? "disabled" : ""}
+                                >
+                                    ${escapeHtml(t("unlinkWorkspace"))}
+                                </button>
+                            `
+                            : `
+                                <button
+                                    type="button"
+                                    class="btn subtle-btn compact"
+                                    data-action="setWorkspaceAccount"
+                                    title="${escapeHtml(t("linkWorkspace"))}"
+                                    ${isBusy() ? "disabled" : ""}
+                                >
+                                    ${escapeHtml(t("linkWorkspace"))}
+                                </button>
+                            `
+                    }
+                </div>
+            </div>
+        `;
+    }
+
     function bindAvatarFallback() {
         document
             .querySelectorAll(
@@ -2374,7 +2557,9 @@
                                 displayName,
                                 state.current.email,
                                 state.current.profilePictureUrl,
-                                "current-avatar"
+                                managed?.colorTag
+                                    ? `current-avatar tag-${escapeHtml(managed.colorTag)}`
+                                    : "current-avatar"
                             )
                         }
 
@@ -2469,7 +2654,9 @@
                         </button>
                     </div>
 
+                    ${renderWorkspaceBar()}
                     ${renderUsage()}
+                    ${renderQuotaHistory(state.current.email)}
                 </div>
             </section>
         `;
@@ -2726,7 +2913,7 @@
             >
                 <div class="saved-account-rail">
                     <div
-                        class="avatar small"
+                        class="avatar small ${account.colorTag ? `tag-${escapeHtml(account.colorTag)}` : ""}"
                         aria-hidden="true"
                     >
                         ${
@@ -2798,7 +2985,7 @@
                                         class="identity-name saved-label"
                                         title="${escapeHtml(accountTitle(account))}"
                                     >
-                                        ${escapeHtml(accountTitle(account))}
+                                        ${account.colorTag ? `<span class="color-tag-dot tag-${escapeHtml(account.colorTag)}" title="${escapeHtml(account.colorTag)}"></span>` : ""}${escapeHtml(accountTitle(account))}
                                     </div>
 
                                     <div class="saved-title-actions">
@@ -2836,6 +3023,17 @@
                                     >
                                         ${escapeHtml(account.email)}
                                     </div>
+
+                                    ${
+                                        state.workspace?.linkedEmail &&
+                                        normalizeEmail(state.workspace.linkedEmail) === normalizeEmail(account.email)
+                                            ? `
+                                                <span class="workspace-pill" title="${escapeHtml(`${t("workspaceLinked")} (${state.workspace.folderName})`)}">
+                                                    📁 ${escapeHtml(state.workspace.folderName)}
+                                                </span>
+                                            `
+                                            : ""
+                                    }
 
                                     ${
                                         updated
@@ -3974,6 +4172,9 @@
         ui.editValue =
             account.label || "";
 
+        ui.editColorTag =
+            account.colorTag || "";
+
         render();
     }
 
@@ -3982,6 +4183,9 @@
             null;
 
         ui.editValue =
+            "";
+
+        ui.editColorTag =
             "";
 
         render();
@@ -4009,6 +4213,8 @@
                 account.email,
             label:
                 ui.editValue,
+            colorTag:
+                ui.editColorTag,
         });
     }
 
@@ -4327,6 +4533,13 @@
                 return;
             }
 
+            if (action === "select-color-tag") {
+                const color = target.dataset.color || "";
+                ui.editColorTag = ui.editColorTag === color ? "" : color;
+                render();
+                return;
+            }
+
             if (
                 action ===
                     "edit-label"
@@ -4469,6 +4682,12 @@
 
                 signout:
                     "signout",
+
+                setWorkspaceAccount:
+                    "setWorkspaceAccount",
+
+                clearWorkspaceAccount:
+                    "clearWorkspaceAccount",
             };
 
             if (
@@ -4489,6 +4708,12 @@
 
                     signout:
                         "signout",
+
+                    setWorkspaceAccount:
+                        "refresh",
+
+                    clearWorkspaceAccount:
+                        "refresh",
                 };
 
                 setOperation({
