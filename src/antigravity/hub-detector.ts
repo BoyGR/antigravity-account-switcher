@@ -22,6 +22,8 @@ export interface AgyProcessInfo {
     executablePath?: string;
     commandLine?: string;
     hubPort?: number;
+    backendType?: 'agy' | 'language_server';
+    csrfToken?: string;
 }
 
 export interface HubHealthInfo {
@@ -46,10 +48,22 @@ interface CimProcessRecord {
     CommandLine?: string;
 }
 
+export function isAntigravityIde(): boolean {
+    const appName = vscode.env.appName || '';
+    if (/antigravity/i.test(appName)) {
+        return true;
+    }
+    const execPath = process.execPath || '';
+    if (/antigravity/i.test(execPath)) {
+        return true;
+    }
+    return false;
+}
+
 export function detectOfficialExtension(): AntigravityExtensionInfo {
-    const extension = vscode.extensions.getExtension(
-        OFFICIAL_EXTENSION_ID,
-    );
+    const extension =
+        vscode.extensions.getExtension('google.antigravity') ||
+        vscode.extensions.getExtension(OFFICIAL_EXTENSION_ID);
 
     if (!extension) {
         return {
@@ -112,7 +126,10 @@ export async function detectRunningAgyHub(): Promise<
     const ps = [
         '$processes = @(',
         '    Get-CimInstance Win32_Process |',
-        "        Where-Object { $_.Name -ieq 'agy.exe' -and $_.CommandLine -match '(?i)--hub(?:\\s|$)' } |",
+        "        Where-Object {",
+        "            ($_.Name -ieq 'agy.exe' -and $_.CommandLine -match '(?i)--hub(?:\\s|$)') -or",
+        "            ($_.Name -match '(?i)^language_server_' -and $_.CommandLine -match '(?i)--csrf_token\\s+([a-f0-9\\-]+)')",
+        "        } |",
         '        Select-Object ProcessId, ParentProcessId, ExecutablePath, CommandLine',
         ')',
         '',
@@ -155,14 +172,55 @@ export async function detectRunningAgyHub(): Promise<
             ? parsed
             : [parsed];
 
-        const record = records.find((item) =>
-            /--hub(?:\s|$)/i.test(
-                item.CommandLine ?? '',
-            ),
-        );
+        const inIde = isAntigravityIde();
+        let record: CimProcessRecord | undefined;
+
+        if (inIde) {
+            // In Antigravity IDE, prefer main language_server (not --enable_lsp)
+            record =
+                records.find(
+                    (item) =>
+                        /language_server/i.test(item.CommandLine ?? '') &&
+                        !/--enable_lsp/i.test(item.CommandLine ?? ''),
+                ) ||
+                records.find((item) =>
+                    /language_server/i.test(item.CommandLine ?? ''),
+                ) ||
+                records.find((item) =>
+                    /--hub(?:\s|$)/i.test(item.CommandLine ?? ''),
+                );
+        } else {
+            // In VS Code, prefer agy.exe
+            record =
+                records.find((item) =>
+                    /--hub(?:\s|$)/i.test(item.CommandLine ?? ''),
+                ) ||
+                records.find(
+                    (item) =>
+                        /language_server/i.test(item.CommandLine ?? '') &&
+                        !/--enable_lsp/i.test(item.CommandLine ?? ''),
+                ) ||
+                records.find((item) =>
+                    /language_server/i.test(item.CommandLine ?? ''),
+                );
+        }
 
         if (!record?.ProcessId) {
             return undefined;
+        }
+
+        const isLanguageServer = /language_server/i.test(
+            record.ExecutablePath || record.CommandLine || '',
+        );
+
+        let csrfToken: string | undefined;
+        if (isLanguageServer && record.CommandLine) {
+            const csrfMatch = /--csrf_token\s+([a-f0-9\-]+)/i.exec(
+                record.CommandLine,
+            );
+            if (csrfMatch) {
+                csrfToken = csrfMatch[1];
+            }
         }
 
         return {
@@ -177,6 +235,8 @@ export async function detectRunningAgyHub(): Promise<
                 record.CommandLine || undefined,
             hubPort:
                 parseHubPort(record.CommandLine),
+            backendType: isLanguageServer ? 'language_server' : 'agy',
+            csrfToken,
         };
     }
     catch {
@@ -304,6 +364,15 @@ export async function inspectAntigravityHub():
         await getAgyVersion(
             processInfo.executablePath,
         );
+
+    if (processInfo.backendType === 'language_server') {
+        result.health = {
+            reachable: true,
+            statusCode: 200,
+            contentType: 'application/json',
+        };
+        return result;
+    }
 
     if (!processInfo.hubPort) {
         return result;

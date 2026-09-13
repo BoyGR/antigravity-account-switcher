@@ -1,7 +1,9 @@
+import * as vscode from "vscode";
 import * as http from "node:http";
 import * as https from "node:https";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { isAntigravityIde } from "./hub-detector";
 
 const execFileAsync = promisify(execFile);
 
@@ -18,9 +20,18 @@ export interface AntigravityAuthStatus {
     grantedScopes: string[];
 }
 
+export interface AntigravityBackendSession {
+    pid: number;
+    backendType: "agy" | "language_server";
+    hubPort: number;
+    lsPort: number;
+    csrfToken: string;
+}
+
 interface AgyProcessInfo {
     ProcessId: number;
     CommandLine: string;
+    Name?: string;
 }
 
 interface TcpListenerInfo {
@@ -82,51 +93,10 @@ async function detectAgyProcess(): Promise<{
     pid: number;
     hubPort: number;
 }> {
-    const script = `
-$process = Get-CimInstance Win32_Process |
-    Where-Object {
-        $_.Name -ieq 'agy.exe' -and
-        $_.CommandLine -match '--hub(?:\\s|$)' -and
-        $_.CommandLine -match '--hub-port=(\\d+)'
-    } |
-    Select-Object -First 1 ProcessId, CommandLine
-
-if ($null -ne $process) {
-    $process | ConvertTo-Json -Compress
-}
-`;
-
-    const output = await runPowerShell(script);
-
-    if (!output) {
-        throw new Error(
-            "No running Antigravity agy --hub process was found."
-        );
-    }
-
-    const processes =
-        parsePowerShellJson<AgyProcessInfo>(output);
-
-    const process = processes[0];
-
-    if (!process) {
-        throw new Error(
-            "Unable to inspect the running Antigravity backend."
-        );
-    }
-
-    const match =
-        /--hub-port=(\d+)/i.exec(process.CommandLine);
-
-    if (!match) {
-        throw new Error(
-            "Running agy process does not expose --hub-port."
-        );
-    }
-
+    const session = await detectAntigravityBackend();
     return {
-        pid: Number(process.ProcessId),
-        hubPort: Number(match[1]),
+        pid: session.pid,
+        hubPort: session.hubPort,
     };
 }
 
@@ -439,52 +409,219 @@ function readHasToken(
     );
 }
 
-export async function getAntigravityAuthStatus():
-    Promise<AntigravityAuthStatus> {
-    const { pid, hubPort } =
-        await detectAgyProcess();
+export async function detectAntigravityBackend(): Promise<AntigravityBackendSession> {
+    const script = `
+$processes = @(
+    Get-CimInstance Win32_Process |
+        Where-Object {
+            ($_.Name -ieq 'agy.exe' -and $_.CommandLine -match '--hub(?:\\s|$)' -and $_.CommandLine -match '--hub-port=(\\d+)') -or
+            ($_.Name -match '^language_server_' -and $_.CommandLine -match '--csrf_token\\s+([a-f0-9\\-]+)')
+        } |
+        Select-Object ProcessId, Name, CommandLine
+)
 
-    const listeners =
-        await getAgyListeners(pid);
+if ($processes.Count -eq 0) {
+    '[]'
+} else {
+    $processes | ConvertTo-Json -Compress
+}
+`;
 
+    const output = await runPowerShell(script);
+
+    if (!output) {
+        throw new Error(
+            "No running Antigravity backend process (agy.exe or language_server) was found."
+        );
+    }
+
+    const rawList = parsePowerShellJson<AgyProcessInfo>(output);
+    if (!rawList || rawList.length === 0) {
+        throw new Error(
+            "Unable to inspect the running Antigravity backend."
+        );
+    }
+
+    const inIde = isAntigravityIde();
+    let selected: AgyProcessInfo | undefined;
+
+    if (inIde) {
+        selected =
+            rawList.find(
+                p => /language_server/i.test(p.Name || p.CommandLine || "") &&
+                     !/--enable_lsp/i.test(p.CommandLine || "")
+            ) ||
+            rawList.find(
+                p => /language_server/i.test(p.Name || p.CommandLine || "")
+            ) ||
+            rawList.find(
+                p => /--hub(?:\s|$)/i.test(p.CommandLine || "")
+            );
+    } else {
+        selected =
+            rawList.find(
+                p => /--hub(?:\s|$)/i.test(p.CommandLine || "")
+            ) ||
+            rawList.find(
+                p => /language_server/i.test(p.Name || p.CommandLine || "") &&
+                     !/--enable_lsp/i.test(p.CommandLine || "")
+            ) ||
+            rawList.find(
+                p => /language_server/i.test(p.Name || p.CommandLine || "")
+            );
+    }
+
+    if (!selected) {
+        throw new Error(
+            "No active Antigravity backend process could be matched."
+        );
+    }
+
+    const pid = Number(selected.ProcessId);
+    const isLanguageServer = /language_server/i.test(
+        selected.Name || selected.CommandLine || ""
+    );
+
+    if (isLanguageServer) {
+        const csrfMatch = /--csrf_token\s+([a-f0-9\-]+)/i.exec(
+            selected.CommandLine || ""
+        );
+        if (!csrfMatch) {
+            throw new Error(
+                "Running Antigravity language_server does not expose --csrf_token."
+            );
+        }
+        const csrfToken = csrfMatch[1];
+
+        const listeners = await getAgyListeners(pid);
+        if (listeners.length === 0) {
+            throw new Error(
+                `Antigravity language_server (PID ${pid}) has no listening ports.`
+            );
+        }
+
+        const candidatePorts: number[] = [];
+        for (const port of listeners) {
+            if (await probeHttpsPort(port)) {
+                candidatePorts.push(port);
+            }
+        }
+
+        if (candidatePorts.length === 0) {
+            throw new Error(
+                "No Antigravity HTTPS Language Server listener was found for language_server process."
+            );
+        }
+
+        let resolvedLsPort = candidatePorts[0];
+        if (candidatePorts.length > 1) {
+            for (const port of candidatePorts) {
+                try {
+                    const testStatus = await invokeConnectJson<{ userStatus?: unknown }>(
+                        port,
+                        "GetUserStatus",
+                        csrfToken
+                    );
+                    if (testStatus) {
+                        resolvedLsPort = port;
+                        break;
+                    }
+                } catch {
+                    // Continue to next port
+                }
+            }
+        }
+
+        return {
+            pid,
+            backendType: "language_server",
+            hubPort: resolvedLsPort,
+            lsPort: resolvedLsPort,
+            csrfToken,
+        };
+    }
+
+    const match = /--hub-port=(\d+)/i.exec(selected.CommandLine);
+    if (!match) {
+        throw new Error(
+            "Running agy process does not expose --hub-port."
+        );
+    }
+    const hubPort = Number(match[1]);
+
+    const listeners = await getAgyListeners(pid);
     if (!listeners.includes(hubPort)) {
         throw new Error(
             `AGY Hub port ${hubPort} is not owned by PID ${pid}.`
         );
     }
 
-    const lsPort =
-        await detectLanguageServerPort(
-            listeners,
-            hubPort
-        );
+    const lsPort = await detectLanguageServerPort(listeners, hubPort);
 
     const hub = await requestHttpText(
-        new URL(
-            `http://127.0.0.1:${hubPort}/`
-        )
+        new URL(`http://127.0.0.1:${hubPort}/`)
     );
 
-    if (
-        hub.statusCode < 200 ||
-        hub.statusCode >= 300
-    ) {
+    if (hub.statusCode < 200 || hub.statusCode >= 300) {
         throw new Error(
             `Antigravity Hub returned HTTP ${hub.statusCode}.`
         );
     }
 
-    // Sensitive value remains local to this function.
-    let csrfToken = extractCsrfToken(
-        hub.body
-    );
+    const csrfToken = extractCsrfToken(hub.body);
+
+    return {
+        pid,
+        backendType: "agy",
+        hubPort,
+        lsPort,
+        csrfToken,
+    };
+}
+
+export async function getAntigravityAuthStatus():
+    Promise<AntigravityAuthStatus> {
+    const session = await detectAntigravityBackend();
+
+    if (session.backendType === "language_server") {
+        try {
+            const userResponse = await invokeConnectJson<GetUserStatusResponse>(
+                session.lsPort,
+                "GetUserStatus",
+                session.csrfToken,
+                {}
+            );
+            const email = userResponse.userStatus?.email?.trim().toLowerCase();
+            const hasValidAuth = Boolean(email);
+
+            return {
+                agyPid: session.pid,
+                hubPort: session.hubPort,
+                lsPort: session.lsPort,
+                serviceName: LANGUAGE_SERVER_SERVICE,
+                hasToken: hasValidAuth,
+                hasValidAuth,
+                grantedScopes: [],
+            };
+        } catch {
+            return {
+                agyPid: session.pid,
+                hubPort: session.hubPort,
+                lsPort: session.lsPort,
+                serviceName: LANGUAGE_SERVER_SERVICE,
+                hasToken: false,
+                hasValidAuth: false,
+                grantedScopes: [],
+            };
+        }
+    }
 
     try {
         const tokenResponse =
             await invokeConnectJson<HasAuthTokenResponse>(
-                lsPort,
+                session.lsPort,
                 "HasAuthToken",
-                csrfToken
+                session.csrfToken
             );
 
         const hasToken =
@@ -492,9 +629,9 @@ export async function getAntigravityAuthStatus():
 
         if (!hasToken) {
             return {
-                agyPid: pid,
-                hubPort,
-                lsPort,
+                agyPid: session.pid,
+                hubPort: session.hubPort,
+                lsPort: session.lsPort,
                 serviceName:
                     LANGUAGE_SERVER_SERVICE,
                 hasToken: false,
@@ -505,18 +642,18 @@ export async function getAntigravityAuthStatus():
 
         const authResponse =
             await invokeConnectJson<GetAuthStatusResponse>(
-                lsPort,
+                session.lsPort,
                 "GetAuthStatus",
-                csrfToken
+                session.csrfToken
             );
 
         const authResult =
             authResponse.authResult;
 
         return {
-            agyPid: pid,
-            hubPort,
-            lsPort,
+            agyPid: session.pid,
+            hubPort: session.hubPort,
+            lsPort: session.lsPort,
             serviceName:
                 LANGUAGE_SERVER_SERVICE,
             hasToken: true,
@@ -540,7 +677,6 @@ export async function getAntigravityAuthStatus():
         };
     } finally {
         // Do not retain or expose the runtime CSRF value.
-        csrfToken = "";
     }
 }
 
@@ -570,6 +706,16 @@ interface LoginResponse {
  */
 export async function signInToAntigravity():
     Promise<AntigravityLoginResult> {
+    const session = await detectAntigravityBackend();
+
+    if (session.backendType === "language_server") {
+        await vscode.commands.executeCommand("antigravity.login");
+        return {
+            hasValidAuth: true,
+            grantedScopes: [],
+        };
+    }
+
     const current =
         await getAntigravityAuthStatus();
 
@@ -585,7 +731,7 @@ export async function signInToAntigravity():
 
     const hub = await requestHttpText(
         new URL(
-            `http://127.0.0.1:${current.hubPort}/`
+            `http://127.0.0.1:${session.hubPort}/`
         )
     );
 
@@ -604,7 +750,7 @@ export async function signInToAntigravity():
     try {
         const response =
             await invokeConnectJson<LoginResponse>(
-                current.lsPort,
+                session.lsPort,
                 "Login",
                 csrfToken,
                 {
@@ -662,6 +808,16 @@ export async function signInToAntigravity():
  */
 export async function reauthenticateAntigravity():
     Promise<AntigravityLoginResult> {
+    const session = await detectAntigravityBackend();
+
+    if (session.backendType === "language_server") {
+        await vscode.commands.executeCommand("antigravity.login");
+        return {
+            hasValidAuth: true,
+            grantedScopes: [],
+        };
+    }
+
     const current =
         await getAntigravityAuthStatus();
 
@@ -677,7 +833,7 @@ export async function reauthenticateAntigravity():
 
     const hub = await requestHttpText(
         new URL(
-            `http://127.0.0.1:${current.hubPort}/`
+            `http://127.0.0.1:${session.hubPort}/`
         )
     );
 
@@ -696,7 +852,7 @@ export async function reauthenticateAntigravity():
     try {
         const response =
             await invokeConnectJson<LoginResponse>(
-                current.lsPort,
+                session.lsPort,
                 "Login",
                 csrfToken,
                 {
@@ -750,6 +906,22 @@ export async function reauthenticateAntigravity():
  */
 export async function signOutFromAntigravity():
     Promise<void> {
+    const session = await detectAntigravityBackend();
+
+    if (session.backendType === "language_server") {
+        try {
+            await invokeConnectJson<Record<string, never>>(
+                session.lsPort,
+                "AuthLogout",
+                session.csrfToken,
+                {}
+            );
+        } catch {
+            // Ignore if standalone mode does not support AuthLogout
+        }
+        return;
+    }
+
     const current =
         await getAntigravityAuthStatus();
 
@@ -761,7 +933,7 @@ export async function signOutFromAntigravity():
 
     const hub = await requestHttpText(
         new URL(
-            `http://127.0.0.1:${current.hubPort}/`
+            `http://127.0.0.1:${session.hubPort}/`
         )
     );
 
@@ -779,7 +951,7 @@ export async function signOutFromAntigravity():
 
     try {
         await invokeConnectJson<Record<string, never>>(
-            current.lsPort,
+            session.lsPort,
             "AuthLogout",
             csrfToken,
             {}
@@ -819,50 +991,24 @@ interface GetUserStatusResponse {
 
 export async function getAntigravityCurrentAccount():
     Promise<AntigravityCurrentAccount> {
-    // Reuse the already proven runtime discovery and
-    // authentication validation path.
-    const current =
-        await getAntigravityAuthStatus();
+    const session = await detectAntigravityBackend();
 
-    if (
-        !current.hasToken ||
-        current.hasValidAuth !== true
-    ) {
-        throw new Error(
-            "Antigravity does not currently have valid authentication.",
-        );
-    }
-
-    // Fetch the current Hub bootstrap so the CSRF value is always
-    // paired with the active AGY runtime discovered above.
-    const hub =
-        await requestHttpText(
-            new URL(
-                `http://127.0.0.1:${current.hubPort}/`,
-            ),
-        );
-
-    if (
-        hub.statusCode < 200 ||
-        hub.statusCode >= 300
-    ) {
-        throw new Error(
-            `Antigravity Hub returned HTTP ${hub.statusCode}.`,
-        );
-    }
-
-    // Sensitive value remains local to this function.
-    let csrfToken =
-        extractCsrfToken(hub.body);
-
-    try {
-        const response =
-            await invokeConnectJson<GetUserStatusResponse>(
-                current.lsPort,
-                "GetUserStatus",
-                csrfToken,
-                {},
+    if (session.backendType === "agy") {
+        const current = await getAntigravityAuthStatus();
+        if (!current.hasToken || current.hasValidAuth !== true) {
+            throw new Error(
+                "Antigravity does not currently have valid authentication.",
             );
+        }
+    }
+
+    const response =
+        await invokeConnectJson<GetUserStatusResponse>(
+            session.lsPort,
+            "GetUserStatus",
+            session.csrfToken,
+            {},
+        );
 
         const userStatus =
             response.userStatus;
@@ -909,11 +1055,7 @@ export async function getAntigravityCurrentAccount():
                 userStatus.profilePictureUrl?.trim() ||
                 undefined,
         };
-    } finally {
-        // Never retain the runtime CSRF value longer than needed.
-        csrfToken = "";
     }
-}
 /* ============================================================
  * Antigravity quota / profile snapshot
  *
@@ -1091,49 +1233,26 @@ function normalizeAntigravityTimestamp(
  */
 export async function getAntigravityQuotaSnapshot():
     Promise<AntigravityQuotaSnapshot> {
-    const current =
-        await getAntigravityAuthStatus();
+    const session = await detectAntigravityBackend();
 
-    if (
-        !current.hasToken ||
-        current.hasValidAuth !== true
-    ) {
-        throw new Error(
-            "Antigravity does not currently have valid authentication.",
-        );
-    }
-
-    const hub =
-        await requestHttpText(
-            new URL(
-                `http://127.0.0.1:${current.hubPort}/`,
-            ),
-        );
-
-    if (
-        hub.statusCode < 200 ||
-        hub.statusCode >= 300
-    ) {
-        throw new Error(
-            `Antigravity Hub returned HTTP ${hub.statusCode}.`,
-        );
-    }
-
-    let csrfToken =
-        extractCsrfToken(
-            hub.body,
-        );
-
-    try {
-        const response =
-            await invokeConnectJson<
-                AntigravityQuotaGetUserStatusResponse
-            >(
-                current.lsPort,
-                "GetUserStatus",
-                csrfToken,
-                {},
+    if (session.backendType === "agy") {
+        const current = await getAntigravityAuthStatus();
+        if (!current.hasToken || current.hasValidAuth !== true) {
+            throw new Error(
+                "Antigravity does not currently have valid authentication.",
             );
+        }
+    }
+
+    const response =
+        await invokeConnectJson<
+            AntigravityQuotaGetUserStatusResponse
+        >(
+            session.lsPort,
+            "GetUserStatus",
+            session.csrfToken,
+            {},
+        );
 
         const userStatus =
             response.userStatus;
@@ -1232,14 +1351,7 @@ export async function getAntigravityQuotaSnapshot():
 
             models,
         };
-    } finally {
-        /*
-         * Sensitive runtime value is never retained after the
-         * read-only request.
-         */
-        csrfToken = "";
     }
-}
 /* ============================================================
  * Official Antigravity quota summary
  *
@@ -1420,51 +1532,28 @@ function normalizeQuotaSummaryBucket(
 export async function getAntigravityQuotaSummary(
     forceRefresh = true,
 ): Promise<AntigravityQuotaSummarySnapshot> {
-    const current =
-        await getAntigravityAuthStatus();
+    const session = await detectAntigravityBackend();
 
-    if (
-        !current.hasToken ||
-        current.hasValidAuth !== true
-    ) {
-        throw new Error(
-            "Antigravity does not currently have valid authentication.",
-        );
-    }
-
-    const hub =
-        await requestHttpText(
-            new URL(
-                `http://127.0.0.1:${current.hubPort}/`,
-            ),
-        );
-
-    if (
-        hub.statusCode < 200 ||
-        hub.statusCode >= 300
-    ) {
-        throw new Error(
-            `Antigravity Hub returned HTTP ${hub.statusCode}.`,
-        );
-    }
-
-    let csrfToken =
-        extractCsrfToken(
-            hub.body,
-        );
-
-    try {
-        const envelope =
-            await invokeConnectJson<
-                AntigravityQuotaSummaryEnvelope
-            >(
-                current.lsPort,
-                "RetrieveUserQuotaSummary",
-                csrfToken,
-                {
-                    forceRefresh,
-                },
+    if (session.backendType === "agy") {
+        const current = await getAntigravityAuthStatus();
+        if (!current.hasToken || current.hasValidAuth !== true) {
+            throw new Error(
+                "Antigravity does not currently have valid authentication.",
             );
+        }
+    }
+
+    const envelope =
+        await invokeConnectJson<
+            AntigravityQuotaSummaryEnvelope
+        >(
+            session.lsPort,
+            "RetrieveUserQuotaSummary",
+            session.csrfToken,
+            {
+                forceRefresh,
+            },
+        );
 
         const response =
             envelope.response;
@@ -1543,7 +1632,4 @@ export async function getAntigravityQuotaSummary(
 
             groups,
         };
-    } finally {
-        csrfToken = "";
     }
-}

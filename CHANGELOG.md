@@ -4,6 +4,18 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.2.0] - 2026-09-14
+
+### Added
+- **Universal Multi-IDE Support (Antigravity IDE & Visual Studio Code)**:
+  - Added native support for standalone **Antigravity IDE** (`google.antigravity` core extension).
+  - Automatically identifies whether running inside standard VS Code (with `agy.exe --hub`) or standalone Antigravity IDE (with direct `language_server_windows_x64.exe`).
+  - Dynamic discovery of Language Server HTTPS Connect-RPC listener ports and process CSRF token extraction.
+  - Transparent dual-mode session handling: queries account information via `GetUserStatus` and quotas via `RetrieveUserQuotaSummary` directly on standalone language server without failing on unsupported interactive hub RPCs.
+  - Retains 100% backward compatibility with classic VS Code and `agy.exe --hub` workflow.
+
+---
+
 ## [1.1.0] - 2026-09-14
 
 ### Added
