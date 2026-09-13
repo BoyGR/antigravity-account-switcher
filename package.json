@@ -1,5 +1,5 @@
 {
-    "name": "boygr-antigravity-account-switcher",
+    "name": "antigravity-account-switcher",
     "displayName": "Antigravity Account Switcher",
     "description": "Manage and switch Google accounts used by Google Antigravity in Visual Studio Code through Antigravity's existing authentication flow.",
     "version": "0.4.0",

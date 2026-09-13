@@ -116,7 +116,7 @@ Customize behavior via VS Code Settings (`settings.json`):
 
 ### From VSIX Package
 
-1. Download or locate `boygr-antigravity-account-switcher-0.4.0.vsix`.
+1. Download or locate `antigravity-account-switcher-0.4.0.vsix`.
 2. In VS Code:
    - Go to **Extensions** (`Ctrl+Shift+X` / `Cmd+Shift+X`).
    - Click the `...` menu (top right of Extensions view).
@@ -124,7 +124,7 @@ Customize behavior via VS Code Settings (`settings.json`):
    - Choose the file.
 3. Or install via terminal:
    ```powershell
-   code --install-extension boygr-antigravity-account-switcher-0.4.0.vsix
+   code --install-extension antigravity-account-switcher-0.4.0.vsix
    ```
 
 ---
