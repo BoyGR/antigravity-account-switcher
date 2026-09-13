@@ -2,7 +2,7 @@
     "name": "antigravity-account-switcher",
     "displayName": "Antigravity Account Switcher",
     "description": "Manage and switch Google accounts used by Google Antigravity in Visual Studio Code through Antigravity's existing authentication flow.",
-    "version": "0.9.0",
+    "version": "1.0.0",
     "publisher": "boygr",
     "author": {
         "name": "Boy Gilang Ramadhan",
@@ -182,6 +182,12 @@
                 "title": "View Multi-Account Quota Matrix...",
                 "category": "Antigravity Account Switcher",
                 "icon": "$(dashboard)"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.clearTokenVault",
+                "title": "Clear Stored Token Vault...",
+                "category": "Antigravity Account Switcher",
+                "icon": "$(key)"
             }
         ],
         "viewsContainers": {
@@ -300,6 +306,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Play subtle synthesized audio chimes when quota resets or reaches critical low thresholds."
+                },
+                "boygr.antigravityAccountSwitcher.enableInstantSwitch": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable instant account switching without opening the browser by securely caching credentials in the Token Vault."
                 },
                 "boygr.antigravityAccountSwitcher.autoPromptWorkspaceAccount": {
                     "type": "boolean",

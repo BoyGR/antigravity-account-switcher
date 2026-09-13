@@ -35,10 +35,13 @@
             smartQuotaFallback: true,
             autoRoundRobin: false,
             enableQuotaAudio: true,
+            enableInstantSwitch: true,
         },
 
+        vaultedEmails: [],
+
         meta: {
-            version: "0.9.0",
+            version: "1.0.0",
             developer: "Boy Gilang Ramadhan",
             website: "https://boygr.com",
             iconUri: "",
@@ -534,6 +537,21 @@
 
             unlinkWorkspace:
                 "Unlink",
+
+            instantSwitch:
+                "Instant Switch (No Browser)",
+
+            instantBadge:
+                "Instant",
+
+            vaultTitle:
+                "Token Vault",
+
+            purgeVault:
+                "Clear Token Vault...",
+
+            vaultInfo:
+                "Saved in encrypted Token Vault for 1-click seamless switching",
         },
 
         id: {
@@ -955,6 +973,21 @@
 
             unlinkWorkspace:
                 "Lepas",
+
+            instantSwitch:
+                "Switch Instan (Tanpa Browser)",
+
+            instantBadge:
+                "Instan",
+
+            vaultTitle:
+                "Brankas Token",
+
+            purgeVault:
+                "Bersihkan Brankas Token...",
+
+            vaultInfo:
+                "Tersimpan di Brankas Token terenkripsi untuk pergantian 1-klik tanpa login browser",
         },
     };
 
@@ -1159,6 +1192,13 @@
                     <rect x="9" y="2.2" width="4.8" height="4.8" rx="1.2" stroke="currentColor" stroke-width="1.2"/>
                     <rect x="2.2" y="9" width="4.8" height="4.8" rx="1.2" stroke="currentColor" stroke-width="1.2"/>
                     <rect x="9" y="9" width="4.8" height="4.8" rx="1.2" stroke="currentColor" stroke-width="1.2"/>
+                </svg>
+            `,
+
+            key: `
+                <svg ${common}>
+                    <circle cx="5" cy="8" r="3" stroke="currentColor" stroke-width="1.2"/>
+                    <path d="M7.8 8H14M11.5 8v2M13.5 8v1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
                 </svg>
             `,
         };
@@ -3211,6 +3251,16 @@
                                     </div>
 
                                     ${
+                                        state.vaultedEmails?.includes(normalizeEmail(account.email))
+                                            ? `
+                                                <span class="vault-pill" title="${escapeHtml(t("vaultInfo"))}">
+                                                    ⚡ ${escapeHtml(t("instantBadge"))}
+                                                </span>
+                                            `
+                                            : ""
+                                    }
+
+                                    ${
                                         account.group
                                             ? `
                                                 <span class="group-pill" title="Group: ${escapeHtml(account.group)}">
@@ -3900,6 +3950,7 @@
                                 </div>
                                 <div class="matrix-email-row" title="${escapeHtml(account.email)}">${escapeHtml(account.email)}</div>
                                 <div class="matrix-tags-row">
+                                    ${state.vaultedEmails?.includes(normalizeEmail(account.email)) ? `<span class="vault-pill" title="${escapeHtml(t("vaultInfo"))}">⚡ ${escapeHtml(t("instantBadge"))}</span>` : ""}
                                     ${localLabel ? `<span class="account-label">${escapeHtml(localLabel)}</span>` : ""}
                                     ${account.group ? `<span class="group-pill" title="Group: ${escapeHtml(account.group)}">🏷️ ${escapeHtml(account.group)}</span>` : ""}
                                 </div>
@@ -4245,6 +4296,14 @@
                                     draft.enableQuotaAudio !== false
                                 )
                             }
+
+                            ${
+                                renderCheckbox(
+                                    "enableInstantSwitch",
+                                    t("instantSwitch"),
+                                    draft.enableInstantSwitch !== false
+                                )
+                            }
                         </div>
 
                         <div class="settings-group">
@@ -4302,6 +4361,24 @@
                             </div>
                         </div>
 
+                        <div class="settings-group">
+                            <h3>
+                                ${escapeHtml(t("vaultTitle"))}
+                            </h3>
+                            <p class="settings-desc">
+                                ${escapeHtml(t("vaultInfo"))}
+                            </p>
+                            <div class="settings-actions-row">
+                                <button
+                                    type="button"
+                                    class="btn block"
+                                    data-action="clear-token-vault"
+                                >
+                                    ${icon("key")} ${escapeHtml(t("purgeVault"))}
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="settings-group about-group">
                             <h3>
                                 ${escapeHtml(t("about"))}
@@ -4318,7 +4395,7 @@
                                 </span>
 
                                 <span>
-                                    v${escapeHtml(state.meta?.version || "0.6.0")}
+                                    v${escapeHtml(state.meta?.version || "1.0.0")}
                                 </span>
                             </div>
 
@@ -4700,6 +4777,9 @@
 
             enableQuotaAudio:
                 preferences.enableQuotaAudio !== false,
+
+            enableInstantSwitch:
+                preferences.enableInstantSwitch !== false,
         };
 
         ui.settingsOpen =
@@ -4967,6 +5047,13 @@
             if (action === "import-accounts") {
                 vscode.postMessage({
                     type: "importAccounts",
+                });
+                return;
+            }
+
+            if (action === "clear-token-vault") {
+                vscode.postMessage({
+                    type: "clearTokenVault",
                 });
                 return;
             }

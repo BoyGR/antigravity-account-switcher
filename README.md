@@ -14,8 +14,8 @@ A Visual Studio Code extension for managing, monitoring quota, and switching Goo
 
 ### Status
 
-- **Version**: `0.9.0`
-- **Supported Platforms**: Windows, macOS, Linux
+- **Version**: `1.0.0`
+- **Supported Platforms**: Windows (with Instant Token Swapping), macOS, Linux
 - **Compatibility**: Visual Studio Code, Google Antigravity extension `1.3.0+`, AGY backend `1.2.2+`
 
 ---
@@ -116,15 +116,24 @@ A Visual Studio Code extension for managing, monitoring quota, and switching Goo
 - Zero external audio files required, completely lightweight and non-intrusive.
 - Configurable via `boygr.antigravityAccountSwitcher.enableQuotaAudio`.
 
+### 16. Instant Token Swapping (Switch Tanpa Login Browser) ⚡
+- **True 1-Click Seamless Switching**: Switch between saved accounts instantly without opening a browser or repeating the Google OAuth login sequence.
+- **Windows Credential Manager Interop**: Uses native Win32 `Advapi32.dll` credential APIs (`CredReadW`, `CredWriteW`) to back up and swap Google Antigravity authentication tokens directly under target `gemini:antigravity`.
+- **Zero Third-Party Dependencies**: No external compiled binaries or node-gyp packages required; executes via lightweight PowerShell P/Invoke script.
+- **Transparent Process Respawn**: Gracefully restarts the `agy.exe` background worker process, triggering the official Antigravity extension host to immediately adopt the new token without window reloads or disruptions.
+- **Encrypted Local Token Vault**: Securely persists authentication blobs in VS Code's native `vscode.SecretStorage` (`context.secrets`), fully encrypted using OS Data Protection API (DPAPI).
+- **Graceful One-Time Fallback**: Accounts that haven't been vaulted yet simply open the browser once to authenticate; their credentials are then automatically vaulted for all subsequent 1-click instant switches.
+- **Configurable & Safe**: Can be disabled anytime via `boygr.antigravityAccountSwitcher.enableInstantSwitch`, and vault contents can be purged via `boygr.antigravityAccountSwitcher.clearTokenVault`.
+
 ---
 
 ## Security Model
 
-- **No Credential Interception**: Does not implement independent OAuth or capture Google passwords, access tokens, refresh tokens, or session cookies.
-- **Official Google Auth Reuse**: Leverages Antigravity's built-in OAuth flow (`AuthStartLogin` / `AuthStartReauth`).
+- **Local-Only Encrypted Storage**: Account tokens are stored exclusively within VS Code's OS-backed `vscode.SecretStorage` (`context.secrets`, backed by Windows DPAPI). Tokens are never sent over the network, uploaded, or transmitted to any third-party server.
+- **Credential Manager Target Scoping**: Only accesses the specific `gemini:antigravity` target created and used by the official Google Antigravity extension.
 - **Memory-Only CSRF**: Hub CSRF tokens are retained strictly in memory during operation and never written to disk.
 - **Non-Destructive Storage**: Does not alter VS Code's internal database (`state.vscdb`) or tamper with `.gemini` configurations.
-- **Metadata Only**: Local account storage preserves only non-sensitive descriptors (email, custom label, display name, timestamps).
+- **Purgeable Vault**: Users can inspect vaulted accounts (`⚡ Instant` badge) and completely purge all vaulted tokens at any time via the Command Palette or Settings modal.
 
 ---
 
@@ -137,7 +146,8 @@ Access these commands via the VS Code Command Palette (`Ctrl+Shift+P` / `Cmd+Shi
 | `boygr.antigravityAccountSwitcher.statusBarMenu` | **Status Bar Menu** | `Alt+A` (`Cmd+Alt+A`) | Open QuickPick menu to switch accounts sorted by quota |
 | `boygr.antigravityAccountSwitcher.refreshAccountsView` | **Refresh** | `Alt+Shift+A` (`Cmd+Alt+Shift+A`) | Refresh runtime status, active account, quota, and saved accounts |
 | `boygr.antigravityAccountSwitcher.quotaOverview` | **View Multi-Account Quota Matrix...** | | Open full-screen quota comparison matrix for all accounts |
-| `boygr.antigravityAccountSwitcher.switchAccount` | **Switch Account** | | Switch to a saved account directly or via QuickPick |
+| `boygr.antigravityAccountSwitcher.switchAccount` | **Switch Account** | | Switch to a saved account directly (instant token swap or browser login) |
+| `boygr.antigravityAccountSwitcher.clearTokenVault` | **Clear Token Vault (Instant Switching Credentials)...** | | Securely delete all stored account tokens from secret storage |
 | `boygr.antigravityAccountSwitcher.setWorkspaceAccount` | **Set Default Account for Workspace...** | | Link active project folder to a default Antigravity account |
 | `boygr.antigravityAccountSwitcher.clearWorkspaceAccount` | **Clear Default Account for Workspace** | | Remove project folder account link |
 | `boygr.antigravityAccountSwitcher.exportAccounts` | **Export Saved Accounts...** | | Export saved accounts metadata to JSON file |
@@ -197,7 +207,10 @@ Customize behavior via VS Code Settings (`settings.json`):
   "boygr.antigravityAccountSwitcher.autoRoundRobin": false,
 
   // Play subtle synthesized audio chimes on quota restoration or warning (default: true)
-  "boygr.antigravityAccountSwitcher.enableQuotaAudio": true
+  "boygr.antigravityAccountSwitcher.enableQuotaAudio": true,
+
+  // Enable instant 1-click token swapping without opening browser login (default: true)
+  "boygr.antigravityAccountSwitcher.enableInstantSwitch": true
 }
 ```
 
@@ -207,7 +220,7 @@ Customize behavior via VS Code Settings (`settings.json`):
 
 ### From VSIX Package
 
-1. Download or locate `release/antigravity-account-switcher-0.9.0.vsix`.
+1. Download or locate `release/antigravity-account-switcher-1.0.0.vsix`.
 2. In VS Code:
    - Go to **Extensions** (`Ctrl+Shift+X` / `Cmd+Shift+X`).
    - Click the `...` menu (top right of Extensions view).
@@ -215,7 +228,7 @@ Customize behavior via VS Code Settings (`settings.json`):
    - Choose the file.
 3. Or install via terminal:
    ```powershell
-   code --install-extension release/antigravity-account-switcher-0.9.0.vsix
+   code --install-extension release/antigravity-account-switcher-1.0.0.vsix
    ```
 
 ---

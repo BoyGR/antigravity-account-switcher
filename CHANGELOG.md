@@ -4,6 +4,24 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.0.0] - 2026-09-14
+
+### Added
+- **Instant Token Swapping (Switch Tanpa Login Browser)**:
+  - 1-click seamless account switching without opening a browser or repeating OAuth login prompts.
+  - Interacts directly with Windows Credential Manager (`Advapi32.dll` via PowerShell interop) to read, backup, and restore active authentication blobs under `gemini:antigravity`.
+  - Secure local token encryption using VS Code's native `vscode.SecretStorage` (`context.secrets`) backed by OS DPAPI.
+  - Instant process reload: cleanly cycles `agy.exe` background worker process, triggering Antigravity to immediately adopt the new account session without UI disruptions.
+  - Visual `⚡ Instant` vault badge on saved account rows and Quota Matrix dashboard for all securely vaulted accounts.
+- **Encrypted Token Vault Management**:
+  - Automatically captures active account tokens into the encrypted vault on startup and after successful logins.
+  - Graceful fallback: non-vaulted accounts trigger the official browser login once, and are then automatically vaulted for future instant switches.
+  - New setting `boygr.antigravityAccountSwitcher.enableInstantSwitch` (enabled by default).
+  - New command `boygr.antigravityAccountSwitcher.clearTokenVault` with full user confirmation modal.
+  - "Clear Token Vault" control in the extension Settings modal.
+
+---
+
 ## [0.9.0] - 2026-09-14
 
 ### Added

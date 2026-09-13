@@ -1,8 +1,15 @@
+import * as vscode from "vscode";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import {
     AntigravityCurrentAccount,
     getAntigravityCurrentAccount,
     reauthenticateAntigravity,
 } from "./hub-auth-client";
+import { detectRunningAgyHub } from "./hub-detector";
+import { TokenVaultService } from "./token-vault-service";
+
+const execFileAsync = promisify(execFile);
 
 export interface AntigravitySwitchResult {
     targetEmail: string;
@@ -10,6 +17,7 @@ export interface AntigravitySwitchResult {
     afterEmail: string;
     changed: boolean;
     verified: boolean;
+    swappedInstantly?: boolean;
 }
 
 export interface AntigravityAccountChangeResult {
@@ -17,6 +25,11 @@ export interface AntigravityAccountChangeResult {
     after: AntigravityCurrentAccount;
     changed: boolean;
     reauthWarning?: string;
+}
+
+export interface SwitchAccountOptions {
+    tokenVault?: TokenVaultService;
+    enableInstantSwitch?: boolean;
 }
 
 function normalizeEmail(email: string): string {
@@ -30,8 +43,8 @@ function delay(milliseconds: number): Promise<void> {
 }
 
 async function waitForCurrentAccount(
-    attempts = 12,
-    delayMs = 1500,
+    attempts = 15,
+    delayMs = 1200,
 ): Promise<AntigravityCurrentAccount> {
     let lastError: unknown;
 
@@ -61,8 +74,9 @@ async function waitForCurrentAccount(
     );
 }
 
-export async function reauthenticateAndDetectAccount():
-    Promise<AntigravityAccountChangeResult> {
+export async function reauthenticateAndDetectAccount(
+    options?: SwitchAccountOptions,
+): Promise<AntigravityAccountChangeResult> {
     const before =
         await getAntigravityCurrentAccount();
 
@@ -94,14 +108,16 @@ export async function reauthenticateAndDetectAccount():
         throw verificationError;
     }
 
+    if (options?.tokenVault?.isSupported() && after?.email) {
+        await options.tokenVault.saveActiveCredential(after.email).catch(() => false);
+    }
+
     return {
         before,
         after,
-
         changed:
             normalizeEmail(before.email) !==
             normalizeEmail(after.email),
-
         reauthWarning:
             reauthError instanceof Error
                 ? reauthError.message
@@ -111,6 +127,7 @@ export async function reauthenticateAndDetectAccount():
 
 export async function switchAntigravityAccount(
     targetEmail: string,
+    options?: SwitchAccountOptions,
 ): Promise<AntigravitySwitchResult> {
     const target =
         normalizeEmail(targetEmail);
@@ -128,6 +145,10 @@ export async function switchAntigravityAccount(
         normalizeEmail(before.email);
 
     if (beforeEmail === target) {
+        if (options?.tokenVault?.isSupported()) {
+            await options.tokenVault.saveActiveCredential(target).catch(() => false);
+        }
+
         return {
             targetEmail:
                 target,
@@ -142,20 +163,74 @@ export async function switchAntigravityAccount(
 
             verified:
                 true,
+
+            swappedInstantly:
+                true,
         };
     }
 
+    // 1. Try Instant Token Swapping if token exists in vault
+    const isVaultSupported = options?.tokenVault?.isSupported() === true;
+    const isInstantEnabled = options?.enableInstantSwitch !== false;
+
+    if (isVaultSupported && isInstantEnabled && options?.tokenVault) {
+        const hasVaulted = await options.tokenVault.hasCredential(target);
+        if (hasVaulted) {
+            try {
+                // Safeguard: Capture the currently active account token first
+                if (beforeEmail) {
+                    await options.tokenVault.saveActiveCredential(beforeEmail).catch(() => false);
+                }
+
+                // Apply target account token to OS Credential Manager
+                const applied = await options.tokenVault.applyCredential(target);
+                if (applied) {
+                    // Terminate current agy backend process so host respawns with new credential
+                    const processInfo = await detectRunningAgyHub();
+                    if (processInfo?.pid) {
+                        if (process.platform === "win32") {
+                            await execFileAsync("taskkill", [
+                                "/PID",
+                                String(processInfo.pid),
+                                "/T",
+                                "/F",
+                            ]).catch(() => undefined);
+                        } else {
+                            try {
+                                process.kill(processInfo.pid, "SIGTERM");
+                            } catch {
+                                // Ignore
+                            }
+                        }
+                    }
+
+                    // Wait for fresh agy instance to start and report new account
+                    const afterSwap = await waitForCurrentAccount(16, 1200);
+                    const afterSwapEmail = normalizeEmail(afterSwap.email);
+
+                    if (afterSwapEmail === target) {
+                        return {
+                            targetEmail: target,
+                            beforeEmail,
+                            afterEmail: afterSwapEmail,
+                            changed: true,
+                            verified: true,
+                            swappedInstantly: true,
+                        };
+                    }
+                }
+            } catch {
+                // Fall back to standard browser OAuth flow if instant swap encountered an issue
+            }
+        }
+    }
+
+    // 2. Standard Fallback: Browser-based OAuth login
     let reauthError: unknown;
 
     try {
         await reauthenticateAntigravity();
     } catch (error) {
-        /*
-         * Interactive Login can succeed in the browser even when
-         * the Connect request reports a timeout/transport error.
-         *
-         * GetUserStatus remains the authoritative verification.
-         */
         reauthError = error;
     }
 
@@ -191,10 +266,11 @@ export async function switchAntigravityAccount(
         );
     }
 
-    /*
-     * Do not fail merely because Login transport reported an error
-     * if GetUserStatus already proved the target account is active.
-     */
+    // Automatically capture newly authenticated account into vault for future instant switches
+    if (options?.tokenVault?.isSupported()) {
+        await options.tokenVault.saveActiveCredential(afterEmail).catch(() => false);
+    }
+
     void reauthError;
 
     return {
@@ -210,5 +286,8 @@ export async function switchAntigravityAccount(
 
         verified:
             true,
+
+        swappedInstantly:
+            false,
     };
 }

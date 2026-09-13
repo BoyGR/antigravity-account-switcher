@@ -5995,6 +5995,31 @@ body {
     color: var(--ag-muted, #888);
 }
 
+/* === V1.0.0 INSTANT TOKEN SWAPPING & TOKEN VAULT === */
+.vault-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px 6px;
+    font-size: 8.5px;
+    font-weight: 600;
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.28);
+    border-radius: 10px;
+    line-height: 1.2;
+    white-space: nowrap;
+    letter-spacing: 0.2px;
+}
+
+.settings-actions-row {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
 
 
 

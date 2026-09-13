@@ -40,6 +40,7 @@ import {
     getAllAccountsQuotaHistory,
     recordUsageSnapshotIfAvailable,
 } from "../antigravity/quota-history-store";
+import { TokenVaultService } from "../antigravity/token-vault-service";
 
 type ThemePreference =
     | "vscode"
@@ -76,6 +77,8 @@ interface AccountSwitcherPreferences {
     autoRoundRobin?: boolean;
 
     enableQuotaAudio?: boolean;
+
+    enableInstantSwitch?: boolean;
 }
 
 interface ResolvedAccountSwitcherPreferences
@@ -126,6 +129,7 @@ type WebviewMessage =
     | { type: "setWorkspaceAccount" }
     | { type: "clearWorkspaceAccount" }
     | { type: "exportQuotaAnalytics" }
+    | { type: "clearTokenVault" }
     | {
           type: "saveSettings";
           preferences: {
@@ -138,6 +142,9 @@ type WebviewMessage =
               enableLowQuotaReminder?: boolean;
               lowQuotaThresholdPercent?: number;
               smartQuotaFallback?: boolean;
+              autoRoundRobin?: boolean;
+              enableQuotaAudio?: boolean;
+              enableInstantSwitch?: boolean;
           };
       };
 
@@ -167,6 +174,10 @@ interface AccountSwitcherSnapshot {
     };
 
     quotaHistory?: Record<string, DailyQuotaRecord[]>;
+
+    vaultedEmails?: string[];
+
+    isVaultSupported?: boolean;
 }
 interface AccountSwitcherViewState
     extends AccountSwitcherSnapshot {
@@ -201,6 +212,7 @@ const DEFAULT_PREFERENCES: AccountSwitcherPreferences = {
     smartQuotaFallback: true,
     autoRoundRobin: false,
     enableQuotaAudio: true,
+    enableInstantSwitch: true,
 };
 
 export class AntigravityAccountWebviewProvider
@@ -231,6 +243,7 @@ export class AntigravityAccountWebviewProvider
     constructor(
         private readonly context: vscode.ExtensionContext,
         private readonly statusBarManager?: AntigravityStatusBarManager,
+        private readonly tokenVault?: TokenVaultService,
     ) {
         const currentPath = getCurrentWorkspacePath();
         const workspaceLinkedEmail = currentPath
@@ -541,6 +554,14 @@ export class AntigravityAccountWebviewProvider
             ? getWorkspaceAccount(this.context, currentPath)
             : undefined;
 
+        let vaultedEmails: string[] = [];
+        if (this.tokenVault) {
+            if (current?.email && this.tokenVault.isSupported()) {
+                await this.tokenVault.saveActiveCredential(current.email).catch(() => false);
+            }
+            vaultedEmails = await this.tokenVault.getVaultedEmails().catch(() => []);
+        }
+
         this.snapshot = {
             current,
             accounts,
@@ -557,6 +578,8 @@ export class AntigravityAccountWebviewProvider
                   }
                 : undefined,
             quotaHistory: getAllAccountsQuotaHistory(this.context, 7),
+            vaultedEmails,
+            isVaultSupported: this.tokenVault?.isSupported() === true,
         };
 
         this.statusBarManager?.update(
@@ -792,6 +815,10 @@ export class AntigravityAccountWebviewProvider
                     message.email,
                 );
 
+                if (this.tokenVault) {
+                    await this.tokenVault.removeCredential(message.email).catch(() => undefined);
+                }
+
                 await this.refreshLocalAccounts();
                 return;
 
@@ -860,6 +887,13 @@ export class AntigravityAccountWebviewProvider
             case "clearWorkspaceAccount":
                 await vscode.commands.executeCommand(
                     "boygr.antigravityAccountSwitcher.clearWorkspaceAccount",
+                );
+                await this.refresh(false);
+                return;
+
+            case "clearTokenVault":
+                await vscode.commands.executeCommand(
+                    "boygr.antigravityAccountSwitcher.clearTokenVault",
                 );
                 await this.refresh(false);
                 return;
@@ -1032,6 +1066,11 @@ export class AntigravityAccountWebviewProvider
                 ? input.enableQuotaAudio
                 : DEFAULT_PREFERENCES.enableQuotaAudio;
 
+        const enableInstantSwitch =
+            typeof input.enableInstantSwitch === "boolean"
+                ? input.enableInstantSwitch
+                : DEFAULT_PREFERENCES.enableInstantSwitch;
+
         return {
             version: 1,
             theme,
@@ -1054,6 +1093,7 @@ export class AntigravityAccountWebviewProvider
             smartQuotaFallback,
             autoRoundRobin,
             enableQuotaAudio,
+            enableInstantSwitch,
         };
     }
 
@@ -1100,6 +1140,7 @@ export class AntigravityAccountWebviewProvider
             smartQuotaFallback?: boolean;
             autoRoundRobin?: boolean;
             enableQuotaAudio?: boolean;
+            enableInstantSwitch?: boolean;
         },
     ): Promise<void> {
         const preferences =
@@ -1121,6 +1162,9 @@ export class AntigravityAccountWebviewProvider
             autoRoundRobin: preferences.autoRoundRobin,
             enableQuotaAudio: preferences.enableQuotaAudio,
         });
+
+        const config = vscode.workspace.getConfiguration("boygr.antigravityAccountSwitcher");
+        await config.update("enableInstantSwitch", preferences.enableInstantSwitch, vscode.ConfigurationTarget.Global).then(undefined, () => undefined);
     }
 
     private getHtml(
@@ -1212,11 +1256,13 @@ export class AntigravityAccountWebviewProvider
 export function registerAntigravityAccountWebview(
     context: vscode.ExtensionContext,
     statusBarManager?: AntigravityStatusBarManager,
+    tokenVault?: TokenVaultService,
 ): AntigravityAccountWebviewProvider {
     const provider =
         new AntigravityAccountWebviewProvider(
             context,
             statusBarManager,
+            tokenVault,
         );
 
     const registration =

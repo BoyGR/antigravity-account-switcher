@@ -18,8 +18,10 @@ import { registerStatusBarMenuCommand } from "./commands/status-bar-menu";
 import { registerBackupAccountsCommands } from "./commands/backup-accounts";
 import { registerRecoveryCommands } from "./commands/recovery";
 import { registerExportAnalyticsCommand } from "./commands/export-analytics";
+import { registerTokenVaultCommands } from "./commands/token-vault-commands";
 import { AntigravityStatusBarManager } from "./status-bar/status-bar-manager";
 import { registerAntigravityAccountWebview } from "./views/account-webview-provider";
+import { TokenVaultService } from "./antigravity/token-vault-service";
 import {
     checkAndPromptWorkspaceAccount,
     registerWorkspaceAssociationCommands,
@@ -28,6 +30,8 @@ import {
 export function activate(
     context: vscode.ExtensionContext,
 ): void {
+    const tokenVault = new TokenVaultService(context.secrets);
+
     registerAddAccountCommand(context);
     registerAccountContextCommands(context);
     registerManageAccountsCommand(context);
@@ -39,7 +43,7 @@ export function activate(
     registerSignOutCommand(context);
     registerInspectBridgeCommand(context);
     registerStatusCommand(context);
-    registerSwitchAccountCommand(context);
+    registerSwitchAccountCommand(context, tokenVault);
 
     const diagnoseCommand =
         vscode.commands.registerCommand(
@@ -54,7 +58,16 @@ export function activate(
         registerAntigravityAccountWebview(
             context,
             statusBarManager,
+            tokenVault,
         );
+
+    const tokenVaultCommands = registerTokenVaultCommands(
+        context,
+        tokenVault,
+        async () => {
+            await accountWebview.refresh();
+        },
+    );
 
     const statusBarMenuCommand =
         registerStatusBarMenuCommand(
@@ -110,6 +123,7 @@ export function activate(
         refreshCommand,
         exportAnalyticsCommand,
         quotaOverviewCommand,
+        ...tokenVaultCommands,
         ...backupCommands,
         ...recoveryCommands,
         ...workspaceCommands,
