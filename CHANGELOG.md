@@ -4,6 +4,19 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.2.12] - 2026-09-14
+
+### Changed & Improved (UI/UX)
+- **Current Account Layout Redesign**:
+  - Restructured the active account card to match the sleek horizontal badges flow of saved accounts.
+  - Replaced redundant layered names with a unified header row: Custom Label / Google Display Name + inline edit button.
+  - Grouped account badges into a single clean horizontal chip row: Subscription Plan (`Pro`, `Plus`, `Ultra`, `Free`), `⚡ Instant` vault indicator, Custom Group tag (`🏷️ Group`), and live connection status (`● Connected` / `Checking...`).
+- **Eliminated Redundant "Last Updated" Chip from Saved Accounts**:
+  - Removed the confusing `Updated Xm ago` text chip that sat beside the `⏱ Last used` badge.
+  - Seamlessly integrated the exact quota snapshot timestamp into the hover tooltip of the `Last used` pill (`Last used: ... • Snapshot updated: ...`), delivering a pristine, distraction-free badge row.
+
+---
+
 ## [1.2.11] - 2026-09-14
 
 ### Changed & Improved

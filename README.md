@@ -14,7 +14,7 @@ An extension for Visual Studio Code, Google Antigravity Standalone IDE, Cursor, 
 
 ### Status
 
-- **Version**: `1.2.11`
+- **Version**: `1.2.12`
 - **Supported Platforms**: Windows (with Instant Token Swapping), macOS, Linux
 - **Supported IDEs**: Visual Studio Code, Google Antigravity Standalone IDE, Cursor, and other VS Code-compatible editors
 - **Compatibility**: Official Google Antigravity extension `1.3.0+`, AGY backend `1.2.2+`
@@ -31,8 +31,8 @@ An extension for Visual Studio Code, Google Antigravity Standalone IDE, Cursor, 
 ### 2. Interactive Sidebar Dashboard (Activity Bar)
 - **Runtime Status Indicator**: Live status pill showing Antigravity connection health, PID, Hub port, and Language Server port in a detailed modal.
 - **Current Account Card**:
-  - Displays Google profile avatar (with CDN support and initials fallback), display name, and email.
-  - **Automatic Subscription Plan Badge**: Automatically detects and displays your account tier (`Google AI Plus`, `Google AI Ultra`, `Google AI Pro`, `Google AI Free`, etc.) neatly positioned beside account credentials.
+  - Displays Google profile avatar (with CDN support and initials fallback), custom label or display name, and email.
+  - **Unified Badges Flow**: Automatically presents subscription tier (`Google AI Plus`, `Ultra`, `Pro`, `Free`), `⚡ Instant` vault indicator, custom group tag, and live connection status (`● Connected`) in a sleek horizontal chip row.
   - Quick action buttons: Re-auth, Sign Out, and Add Account.
 - **Quota & Usage Monitor**:
   - Visual progress bars for **5-Hour Limit** and **Weekly Limit**.
@@ -41,7 +41,7 @@ An extension for Visual Studio Code, Google Antigravity Standalone IDE, Cursor, 
 - **Saved Accounts List**:
   - **Smart Default Sorting**: Defaults to **Last used** (`recent`) so your most relevant accounts are always up top, with 1-click toggling between Quota and Name.
   - **Fast Search & Instant Clear**: Real-time filtering with an inline `✕` clear button and empty-state filter recovery.
-  - **Compact Horizontal Badge Row**: Neatly presents subscription plan, `⚡ Instant` vault indicator, custom group tag (`🏷️ Work`), relative last-used badge (`Active now`, `5m ago`), and snapshot updated timestamp in a clean horizontal flow.
+  - **Compact Horizontal Badge Row**: Neatly presents subscription plan, `⚡ Instant` vault indicator, custom group tag (`🏷️ Work`), and relative last-used badge (`Active now`, `5m ago`), with exact snapshot update timestamps preserved in hover tooltips.
   - **Custom Account Groups**: Assign default tags (`Personal`, `Work`) or create inline `+ Custom` groups (up to 24 characters) with rapid keyboard shortcuts (**Enter** / **Escape**).
   - Inline label editing and secure account removal dialogs.
   - Dedicated scrollable container with skeleton loading on startup.
@@ -226,7 +226,7 @@ Customize behavior via your IDE Settings (`settings.json`):
 
 ### From GitHub Releases / VSIX Package
 
-1. Download the latest `antigravity-account-switcher-1.2.11.vsix` from [GitHub Releases](https://github.com/BoyGR/antigravity-account-switcher/releases).
+1. Download the latest `antigravity-account-switcher-1.2.12.vsix` from [GitHub Releases](https://github.com/BoyGR/antigravity-account-switcher/releases).
 
 2. **Via Graphical Interface (VS Code, Antigravity IDE, or Cursor)**:
    - Open **Extensions** (`Ctrl+Shift+X` / `Cmd+Shift+X`).
@@ -237,15 +237,15 @@ Customize behavior via your IDE Settings (`settings.json`):
 3. **Via Terminal / Command Line**:
    - **Visual Studio Code**:
      ```powershell
-     code --install-extension antigravity-account-switcher-1.2.11.vsix
+     code --install-extension antigravity-account-switcher-1.2.12.vsix
      ```
    - **Google Antigravity Standalone IDE**:
      ```powershell
-     antigravity --install-extension antigravity-account-switcher-1.2.11.vsix
+     antigravity --install-extension antigravity-account-switcher-1.2.12.vsix
      ```
    - **Cursor**:
      ```powershell
-     cursor --install-extension antigravity-account-switcher-1.2.11.vsix
+     cursor --install-extension antigravity-account-switcher-1.2.12.vsix
      ```
 
 ---

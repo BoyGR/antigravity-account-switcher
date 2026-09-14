@@ -2938,52 +2938,27 @@
                         }
 
                         <div class="identity">
-                            <div class="identity-heading current-identity-heading">
-                                <div
-                                    class="identity-name current-name"
-                                    title="${escapeHtml(displayName)}"
-                                >
-                                    ${escapeHtml(displayName)}
-                                </div>
-
-                                ${renderPlanBadge(managed?.plan ? managed : state.current)}
-                            </div>
-
-                            <div
-                                class="identity-email"
-                                title="${escapeHtml(state.current.email)}"
-                            >
-                                ${escapeHtml(state.current.email)}
-                            </div>
-
                             ${
                                 managed && editing
                                     ? `
                                         <div class="current-label-editor">
                                             ${renderLabelEditor(managed)}
                                         </div>
-
-                                        <div class="current-status-row">
-                                            ${connectionStatus}
-                                        </div>
                                     `
                                     : `
-                                        <div class="current-label-row">
-                                            <div class="current-label-edit">
-                                                <span class="account-label">
-                                                    ${escapeHtml(localLabel)}
-                                                </span>
+                                        <div class="saved-title-row current-title-row">
+                                            <div
+                                                class="identity-name current-name"
+                                                title="${escapeHtml(
+                                                    (managed?.label && managed.label.trim() && managed.label.trim() !== displayName)
+                                                        ? `${managed.label.trim()} (${displayName})`
+                                                        : displayName
+                                                )}"
+                                            >
+                                                ${managed?.colorTag ? `<span class="color-tag-dot tag-${escapeHtml(managed.colorTag)}" title="${escapeHtml(managed.colorTag)}"></span>` : ""}${escapeHtml((managed?.label && managed.label.trim()) ? managed.label.trim() : displayName)}
+                                            </div>
 
-                                                ${
-                                                    managed?.group
-                                                        ? `
-                                                            <span class="group-pill" title="Group: ${escapeHtml(managed.group)}">
-                                                                🏷️ ${escapeHtml(managed.group)}
-                                                            </span>
-                                                        `
-                                                        : ""
-                                                }
-
+                                            <div class="saved-title-actions">
                                                 ${
                                                     managed
                                                         ? `
@@ -3002,6 +2977,37 @@
                                                         : ""
                                                 }
                                             </div>
+                                        </div>
+
+                                        <div
+                                            class="identity-email"
+                                            title="${escapeHtml(state.current.email)}"
+                                        >
+                                            ${escapeHtml(state.current.email)}
+                                        </div>
+
+                                        <div class="saved-badges-row current-badges-row">
+                                            ${renderPlanBadge(managed?.plan ? managed : state.current)}
+
+                                            ${
+                                                state.vaultedEmails?.includes(normalizeEmail(state.current.email))
+                                                    ? `
+                                                        <span class="vault-pill" title="${escapeHtml(t("vaultInfo"))}">
+                                                            ⚡ ${escapeHtml(t("instantBadge"))}
+                                                        </span>
+                                                    `
+                                                    : ""
+                                            }
+
+                                            ${
+                                                managed?.group
+                                                    ? `
+                                                        <span class="group-pill" title="Group: ${escapeHtml(managed.group)}">
+                                                            🏷️ ${escapeHtml(managed.group)}
+                                                        </span>
+                                                    `
+                                                    : ""
+                                            }
 
                                             ${connectionStatus}
                                         </div>
@@ -3294,9 +3300,20 @@
             ? (t("activeNow") || "Active now")
             : (account.lastSeenAt ? formatRelativeTime(account.lastSeenAt) : "");
 
+        const tooltipParts = [];
+        if (isActive) {
+            tooltipParts.push(t("active") || "Active account");
+        } else if (account.lastSeenAt) {
+            tooltipParts.push(`${t("lastUsed") || "Last used"}: ${new Date(account.lastSeenAt).toLocaleString()}`);
+        }
+        if (updated) {
+            tooltipParts.push(`${t("updated") || "Snapshot updated"}: ${updated}`);
+        }
+        const lastSeenTooltip = tooltipParts.join(" • ");
+
         const lastSeenHtml = lastUsedText
             ? `
-                <span class="last-seen-pill ${isActive ? "active" : ""}" title="${isActive ? escapeHtml(t("active")) : escapeHtml((t("lastUsed") || "Last used") + ": " + (account.lastSeenAt ? new Date(account.lastSeenAt).toLocaleString() : ""))}">
+                <span class="last-seen-pill ${isActive ? "active" : ""}" title="${escapeHtml(lastSeenTooltip)}">
                     <span class="last-seen-clock" aria-hidden="true">⏱</span>
                     <span>${escapeHtml(lastUsedText)}</span>
                 </span>
@@ -3437,20 +3454,6 @@
                                         }
 
                                         ${lastSeenHtml}
-
-                                        ${
-                                            updated
-                                                ? `
-                                                    <span
-                                                        class="saved-updated"
-                                                        data-snapshot-fetched-at="${escapeHtml(snapshot.fetchedAt)}"
-                                                        title="${escapeHtml(`${t("updated")} ${updated}`)}"
-                                                    >
-                                                        ${escapeHtml(`${t("updated")} ${updated}`)}
-                                                    </span>
-                                                `
-                                                : ""
-                                        }
                                     </div>
                                 </div>
 

@@ -6215,26 +6215,62 @@ body {
     border-color: rgba(180, 83, 9, 0.3);
 }
 
-/* Position plan badge neatly on the right side of current account identity */
-.identity-heading.current-identity-heading {
+/* === CURRENT ACCOUNT TITLE & BADGES ROW === */
+.current-title-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 6px;
     min-width: 0;
 }
 
-.current-identity-heading .current-name {
-    min-width: 0;
-    flex: 1 1 auto;
+.current-title-row .current-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ag-fg);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
-.current-identity-heading .plan-pill {
-    flex-shrink: 0;
-    margin-left: auto;
+.current-badges-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    margin-top: 4px;
+    min-width: 0;
+}
+
+.current-badges-row .connection-state.inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 7px;
+    font-size: 8.5px;
+    font-weight: 500;
+    line-height: 1.35;
+    border-radius: 10px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.28);
+    color: var(--ag-success, #10b981);
+    white-space: nowrap;
+}
+
+.current-badges-row .connection-state.inline.checking {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.28);
+    color: #f59e0b;
+}
+
+.current-badges-row .connection-state.inline .status-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
 }
 
 
