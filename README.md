@@ -14,109 +14,121 @@ A Visual Studio Code extension for managing, monitoring quota, and switching Goo
 
 ### Status
 
-- **Version**: `1.0.1`
+- **Version**: `1.2.8`
 - **Supported Platforms**: Windows (with Instant Token Swapping), macOS, Linux
-- **Compatibility**: Visual Studio Code, Google Antigravity extension `1.3.0+`, AGY backend `1.2.2+`
+- **Compatibility**: Visual Studio Code, Cursor, Google Antigravity standalone IDE, Google Antigravity extension `1.3.0+`, AGY backend `1.2.2+`
 
 ---
 
 ## Key Features
 
-### 1. Interactive Sidebar Dashboard (Activity Bar)
+### 1. Universal Multi-IDE Support (VS Code, Cursor & Antigravity IDE) 🚀
+- **Dual-Mode Engine**: Automatically detects and adapts whether running inside standard **Visual Studio Code / Cursor** (via `agy.exe --hub` process) or standalone **Google Antigravity IDE** (via direct `language_server_windows_x64.exe` Connect-RPC).
+- **Direct Connect-RPC & CSRF Discovery**: Dynamically extracts HTTPS listener ports and process CSRF tokens to query account status (`GetUserStatus`) and quotas (`RetrieveUserQuotaSummary`) directly without requiring an active hub process.
+- **100% Backward Compatibility**: Zero breaking changes for existing VS Code and Cursor setups.
+
+### 2. Interactive Sidebar Dashboard (Activity Bar)
 - **Runtime Status Indicator**: Live status pill showing Antigravity connection health, PID, Hub port, and Language Server port in a detailed modal.
-- **Current Account Card**: Displays the active Google account, profile avatar, display name, email, and quick actions (Re-auth, Sign Out, Add Account).
+- **Current Account Card**:
+  - Displays Google profile avatar (with CDN support and initials fallback), display name, and email.
+  - **Automatic Subscription Plan Badge**: Automatically detects and displays your account tier (`Google AI Plus`, `Google AI Ultra`, `Google AI Pro`, `Google AI Free`, etc.) neatly positioned beside account credentials.
+  - Quick action buttons: Re-auth, Sign Out, and Add Account.
 - **Quota & Usage Monitor**:
   - Visual progress bars for **5-Hour Limit** and **Weekly Limit**.
   - Remaining percentage indicators and exact reset countdown times.
   - Expandable model quota breakdown.
 - **Saved Accounts List**:
-  - Dedicated scrollable container designed for multiple accounts without overflowing the sidebar.
-  - Real-time search and filter with matched account counters.
-  - Clear status badges: `Active` badge for the current account and action badges for quick switching.
+  - **Smart Default Sorting**: Defaults to **Last used** (`recent`) so your most relevant accounts are always up top, with 1-click toggling between Quota and Name.
+  - **Fast Search & Instant Clear**: Real-time filtering with an inline `✕` clear button and empty-state filter recovery.
+  - **Relative Timestamp Badges**: Theme-adaptive time pills (`Active now`, `5m ago`, `2h ago`, `3d ago`) for each account.
+  - **Status & Plan Badges**: Shows active status, subscription tiers, color accent dots, and `⚡ Instant` vault indicators.
+  - **Custom Account Groups**: Assign default tags (`Personal`, `Work`) or create inline `+ Custom` groups (up to 24 characters) with rapid keyboard shortcuts (**Enter** / **Escape**).
   - Inline label editing and secure account removal dialogs.
-  - Skeleton loading screen on initial startup.
+  - Dedicated scrollable container with skeleton loading on startup.
 - **Footer**: Developer attribution and links with safe external browser navigation.
 
-### 2. Status Bar Item & 1-Click Menu
-- **Real-Time Quota Glance**: Directly monitors active account quota from VS Code's status bar (e.g. `AGY: 85%`).
+### 3. Status Bar Item & Quick Navigation
+- **Real-Time Quota Glance**: Directly monitors active account quota from VS Code's status bar (`$(account) Antigravity Account Switcher: 85%`).
 - **Color-Coded Status Alerts**: Dynamic warning background when quota $\le 20\%$ and critical error background when $\le 10\%$.
 - **Rich Markdown Tooltip**: Hovering reveals active account details, 5-hour quota, weekly quota, exact reset countdown, and quick links.
-- **Customizable Display Formats**: Choose between `compact` (`AGY: 85%`), `detailed` (`AGY: 85% (1h 45m)`), and `percentageOnly` (`85%`).
-- **1-Click Quick Menu**: Click the status bar item to open a sleek QuickPick menu for instant account switching, adding accounts, opening dashboard, or refreshing.
+- **Customizable Display Formats**: Choose between `compact` (`85%`), `detailed` (`85% (1h 45m)`), and `percentageOnly`.
+- **1-Click Direct Focus**: Clicking the status bar item immediately focuses and reveals the Account Switcher view in the Activity Bar. Quick menu remains accessible via `Alt+A`.
 
-### 3. Auto-Refresh Quota & Low Quota Reminders
-- **Background Quota Monitoring**: Automatically polls and refreshes active account quota at customizable intervals (e.g. 1m, 5m, 15m, 30m, 1h).
+### 4. Auto-Refresh Quota & Low Quota Reminders
+- **Background Quota Monitoring**: Automatically polls and refreshes active account quota at customizable intervals (1m, 5m, 15m, 30m, 1h).
 - **Low Quota Notification Alert**: Displays warning notifications when quota drops below threshold (e.g. 20%) with quick action buttons:
   - `[Switch Account]`: Opens interactive account switcher.
   - `[View Details]`: Opens the account switcher dashboard.
+- **Smart Quota Fallback**: Non-disruptively suggests a 1-click switch button to the saved account with the highest available quota.
 - **Smart Deduplication**: Prevents alert spam by tracking notification state per reset cycle.
 
-### 4. Antigravity UI Synchronization (No Window Reload)
+### 5. Antigravity UI Synchronization (No Window Reload)
 - **Instant Official Panel Sync**: Automatically reconnects and refreshes the official Google Antigravity sidebar (`google.google-antigravity`) upon account switch, sign-out, or re-authentication via internal RPC hooks (`antigravity.reconnect` / `antigravity.triggerUpdate`).
 - **Zero Disruptions**: Eliminates the need to reload the VS Code window or lose active editor states.
 - **Safe Fallback**: Provides an optional prompt to reload window only if official auto-sync cannot be confirmed.
 
-### 5. Settings & Personalization Modal
+### 6. Settings & Personalization Modal
 - Accessible via the gear icon (`⚙`) on the dashboard header:
-  - **Appearance**: Theme selection (*Follow VS Code*, *Dark*, *Light*, *System*) and Bilingual Language support (*English*, *Bahasa Indonesia*, *Automatic*).
-  - **Quota & Reminders**: Enable/disable background auto-refresh, polling interval, warning threshold (5% - 30%), and smart fallback.
-  - **Backup & Restore**: 1-click Export and Import of saved accounts metadata with deduplication.
-  - **Layout**: Show or hide individual dashboard sections (Antigravity Status, Current Account, Saved Accounts).
+  - **Appearance**: Universal theme selection (*Follow Editor / IDE Theme*, *Dark*, *Light*, *System*) and Bilingual Language support (*English*, *Bahasa Indonesia*, *Automatic*).
+  - **Layout & Section Visibility**: Intuitive `Hide ...` toggles to hide or display Antigravity Status, Current Account, Saved Accounts, Quota Matrix button, or the 7-day quota analytics chart.
+  - **Descriptions & Dividers**: Clean category separators and 1-line muted descriptions under all automation and reminder toggles.
+  - **Quota & Reminders**: Configure background auto-refresh interval, low quota threshold (5% - 30%), audio chimes, and reset notifications.
+  - **Backup & Vault**: 1-click Export/Import of saved accounts metadata with deduplication, plus Token Vault purge.
   - **About**: Version, developer info, and website link.
 
-### 6. Quota Reset Alarms & Restoration Notifications
+### 7. Quota Reset Alarms & Restoration Notifications
 - Automatically monitors exhausted or low-quota accounts and calculates exact reset countdowns.
 - Notifies immediately via desktop popup when an account's quota reset window passes and quota is restored.
 - Configurable via `boygr.antigravityAccountSwitcher.notifyQuotaReset`.
 
-### 7. Account Color Tags & Visual Badges
+### 8. Account Color Tags & Visual Badges
 - Assign custom color accents (`Blue`, `Green`, `Purple`, `Amber`, `Rose`, `Teal`) to any saved account.
 - Renders colored indicator dots next to account labels and colored avatar ring accents on both Current Account and Saved Accounts cards.
 - Preserves color tags during JSON export and import.
 
-### 8. Workspace / Project Folder Association
+### 9. Workspace / Project Folder Association
 - Link specific project folders or workspaces to preferred Antigravity accounts.
 - Automatic prompt upon opening workspace to switch to the linked account (`boygr.antigravityAccountSwitcher.autoPromptWorkspaceAccount`).
 - Dedicated workspace link banner in the dashboard and workspace badge tags in the Saved Accounts list.
 
-### 9. 7-Day Quota Usage History & Analytics
+### 10. 7-Day Quota Usage History & Analytics
 - Automatically records daily minimum remaining quota for each account.
 - Renders an interactive 7-day mini bar chart in the accounts view with color-coded health indicators (Healthy, Warning, Critical).
 - Detailed hover tooltips showing weekday, date, and minimum remaining quota percentage.
 
-### 10. Account Grouping & Profile Filters
-- Categorize accounts into groups (`Personal`, `Work`, `Client`, or custom group tags).
+### 11. Account Grouping & Profile Filters
+- Categorize accounts into groups (`Personal`, `Work`, or custom group tags).
 - Interactive filter chips above Saved Accounts allow 1-click filtering by category.
 - Group badge chips visually displayed on both Current and Saved account cards.
 - Search accounts dynamically by group tag name.
 - Group assignments preserved across JSON backups and imports.
 
-### 11. Rate Limit Auto-Switch Detection
+### 12. Rate Limit Auto-Switch Detection
 - Detects complete quota exhaustion (0% remaining / rate limit) immediately upon background refresh or model check.
 - Triggers an instant error modal with a 1-click switch prompt to the best available backup account.
 - Configurable via `boygr.antigravityAccountSwitcher.autoSwitchOnExhaustion`.
 
-### 12. Quota Analytics CSV & JSON Export
+### 13. Quota Analytics CSV & JSON Export
 - Export full historical quota records across all accounts to standard `.csv` or formatted `.json`.
 - Direct "Export" button in the 7-Day Quota Analytics dashboard header.
 - Accessible via command `boygr.antigravityAccountSwitcher.exportQuotaAnalytics`.
 
-### 13. Multi-Account Quota Matrix Dashboard
-- Full-screen modal comparison matrix displaying real-time 5-hour and weekly quota progress bars, exact reset countdowns, and 1-click switch buttons for all saved accounts side-by-side.
-- Dedicated "Quota Matrix" trigger button in the runtime status bar and title navigation action.
+### 14. Multi-Account Quota Matrix Dashboard
+- Full-screen modal comparison matrix displaying real-time 5-hour and weekly quota progress bars, exact reset countdowns, profile pictures, plan badges, and 1-click switch buttons for all saved accounts side-by-side.
+- Dedicated "Quota Matrix" icon button directly in the Activity Bar title bar (`view/title`).
 - Accessible via command `boygr.antigravityAccountSwitcher.quotaOverview`.
 
-### 14. Auto-Round-Robin Account Rotation
+### 15. Auto-Round-Robin Account Rotation
 - Automatically switches to the best backup account with the highest available quota when active account quota drops to 0% exhaustion or encounters rate limit errors.
 - Built-in 60-second cooldown protection against rapid switching loops.
 - Configurable via `boygr.antigravityAccountSwitcher.autoRoundRobin`.
 
-### 15. Subtle Quota Audio Chimes
+### 16. Subtle Quota Audio Chimes
 - Pure synthesized Web Audio API (`AudioContext`) melodic feedback for quota restoration (ascending chime) and critical quota warnings (gentle descending tone).
 - Zero external audio files required, completely lightweight and non-intrusive.
 - Configurable via `boygr.antigravityAccountSwitcher.enableQuotaAudio`.
 
-### 16. Instant Token Swapping (Switch Tanpa Login Browser) ⚡
+### 17. Instant Token Swapping (Switch Tanpa Login Browser) ⚡
 - **True 1-Click Seamless Switching**: Switch between saved accounts instantly without opening a browser or repeating the Google OAuth login sequence.
 - **Windows Credential Manager Interop**: Uses native Win32 `Advapi32.dll` credential APIs (`CredReadW`, `CredWriteW`) to back up and swap Google Antigravity authentication tokens directly under target `gemini:antigravity`.
 - **Zero Third-Party Dependencies**: No external compiled binaries or node-gyp packages required; executes via lightweight PowerShell P/Invoke script.
@@ -143,11 +155,12 @@ Access these commands via the VS Code Command Palette (`Ctrl+Shift+P` / `Cmd+Shi
 
 | Command | Title | Shortcut | Description |
 | :--- | :--- | :--- | :--- |
+| `boygr.antigravityAccountSwitcher.focusView` | **Focus Account Switcher View** | | Reveal and focus the Account Switcher sidebar |
 | `boygr.antigravityAccountSwitcher.statusBarMenu` | **Status Bar Menu** | `Alt+A` (`Cmd+Alt+A`) | Open QuickPick menu to switch accounts sorted by quota |
 | `boygr.antigravityAccountSwitcher.refreshAccountsView` | **Refresh** | `Alt+Shift+A` (`Cmd+Alt+Shift+A`) | Refresh runtime status, active account, quota, and saved accounts |
 | `boygr.antigravityAccountSwitcher.quotaOverview` | **View Multi-Account Quota Matrix...** | | Open full-screen quota comparison matrix for all accounts |
 | `boygr.antigravityAccountSwitcher.switchAccount` | **Switch Account** | | Switch to a saved account directly (instant token swap or browser login) |
-| `boygr.antigravityAccountSwitcher.clearTokenVault` | **Clear Token Vault (Instant Switching Credentials)...** | | Securely delete all stored account tokens from secret storage |
+| `boygr.antigravityAccountSwitcher.clearTokenVault` | **Clear Stored Token Vault...** | | Securely delete all stored account tokens from secret storage |
 | `boygr.antigravityAccountSwitcher.setWorkspaceAccount` | **Set Default Account for Workspace...** | | Link active project folder to a default Antigravity account |
 | `boygr.antigravityAccountSwitcher.clearWorkspaceAccount` | **Clear Default Account for Workspace** | | Remove project folder account link |
 | `boygr.antigravityAccountSwitcher.exportAccounts` | **Export Saved Accounts...** | | Export saved accounts metadata to JSON file |
@@ -178,6 +191,9 @@ Customize behavior via VS Code Settings (`settings.json`):
 
   // Display format for status bar indicator: "compact", "detailed", "percentageOnly" (default: "compact")
   "boygr.antigravityAccountSwitcher.statusBarFormat": "compact",
+
+  // Show the 7-day quota usage analytics and history chart under active account (default: false)
+  "boygr.antigravityAccountSwitcher.showQuotaAnalytics": false,
 
   // Auto-refresh quota interval in minutes (0 = manual only, default: 5)
   "boygr.antigravityAccountSwitcher.autoRefreshIntervalMinutes": 5,
@@ -218,9 +234,9 @@ Customize behavior via VS Code Settings (`settings.json`):
 
 ## Installation
 
-### From VSIX Package
+### From GitHub Releases / VSIX Package
 
-1. Download or locate `release/antigravity-account-switcher-1.0.1.vsix`.
+1. Download `antigravity-account-switcher-1.2.8.vsix` from [GitHub Releases](https://github.com/BoyGR/antigravity-account-switcher/releases) or locate `release/antigravity-account-switcher-1.2.8.vsix`.
 2. In VS Code:
    - Go to **Extensions** (`Ctrl+Shift+X` / `Cmd+Shift+X`).
    - Click the `...` menu (top right of Extensions view).
@@ -228,7 +244,7 @@ Customize behavior via VS Code Settings (`settings.json`):
    - Choose the file.
 3. Or install via terminal:
    ```powershell
-   code --install-extension release/antigravity-account-switcher-1.0.1.vsix
+   code --install-extension release/antigravity-account-switcher-1.2.8.vsix
    ```
 
 ---
