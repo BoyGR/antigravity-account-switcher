@@ -4,6 +4,19 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.2.2] - 2026-09-14
+
+### Improved & Fixed
+- **Light Mode UI/UX & High-Contrast Visual Polish**:
+  - Fixed dark rectangular blocks on Saved Accounts quota panels (`Gemini` & `Claude + GPT`) in light mode by replacing editor-inherited backgrounds with `--ag-card-subtle` and `--ag-card-border`.
+  - Fixed dark `#252526` pill background on Antigravity status pill (`.runtime-status-pill`) and Quota Matrix trigger button (`.quota-matrix-trigger-btn`), styling them with crisp, theme-aware surface cards and readable text colors.
+  - Enhanced Quota Matrix Modal with dedicated light/dark theme variables, preventing dark overlays, invisible quota tracks, or hardcoded dark fills.
+  - Fixed dark square button artifacts on Saved Accounts action buttons (Add `+`, Edit pencil, Delete trash, and Switch badge) to seamlessly adapt to light and dark themes.
+  - Added clean native custom scrollbar styling (`scrollbar-color` & `::-webkit-scrollbar`) to eliminate dark scrollbar tracks on light backgrounds.
+  - Ensured active account avatar checkmark badge maintains crisp white contrast across all themes.
+
+---
+
 ## [1.2.1] - 2026-09-14
 
 ### Added

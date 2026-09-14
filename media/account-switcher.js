@@ -43,7 +43,7 @@
         vaultedEmails: [],
 
         meta: {
-            version: "1.2.1",
+            version: "1.2.2",
             developer: "Boy Gilang Ramadhan",
             website: "https://boygr.com",
             iconUri: "",
