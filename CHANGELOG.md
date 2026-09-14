@@ -4,6 +4,15 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.2.9] - 2026-09-14
+
+### Fixed
+- **Duplicate Command Manifest Registration**:
+  - Removed duplicate `boygr.antigravityAccountSwitcher.diagnose` command declaration in `package.json` (`contributes.commands`), preventing VS Code extension registry warning *"Command boygr.antigravityAccountSwitcher.diagnose already registered by Antigravity Account Switcher"*.
+  - Verified zero duplicate command and activation event declarations across the entire extension manifest.
+
+---
+
 ## [1.2.8] - 2026-09-14
 
 ### Improved & Polished (UI/UX)
