@@ -4,6 +4,20 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.2.8] - 2026-09-14
+
+### Improved & Polished (UI/UX)
+- **Search Clear Button & Filter Recovery**:
+  - Added an inline `✕` clear button inside the Saved Accounts search field for instant 1-click query clearing.
+  - Added a "Clear filter" button directly on empty search states to easily restore the full account list.
+- **Relative "Last Used" Timestamp Indicators**:
+  - Displayed subtle, theme-adaptive relative time pills (`Active now`, `Xm ago`, `Xh ago`, `Xd ago`) in the metadata row of each saved account card.
+- **Settings Menu Descriptions & Section Dividers**:
+  - Added clear, 1-line muted helper descriptions under all automation, layout, and reminder toggles in the Settings modal (explaining *Smart Quota Fallback*, *Auto Round Robin*, *Instant Switch*, etc.).
+  - Added clean visual dividers between settings categories for a modern preferences panel aesthetic.
+
+---
+
 ## [1.2.7] - 2026-09-14
 
 ### Changed & Improved

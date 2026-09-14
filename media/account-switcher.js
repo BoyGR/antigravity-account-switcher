@@ -45,7 +45,7 @@
         vaultedEmails: [],
 
         meta: {
-            version: "1.2.7",
+            version: "1.2.8",
             developer: "Boy Gilang Ramadhan",
             website: "https://boygr.com",
             iconUri: "",
@@ -232,6 +232,18 @@
 
             sortRecent:
                 "Recently used",
+
+            clearSearch:
+                "Clear search",
+
+            clearFilter:
+                "Clear filter",
+
+            activeNow:
+                "Active now",
+
+            lastUsed:
+                "Last used",
 
             editLabel:
                 "Edit label",
@@ -560,6 +572,33 @@
             instantSwitch:
                 "Instant Switch (No Browser)",
 
+            instantSwitchHint:
+                "Switch accounts seamlessly using saved session tokens without re-opening your browser.",
+
+            smartQuotaFallbackHint:
+                "Show a 1-click prompt to switch to an account with more quota before limits are reached.",
+
+            autoRoundRobinHint:
+                "Automatically rotate to the account with the highest quota when rate limits occur.",
+
+            enableQuotaAudioHint:
+                "Play gentle synthesized chimes on quota reset or critical alerts.",
+
+            lowQuotaReminderHint:
+                "Show a warning notification when remaining quota falls below threshold.",
+
+            hideRuntimeHint:
+                "Hide the Antigravity background status indicator from the bottom bar.",
+
+            hideCurrentHint:
+                "Hide the current active account panel from the main view.",
+
+            hideSavedHint:
+                "Hide the saved accounts list and manager.",
+
+            showQuotaAnalyticsHint:
+                "Display the 7-day lowest quota analytics bar chart.",
+
             instantBadge:
                 "Instant",
 
@@ -682,6 +721,18 @@
                 "Nama (A-Z)",
 
             sortRecent:
+                "Terakhir dipakai",
+
+            clearSearch:
+                "Hapus pencarian",
+
+            clearFilter:
+                "Hapus filter",
+
+            activeNow:
+                "Sedang aktif",
+
+            lastUsed:
                 "Terakhir dipakai",
 
             editLabel:
@@ -1010,6 +1061,33 @@
 
             instantSwitch:
                 "Switch Instan (Tanpa Browser)",
+
+            instantSwitchHint:
+                "Beralih akun seketika menggunakan token sesi tersimpan tanpa membuka browser.",
+
+            smartQuotaFallbackHint:
+                "Tampilkan prompt 1-klik untuk beralih ke akun berkuota lebih banyak sebelum habis.",
+
+            autoRoundRobinHint:
+                "Otomatis rotasi ke akun dengan kuota tertinggi saat terkena rate limit (tanpa klik).",
+
+            enableQuotaAudioHint:
+                "Bunyikan nada audio lembut saat kuota reset atau mencapai batas kritis.",
+
+            lowQuotaReminderHint:
+                "Tampilkan notifikasi peringatan saat sisa kuota akun berada di bawah batas.",
+
+            hideRuntimeHint:
+                "Sembunyikan status runtime Antigravity dari bilah bawah.",
+
+            hideCurrentHint:
+                "Sembunyikan panel akun yang sedang aktif dari tampilan utama.",
+
+            hideSavedHint:
+                "Sembunyikan daftar dan pengelola akun tersimpan.",
+
+            showQuotaAnalyticsHint:
+                "Tampilkan grafik analitik dan riwayat kuota 7 hari terakhir.",
 
             instantBadge:
                 "Instan",
@@ -3294,6 +3372,19 @@
                 )
                 : "";
 
+        const lastUsedText = isActive
+            ? (t("activeNow") || "Active now")
+            : (account.lastSeenAt ? formatRelativeTime(account.lastSeenAt) : "");
+
+        const lastSeenHtml = lastUsedText
+            ? `
+                <span class="last-seen-pill ${isActive ? "active" : ""}" title="${isActive ? escapeHtml(t("active")) : escapeHtml((t("lastUsed") || "Last used") + ": " + (account.lastSeenAt ? new Date(account.lastSeenAt).toLocaleString() : ""))}">
+                    <span class="last-seen-clock" aria-hidden="true">⏱</span>
+                    <span>${escapeHtml(lastUsedText)}</span>
+                </span>
+            `
+            : "";
+
         return `
             <article
                 class="account-row saved-account-row ${isActive ? "active" : ""}"
@@ -3405,6 +3496,7 @@
                                     </div>
 
                                     ${renderPlanBadge(account)}
+                                    ${lastSeenHtml}
 
                                     ${
                                         state.vaultedEmails?.includes(normalizeEmail(account.email))
@@ -3517,6 +3609,14 @@
                     <div class="secondary-text">
                         ${escapeHtml(t("noMatchesHint"))}
                     </div>
+
+                    ${ui.search.trim() || ui.groupFilter !== "all" ? `
+                        <div style="margin-top: 10px;">
+                            <button type="button" class="btn compact" data-action="clear-search">
+                                ${escapeHtml(t("clearFilter") || "Clear filter")}
+                            </button>
+                        </div>
+                    ` : ""}
                 </div>
             `;
         }
@@ -3634,6 +3734,17 @@
                                                             autocomplete="off"
                                                             spellcheck="false"
                                                         >
+
+                                                        <button
+                                                            type="button"
+                                                            class="search-clear-btn"
+                                                            data-action="clear-search"
+                                                            style="display: ${ui.search ? "inline-flex" : "none"};"
+                                                            title="${escapeHtml(t("clearSearch") || "Clear search")}"
+                                                            aria-label="${escapeHtml(t("clearSearch") || "Clear search")}"
+                                                        >
+                                                            ✕
+                                                        </button>
                                                     </div>
 
                                                     <div class="sort-wrap">
@@ -4316,7 +4427,8 @@
                                 renderCheckbox(
                                     "hideRuntime",
                                     t("hideRuntime"),
-                                    draft.hideRuntime === true || draft.showRuntime === false
+                                    draft.hideRuntime === true || draft.showRuntime === false,
+                                    t("hideRuntimeHint")
                                 )
                             }
 
@@ -4324,7 +4436,8 @@
                                 renderCheckbox(
                                     "hideCurrent",
                                     t("hideCurrent"),
-                                    draft.hideCurrent === true || draft.showCurrent === false
+                                    draft.hideCurrent === true || draft.showCurrent === false,
+                                    t("hideCurrentHint")
                                 )
                             }
 
@@ -4332,7 +4445,8 @@
                                 renderCheckbox(
                                     "hideSaved",
                                     t("hideSaved"),
-                                    draft.hideSaved === true || draft.showSaved === false
+                                    draft.hideSaved === true || draft.showSaved === false,
+                                    t("hideSavedHint")
                                 )
                             }
 
@@ -4340,7 +4454,8 @@
                                 renderCheckbox(
                                     "showQuotaAnalytics",
                                     t("showQuotaAnalytics"),
-                                    draft.showQuotaAnalytics === true
+                                    draft.showQuotaAnalytics === true,
+                                    t("showQuotaAnalyticsHint")
                                 )
                             }
                         </div>
@@ -4401,7 +4516,8 @@
                                 renderCheckbox(
                                     "enableLowQuotaReminder",
                                     t("lowQuotaReminder"),
-                                    draft.enableLowQuotaReminder
+                                    draft.enableLowQuotaReminder,
+                                    t("lowQuotaReminderHint")
                                 )
                             }
 
@@ -4462,7 +4578,8 @@
                                 renderCheckbox(
                                     "enableQuotaAudio",
                                     t("enableQuotaAudio"),
-                                    draft.enableQuotaAudio !== false
+                                    draft.enableQuotaAudio !== false,
+                                    t("enableQuotaAudioHint")
                                 )
                             }
                         </div>
@@ -4476,7 +4593,8 @@
                                 renderCheckbox(
                                     "enableInstantSwitch",
                                     t("instantSwitch"),
-                                    draft.enableInstantSwitch !== false
+                                    draft.enableInstantSwitch !== false,
+                                    t("instantSwitchHint")
                                 )
                             }
 
@@ -4484,7 +4602,8 @@
                                 renderCheckbox(
                                     "smartQuotaFallback",
                                     t("smartQuotaFallback"),
-                                    draft.smartQuotaFallback !== false
+                                    draft.smartQuotaFallback !== false,
+                                    t("smartQuotaFallbackHint")
                                 )
                             }
 
@@ -4492,7 +4611,8 @@
                                 renderCheckbox(
                                     "autoRoundRobin",
                                     t("autoRoundRobin"),
-                                    draft.autoRoundRobin === true
+                                    draft.autoRoundRobin === true,
+                                    t("autoRoundRobinHint")
                                 )
                             }
                         </div>
@@ -4615,20 +4735,24 @@
     function renderCheckbox(
         key,
         label,
-        checked
+        checked,
+        hint
     ) {
         return `
-            <label class="check-row">
-                <input
-                    type="checkbox"
-                    data-setting="${escapeHtml(key)}"
-                    ${checked ? "checked" : ""}
-                >
+            <div class="check-setting-wrap">
+                <label class="check-row">
+                    <input
+                        type="checkbox"
+                        data-setting="${escapeHtml(key)}"
+                        ${checked ? "checked" : ""}
+                    >
 
-                <span>
-                    ${escapeHtml(label)}
-                </span>
-            </label>
+                    <span class="check-label-text">
+                        ${escapeHtml(label)}
+                    </span>
+                </label>
+                ${hint ? `<div class="field-hint">${escapeHtml(hint)}</div>` : ""}
+            </div>
         `;
     }
 
@@ -5010,6 +5134,11 @@
                 ui.search =
                     target.value;
 
+                const clearBtn = document.querySelector(".search-clear-btn");
+                if (clearBtn) {
+                    clearBtn.style.display = ui.search ? "inline-flex" : "none";
+                }
+
                 persistUi();
                 updateSavedListOnly();
                 return;
@@ -5217,6 +5346,26 @@
                 ui.savedCollapsed =
                     !ui.savedCollapsed;
 
+                persistUi();
+                render();
+                return;
+            }
+
+            if (
+                action ===
+                    "clear-search"
+            ) {
+                ui.search = "";
+                ui.groupFilter = "all";
+                const searchInput = document.getElementById("account-search");
+                if (searchInput) {
+                    searchInput.value = "";
+                    searchInput.focus();
+                }
+                const clearBtn = document.querySelector(".search-clear-btn");
+                if (clearBtn) {
+                    clearBtn.style.display = "none";
+                }
                 persistUi();
                 render();
                 return;

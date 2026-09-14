@@ -750,10 +750,36 @@ a {
     height: 31px;
     padding:
         5px
-        8px
+        26px
         5px
         29px;
     font-size: 10px;
+}
+
+.search-clear-btn {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 17px;
+    height: 17px;
+    border: none;
+    background: transparent;
+    color: var(--ag-muted);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 10px;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.search-clear-btn:hover {
+    color: var(--ag-fg);
+    background: var(--ag-hover);
 }
 
 .count {
@@ -1159,7 +1185,9 @@ a {
 }
 
 .settings-group + .settings-group {
-    margin-top: 17px;
+    margin-top: 15px;
+    padding-top: 14px;
+    border-top: 1px solid var(--ag-card-border);
 }
 
 .settings-group h3 {
@@ -1199,17 +1227,38 @@ a {
     border-left: 2px solid var(--vscode-focusBorder, #007fd4);
 }
 
+.check-setting-wrap {
+    margin-bottom: 9px;
+}
+
+.check-setting-wrap:last-child {
+    margin-bottom: 0;
+}
+
 .check-row {
     display: flex;
     align-items: center;
     gap: 7px;
-    min-height: 30px;
-    font-size: 10px;
+    min-height: 22px;
+    font-size: 10.5px;
     cursor: pointer;
 }
 
 .check-row input {
     margin: 0;
+    cursor: pointer;
+}
+
+.check-label-text {
+    font-weight: 500;
+}
+
+.field-hint {
+    margin-top: 2px;
+    margin-left: 21px;
+    color: var(--ag-muted);
+    font-size: 9.5px;
+    line-height: 1.35;
 }
 
 .settings-note {
@@ -6081,6 +6130,33 @@ body {
     line-height: 1.2;
     white-space: nowrap;
     letter-spacing: 0.2px;
+}
+
+.last-seen-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px 6px;
+    font-size: 8.5px;
+    font-weight: 500;
+    color: var(--ag-muted);
+    background: var(--ag-card-subtle);
+    border: 1px solid var(--ag-card-border);
+    border-radius: 10px;
+    line-height: 1.2;
+    white-space: nowrap;
+    letter-spacing: 0.1px;
+}
+
+.last-seen-pill.active {
+    color: var(--ag-success, #10b981);
+    background: color-mix(in srgb, var(--ag-success, #10b981) 10%, transparent);
+    border-color: color-mix(in srgb, var(--ag-success, #10b981) 30%, transparent);
+}
+
+.last-seen-clock {
+    font-size: 8px;
+    opacity: 0.85;
 }
 
 .settings-actions-row {
