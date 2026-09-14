@@ -339,7 +339,7 @@
         "watch": "node esbuild.js --watch",
         "package": "vsce package",
         "vscode:prepublish": "npm run compile",
-        "package:vsix": "npx --yes @vscode/vsce package",
+        "package:vsix": "npx --yes @vscode/vsce package --out internal/releases",
         "publish:marketplace": "npx --yes @vscode/vsce publish",
         "publish:openvsx": "npx --yes ovsx publish"
     },

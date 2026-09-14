@@ -237,26 +237,26 @@ Customize behavior via your IDE Settings (`settings.json`):
 
 ### From GitHub Releases / VSIX Package
 
-1. Download `antigravity-account-switcher-1.2.10.vsix` from [GitHub Releases](https://github.com/BoyGR/antigravity-account-switcher/releases) or locate `release/antigravity-account-switcher-1.2.10.vsix`.
+1. Download the latest `antigravity-account-switcher-1.2.10.vsix` from [GitHub Releases](https://github.com/BoyGR/antigravity-account-switcher/releases).
 
 2. **Via Graphical Interface (VS Code, Cursor, or Antigravity IDE)**:
    - Open **Extensions** (`Ctrl+Shift+X` / `Cmd+Shift+X`).
    - Click the `...` menu at the top right of the Extensions view.
    - Select **Install from VSIX...**.
-   - Choose `antigravity-account-switcher-1.2.10.vsix`.
+   - Choose the downloaded `.vsix` file.
 
 3. **Via Terminal / Command Line**:
    - **Visual Studio Code**:
      ```powershell
-     code --install-extension release/antigravity-account-switcher-1.2.10.vsix
+     code --install-extension antigravity-account-switcher-1.2.10.vsix
      ```
    - **Cursor**:
      ```powershell
-     cursor --install-extension release/antigravity-account-switcher-1.2.10.vsix
+     cursor --install-extension antigravity-account-switcher-1.2.10.vsix
      ```
    - **Google Antigravity Standalone IDE**:
      ```powershell
-     antigravity --install-extension release/antigravity-account-switcher-1.2.10.vsix
+     antigravity --install-extension antigravity-account-switcher-1.2.10.vsix
      ```
 
 ---
