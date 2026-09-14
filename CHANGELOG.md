@@ -4,6 +4,19 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.2.10] - 2026-09-14
+
+### Changed & Improved (UI/UX)
+- **Relocated Quota Matrix Button**:
+  - Moved the **Quota Matrix** trigger button from the VS Code Activity Bar header (`view/title`) directly into the Webview runtime status bar, positioned neatly alongside the **Antigravity: Ready** status pill.
+  - Streamlined the Activity Bar title bar to only show **Refresh** and **Settings**, preventing button crowding.
+- **Manifest Schema & Activation Events Optimization**:
+  - Streamlined `activationEvents` to `onStartupFinished` to utilize VS Code's Automatic Activation Events and eliminate deprecation warnings.
+  - Added the recommended `icon` property to the view definition in `package.json`.
+  - Broadened package and documentation descriptions for full **Visual Studio Code**, **Cursor**, and **Antigravity IDE** support.
+
+---
+
 ## [1.2.9] - 2026-09-14
 
 ### Fixed

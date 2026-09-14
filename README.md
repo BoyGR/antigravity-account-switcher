@@ -14,7 +14,7 @@ An extension for Visual Studio Code, Cursor, and Google Antigravity IDE to manag
 
 ### Status
 
-- **Version**: `1.2.9`
+- **Version**: `1.2.10`
 - **Supported Platforms**: Windows (with Instant Token Swapping), macOS, Linux
 - **Supported IDEs**: Visual Studio Code, Cursor, Google Antigravity Standalone IDE, and other VS Code-compatible editors
 - **Compatibility**: Official Google Antigravity extension `1.3.0+`, AGY backend `1.2.2+`
@@ -237,26 +237,26 @@ Customize behavior via your IDE Settings (`settings.json`):
 
 ### From GitHub Releases / VSIX Package
 
-1. Download `antigravity-account-switcher-1.2.9.vsix` from [GitHub Releases](https://github.com/BoyGR/antigravity-account-switcher/releases) or locate `release/antigravity-account-switcher-1.2.9.vsix`.
+1. Download `antigravity-account-switcher-1.2.10.vsix` from [GitHub Releases](https://github.com/BoyGR/antigravity-account-switcher/releases) or locate `release/antigravity-account-switcher-1.2.10.vsix`.
 
 2. **Via Graphical Interface (VS Code, Cursor, or Antigravity IDE)**:
    - Open **Extensions** (`Ctrl+Shift+X` / `Cmd+Shift+X`).
    - Click the `...` menu at the top right of the Extensions view.
    - Select **Install from VSIX...**.
-   - Choose `antigravity-account-switcher-1.2.9.vsix`.
+   - Choose `antigravity-account-switcher-1.2.10.vsix`.
 
 3. **Via Terminal / Command Line**:
    - **Visual Studio Code**:
      ```powershell
-     code --install-extension release/antigravity-account-switcher-1.2.9.vsix
+     code --install-extension release/antigravity-account-switcher-1.2.10.vsix
      ```
    - **Cursor**:
      ```powershell
-     cursor --install-extension release/antigravity-account-switcher-1.2.9.vsix
+     cursor --install-extension release/antigravity-account-switcher-1.2.10.vsix
      ```
    - **Google Antigravity Standalone IDE**:
      ```powershell
-     antigravity --install-extension release/antigravity-account-switcher-1.2.9.vsix
+     antigravity --install-extension release/antigravity-account-switcher-1.2.10.vsix
      ```
 
 ---
