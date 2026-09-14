@@ -1157,7 +1157,12 @@ export async function getAntigravityCurrentAccount():
                     : undefined,
 
             profilePictureUrl:
-                safeExtractString(userStatus.profilePictureUrl),
+                safeExtractString(userStatus.profilePictureUrl) ||
+                safeExtractString(userStatus.profile_picture_url) ||
+                safeExtractString(userStatus.picture) ||
+                safeExtractString(userStatus.avatarUrl) ||
+                safeExtractString(userStatus.photoUrl) ||
+                undefined,
         };
     }
 /* ============================================================
@@ -1213,6 +1218,11 @@ interface AntigravityClientModelConfigResponse {
 
 interface AntigravityQuotaUserStatusResponse {
     profilePictureUrl?: string;
+    profile_picture_url?: string;
+    picture?: string;
+    avatarUrl?: string;
+    photoUrl?: string;
+    [key: string]: unknown;
 
     cascadeModelConfigData?: {
         clientModelConfigs?:
@@ -1442,9 +1452,11 @@ export async function getAntigravityQuotaSnapshot():
 
             profilePictureAvailable:
                 Boolean(
-                    userStatus
-                        .profilePictureUrl
-                        ?.trim(),
+                    safeExtractString(userStatus.profilePictureUrl) ||
+                    safeExtractString(userStatus.profile_picture_url) ||
+                    safeExtractString(userStatus.picture) ||
+                    safeExtractString(userStatus.avatarUrl) ||
+                    safeExtractString(userStatus.photoUrl)
                 ),
 
             modelConfigCount:

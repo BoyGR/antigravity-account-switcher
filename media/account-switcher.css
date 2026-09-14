@@ -6172,44 +6172,26 @@ body {
     border-color: rgba(180, 83, 9, 0.3);
 }
 
-/* Plan pills in Account Label Editor */
-.label-editor-plans {
-    margin-top: 6px;
+/* Position plan badge neatly on the right side of current account identity */
+.identity-heading.current-identity-heading {
     display: flex;
     align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
 }
 
-.plan-pills-row {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex-wrap: wrap;
+.current-identity-heading .current-name {
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.plan-tag-btn {
-    padding: 2px 7px;
-    font-size: 9.5px;
-    border: 1px solid var(--ag-border);
-    background: var(--ag-raised);
-    color: var(--ag-muted);
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    line-height: 1.3;
-}
-
-.plan-tag-btn:hover {
-    border-color: var(--ag-focus);
-    color: var(--ag-fg);
-}
-
-.plan-tag-btn.selected {
-    border-color: var(--ag-focus);
-    background: var(--ag-focus);
-    color: #ffffff;
-    font-weight: 600;
+.current-identity-heading .plan-pill {
+    flex-shrink: 0;
+    margin-left: auto;
 }
 
 

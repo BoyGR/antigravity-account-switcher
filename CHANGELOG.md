@@ -4,6 +4,20 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.2.6] - 2026-09-14
+
+### Improved & Enhanced
+- **Automatic-Only Account Plan Identification**:
+  - Removed manual plan modification from account editor; account plans are strictly detected automatically from Antigravity Language Server / RPC data and immutable to user edits.
+- **Current Account Badge Layout Alignment**:
+  - Relocated the plan badge to the right side of the account name and email (`.current-identity-heading`), preventing it from obstructing or crowding the local account label and pencil edit button.
+- **Google Account Profile Pictures**:
+  - Added full support for Google account avatar photos across **Current Account**, **Saved Accounts**, and the **Quota Matrix Modal**.
+  - Stored and persisted `profilePictureUrl` across account registry, backups, and exports.
+  - Expanded Webview Content Security Policy (CSP) and URL validator to permit `googleusercontent.com`, `ggpht.com`, `gstatic.com`, and `google.com` avatar CDNs with seamless fallback to initials.
+
+---
+
 ## [1.2.5] - 2026-09-14
 
 ### Fixed & Hardened

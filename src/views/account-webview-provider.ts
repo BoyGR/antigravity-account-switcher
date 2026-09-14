@@ -6,6 +6,7 @@ import {
     ManagedAntigravityAccount,
     removeManagedAccount,
     removeManagedAccountQuotaSnapshot,
+    saveCurrentAccountMetadata,
     updateManagedAccountColorTag,
     updateManagedAccountGroup,
     updateManagedAccountLabel,
@@ -543,6 +544,11 @@ export class AntigravityAccountWebviewProvider
                         usage,
                     );
 
+                    await saveCurrentAccountMetadata(
+                        this.context,
+                        current,
+                    );
+
                     usageSnapshots =
                         getManagedAccountUsageSnapshots(
                             this.context,
@@ -865,7 +871,6 @@ export class AntigravityAccountWebviewProvider
                     message.label,
                     message.colorTag,
                     message.group,
-                    message.plan,
                 );
 
                 await this.refreshLocalAccounts();
@@ -1259,7 +1264,7 @@ export class AntigravityAccountWebviewProvider
         http-equiv="Content-Security-Policy"
         content="
             default-src 'none';
-            img-src ${webview.cspSource} https://googleusercontent.com https://*.googleusercontent.com;
+            img-src ${webview.cspSource} https://*.googleusercontent.com https://googleusercontent.com https://*.ggpht.com https://*.gstatic.com https://*.google.com data:;
             style-src ${webview.cspSource};
             script-src 'nonce-${nonce}';
         "

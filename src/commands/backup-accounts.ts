@@ -23,6 +23,7 @@ interface AccountsBackupPayload {
         plan?: string;
         g1Tier?: string;
         isPro?: boolean;
+        profilePictureUrl?: string;
         firstSeenAt?: string;
         lastSeenAt?: string;
     }>;
@@ -71,6 +72,7 @@ export function registerBackupAccountsCommands(
                         plan: a.plan,
                         g1Tier: a.g1Tier,
                         isPro: a.isPro,
+                        profilePictureUrl: a.profilePictureUrl,
                         firstSeenAt: a.firstSeenAt,
                         lastSeenAt: a.lastSeenAt,
                     })),

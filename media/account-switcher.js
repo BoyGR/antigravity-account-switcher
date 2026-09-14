@@ -45,7 +45,7 @@
         vaultedEmails: [],
 
         meta: {
-            version: "1.2.5",
+            version: "1.2.6",
             developer: "Boy Gilang Ramadhan",
             website: "https://boygr.com",
             iconUri: "",
@@ -97,9 +97,6 @@
             "",
 
         editGroup:
-            "",
-
-        editPlan:
             "",
 
         customGroupInputOpen:
@@ -1817,38 +1814,6 @@
                     ` : ""}
                 </div>
 
-                <div class="label-editor-plans">
-                    <span class="label-editor-meta-title">${escapeHtml(t("plan"))}:</span>
-                    <div class="plan-pills-row">
-                        ${(() => {
-                            const standardPlans = [
-                                "Google AI Plus",
-                                "Google AI Ultra",
-                                "Google AI Pro",
-                                "Google AI Free",
-                            ];
-                            return standardPlans.map(p => `
-                                <button
-                                    type="button"
-                                    class="plan-tag-btn ${ui.editPlan === p ? "selected" : ""}"
-                                    data-action="select-edit-plan"
-                                    data-plan="${escapeHtml(p)}"
-                                >${escapeHtml(p)}</button>
-                            `).join("");
-                        })()}
-                        ${ui.editPlan ? `
-                            <button
-                                type="button"
-                                class="color-clear-btn"
-                                data-action="select-edit-plan"
-                                data-plan=""
-                                title="Auto / Reset"
-                                aria-label="Auto / Reset"
-                            >×</button>
-                        ` : ""}
-                    </div>
-                </div>
-
                 <div class="label-editor-groups">
                     <span class="label-editor-meta-title">Group:</span>
                     <div class="group-pills-row">
@@ -1936,16 +1901,19 @@
                 url.hostname
                     .toLowerCase();
 
+            const isGoogleHost =
+                hostname === "googleusercontent.com" ||
+                hostname.endsWith(".googleusercontent.com") ||
+                hostname === "ggpht.com" ||
+                hostname.endsWith(".ggpht.com") ||
+                hostname === "gstatic.com" ||
+                hostname.endsWith(".gstatic.com") ||
+                hostname === "google.com" ||
+                hostname.endsWith(".google.com");
+
             if (
-                url.protocol !==
-                    "https:" ||
-                !(
-                    hostname ===
-                        "googleusercontent.com" ||
-                    hostname.endsWith(
-                        ".googleusercontent.com"
-                    )
-                )
+                url.protocol !== "https:" ||
+                !isGoogleHost
             ) {
                 return "";
             }
@@ -1960,7 +1928,8 @@
         displayName,
         email,
         profilePictureUrl,
-        className = ""
+        className = "",
+        badgeHtml = ""
     ) {
         const safeUrl =
             safeProfilePictureUrl(
@@ -1996,10 +1965,13 @@
                                 alt=""
                                 referrerpolicy="no-referrer"
                                 draggable="false"
+                                onerror="this.style.display='none'"
                             >
                         `
                         : ""
                 }
+
+                ${badgeHtml}
             </div>
         `;
     }
@@ -2963,13 +2935,15 @@
                         }
 
                         <div class="identity">
-                            <div class="identity-heading">
+                            <div class="identity-heading current-identity-heading">
                                 <div
                                     class="identity-name current-name"
                                     title="${escapeHtml(displayName)}"
                                 >
                                     ${escapeHtml(displayName)}
                                 </div>
+
+                                ${renderPlanBadge(managed?.plan ? managed : state.current)}
                             </div>
 
                             <div
@@ -2996,8 +2970,6 @@
                                                 <span class="account-label">
                                                     ${escapeHtml(localLabel)}
                                                 </span>
-
-                                                ${renderPlanBadge(managed?.plan ? managed : state.current)}
 
                                                 ${
                                                     managed?.group
@@ -3323,21 +3295,12 @@
                 ${isActive ? 'aria-current="true"' : ""}
             >
                 <div class="saved-account-rail">
-                    <div
-                        class="avatar small ${account.colorTag ? `tag-${escapeHtml(account.colorTag)}` : ""}"
-                        aria-hidden="true"
-                    >
-                        ${
-                            escapeHtml(
-                                initials(
-                                    account.displayName ||
-                                    account.label,
-                                    account.email
-                                )
-                            )
-                        }
-
-                        ${
+                    ${
+                        renderAvatar(
+                            account.displayName || account.label,
+                            account.email,
+                            account.profilePictureUrl || (isActive ? state.current?.profilePictureUrl : undefined),
+                            `small ${account.colorTag ? `tag-${escapeHtml(account.colorTag)}` : ""}`,
                             isActive
                                 ? `
                                     <span
@@ -3348,8 +3311,8 @@
                                     </span>
                                 `
                                 : ""
-                        }
-                    </div>
+                        )
+                    }
                     ${
                         isActive
                             ? `
@@ -4878,9 +4841,6 @@
         ui.editGroup =
             account.group || "";
 
-        ui.editPlan =
-            account.plan || "";
-
         ui.customGroupInputOpen =
             false;
 
@@ -4901,9 +4861,6 @@
             "";
 
         ui.editGroup =
-            "";
-
-        ui.editPlan =
             "";
 
         ui.customGroupInputOpen =
@@ -4941,8 +4898,6 @@
                 ui.editColorTag,
             group:
                 ui.editGroup,
-            plan:
-                ui.editPlan || undefined,
         });
     }
 
@@ -5346,13 +5301,6 @@
             if (action === "select-edit-group") {
                 const group = target.dataset.group || "";
                 ui.editGroup = ui.editGroup === group ? "" : group;
-                render();
-                return;
-            }
-
-            if (action === "select-edit-plan") {
-                const plan = target.dataset.plan || "";
-                ui.editPlan = ui.editPlan === plan ? "" : plan;
                 render();
                 return;
             }
