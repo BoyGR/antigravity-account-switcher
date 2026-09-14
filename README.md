@@ -4,19 +4,20 @@
   <img src="media/icon.png" width="128" height="128" alt="Antigravity Account Switcher Logo" />
 </p>
 
-A Visual Studio Code extension for managing, monitoring quota, and switching Google accounts used by Google Antigravity.
+An extension for Visual Studio Code, Cursor, and Google Antigravity IDE to manage, monitor quota, and switch Google accounts used by Google Antigravity.
 
 ---
 
 ## Overview
 
-**Antigravity Account Switcher** extends the official Google Antigravity experience with an interactive sidebar dashboard, real-time quota tracking, background low-quota alerts, instant UI synchronization, and effortless switching between multiple Google accounts.
+**Antigravity Account Switcher** is an all-in-one account management and quota monitoring extension designed for modern AI coding workflows across **Visual Studio Code**, **Cursor**, and the standalone **Google Antigravity IDE**. It extends the official Google Antigravity experience with an interactive sidebar dashboard, real-time quota tracking, background low-quota alerts, instant UI synchronization, and effortless 1-click switching between multiple Google accounts.
 
 ### Status
 
 - **Version**: `1.2.9`
 - **Supported Platforms**: Windows (with Instant Token Swapping), macOS, Linux
-- **Compatibility**: Visual Studio Code, Cursor, Google Antigravity standalone IDE, Google Antigravity extension `1.3.0+`, AGY backend `1.2.2+`
+- **Supported IDEs**: Visual Studio Code, Cursor, Google Antigravity Standalone IDE, and other VS Code-compatible editors
+- **Compatibility**: Official Google Antigravity extension `1.3.0+`, AGY backend `1.2.2+`
 
 ---
 
@@ -48,7 +49,7 @@ A Visual Studio Code extension for managing, monitoring quota, and switching Goo
 - **Footer**: Developer attribution and links with safe external browser navigation.
 
 ### 3. Status Bar Item & Quick Navigation
-- **Real-Time Quota Glance**: Directly monitors active account quota from VS Code's status bar (`$(account) Antigravity Account Switcher: 85%`).
+- **Real-Time Quota Glance**: Directly monitors active account quota from your editor/IDE status bar (`$(account) Antigravity Account Switcher: 85%`).
 - **Color-Coded Status Alerts**: Dynamic warning background when quota $\le 20\%$ and critical error background when $\le 10\%$.
 - **Rich Markdown Tooltip**: Hovering reveals active account details, 5-hour quota, weekly quota, exact reset countdown, and quick links.
 - **Customizable Display Formats**: Choose between `compact` (`85%`), `detailed` (`85% (1h 45m)`), and `percentageOnly`.
@@ -64,7 +65,7 @@ A Visual Studio Code extension for managing, monitoring quota, and switching Goo
 
 ### 5. Antigravity UI Synchronization (No Window Reload)
 - **Instant Official Panel Sync**: Automatically reconnects and refreshes the official Google Antigravity sidebar (`google.google-antigravity`) upon account switch, sign-out, or re-authentication via internal RPC hooks (`antigravity.reconnect` / `antigravity.triggerUpdate`).
-- **Zero Disruptions**: Eliminates the need to reload the VS Code window or lose active editor states.
+- **Zero Disruptions**: Eliminates the need to reload the IDE window or lose active editor states.
 - **Safe Fallback**: Provides an optional prompt to reload window only if official auto-sync cannot be confirmed.
 
 ### 6. Settings & Personalization Modal
@@ -133,7 +134,7 @@ A Visual Studio Code extension for managing, monitoring quota, and switching Goo
 - **Windows Credential Manager Interop**: Uses native Win32 `Advapi32.dll` credential APIs (`CredReadW`, `CredWriteW`) to back up and swap Google Antigravity authentication tokens directly under target `gemini:antigravity`.
 - **Zero Third-Party Dependencies**: No external compiled binaries or node-gyp packages required; executes via lightweight PowerShell P/Invoke script.
 - **Transparent Process Respawn**: Gracefully restarts the `agy.exe` background worker process, triggering the official Antigravity extension host to immediately adopt the new token without window reloads or disruptions.
-- **Encrypted Local Token Vault**: Securely persists authentication blobs in VS Code's native `vscode.SecretStorage` (`context.secrets`), fully encrypted using OS Data Protection API (DPAPI).
+- **Encrypted Local Token Vault**: Securely persists authentication blobs in the IDE's native Secret Storage (`vscode.SecretStorage` / `context.secrets`), fully encrypted using OS Data Protection API (DPAPI).
 - **Graceful One-Time Fallback**: Accounts that haven't been vaulted yet simply open the browser once to authenticate; their credentials are then automatically vaulted for all subsequent 1-click instant switches.
 - **Configurable & Safe**: Can be disabled anytime via `boygr.antigravityAccountSwitcher.enableInstantSwitch`, and vault contents can be purged via `boygr.antigravityAccountSwitcher.clearTokenVault`.
 
@@ -141,17 +142,17 @@ A Visual Studio Code extension for managing, monitoring quota, and switching Goo
 
 ## Security Model
 
-- **Local-Only Encrypted Storage**: Account tokens are stored exclusively within VS Code's OS-backed `vscode.SecretStorage` (`context.secrets`, backed by Windows DPAPI). Tokens are never sent over the network, uploaded, or transmitted to any third-party server.
+- **Local-Only Encrypted Storage**: Account tokens are stored exclusively within the IDE's OS-backed Secret Storage (`vscode.SecretStorage` / `context.secrets`, backed by Windows DPAPI). Tokens are never sent over the network, uploaded, or transmitted to any third-party server.
 - **Credential Manager Target Scoping**: Only accesses the specific `gemini:antigravity` target created and used by the official Google Antigravity extension.
 - **Memory-Only CSRF**: Hub CSRF tokens are retained strictly in memory during operation and never written to disk.
-- **Non-Destructive Storage**: Does not alter VS Code's internal database (`state.vscdb`) or tamper with `.gemini` configurations.
+- **Non-Destructive Storage**: Does not alter the IDE's internal database (`state.vscdb`) or tamper with `.gemini` configurations.
 - **Purgeable Vault**: Users can inspect vaulted accounts (`⚡ Instant` badge) and completely purge all vaulted tokens at any time via the Command Palette or Settings modal.
 
 ---
 
 ## Commands
 
-Access these commands via the VS Code Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`):
+Access these commands via the Command Palette in your IDE (`Ctrl+Shift+P` / `Cmd+Shift+P`):
 
 | Command | Title | Shortcut | Description |
 | :--- | :--- | :--- | :--- |
@@ -182,7 +183,7 @@ Access these commands via the VS Code Command Palette (`Ctrl+Shift+P` / `Cmd+Shi
 
 ## Configuration Settings
 
-Customize behavior via VS Code Settings (`settings.json`):
+Customize behavior via your IDE Settings (`settings.json`):
 
 ```json
 {
@@ -237,15 +238,26 @@ Customize behavior via VS Code Settings (`settings.json`):
 ### From GitHub Releases / VSIX Package
 
 1. Download `antigravity-account-switcher-1.2.9.vsix` from [GitHub Releases](https://github.com/BoyGR/antigravity-account-switcher/releases) or locate `release/antigravity-account-switcher-1.2.9.vsix`.
-2. In VS Code:
-   - Go to **Extensions** (`Ctrl+Shift+X` / `Cmd+Shift+X`).
-   - Click the `...` menu (top right of Extensions view).
+
+2. **Via Graphical Interface (VS Code, Cursor, or Antigravity IDE)**:
+   - Open **Extensions** (`Ctrl+Shift+X` / `Cmd+Shift+X`).
+   - Click the `...` menu at the top right of the Extensions view.
    - Select **Install from VSIX...**.
-   - Choose the file.
-3. Or install via terminal:
-   ```powershell
-   code --install-extension release/antigravity-account-switcher-1.2.9.vsix
-   ```
+   - Choose `antigravity-account-switcher-1.2.9.vsix`.
+
+3. **Via Terminal / Command Line**:
+   - **Visual Studio Code**:
+     ```powershell
+     code --install-extension release/antigravity-account-switcher-1.2.9.vsix
+     ```
+   - **Cursor**:
+     ```powershell
+     cursor --install-extension release/antigravity-account-switcher-1.2.9.vsix
+     ```
+   - **Google Antigravity Standalone IDE**:
+     ```powershell
+     antigravity --install-extension release/antigravity-account-switcher-1.2.9.vsix
+     ```
 
 ---
 
