@@ -26,10 +26,12 @@
             theme: "vscode",
             language: "auto",
             effectiveLanguage: "en",
+            hideCurrent: false,
+            hideSaved: false,
+            hideRuntime: false,
             showCurrent: true,
             showSaved: true,
             showRuntime: true,
-            showQuotaMatrix: false,
             showQuotaAnalytics: false,
             autoRefreshIntervalMinutes: 5,
             enableLowQuotaReminder: true,
@@ -43,7 +45,7 @@
         vaultedEmails: [],
 
         meta: {
-            version: "1.2.2",
+            version: "1.2.4",
             developer: "Boy Gilang Ramadhan",
             website: "https://boygr.com",
             iconUri: "",
@@ -95,6 +97,9 @@
             "",
 
         editGroup:
+            "",
+
+        editPlan:
             "",
 
         customGroupInputOpen:
@@ -276,17 +281,14 @@
             indonesian:
                 "Bahasa Indonesia",
 
-            showCurrent:
-                "Show current account",
+            hideCurrent:
+                "Hide current account",
 
-            showSaved:
-                "Show saved accounts",
+            hideSaved:
+                "Hide saved accounts",
 
-            showRuntime:
-                "Show Antigravity status",
-
-            showQuotaMatrix:
-                "Show Quota Matrix button",
+            hideRuntime:
+                "Hide Antigravity status",
 
             showQuotaAnalytics:
                 "Show 7-day quota analytics",
@@ -569,6 +571,15 @@
 
             vaultInfo:
                 "Saved in encrypted Token Vault for 1-click seamless switching",
+
+            plan:
+                "Plan",
+
+            accountPlan:
+                "Account Plan",
+
+            selectPlan:
+                "Select Plan",
         },
 
         id: {
@@ -721,17 +732,14 @@
             indonesian:
                 "Bahasa Indonesia",
 
-            showCurrent:
-                "Tampilkan akun saat ini",
+            hideCurrent:
+                "Sembunyikan akun saat ini",
 
-            showSaved:
-                "Tampilkan akun tersimpan",
+            hideSaved:
+                "Sembunyikan akun tersimpan",
 
-            showRuntime:
-                "Tampilkan status Antigravity",
-
-            showQuotaMatrix:
-                "Tampilkan tombol Quota Matrix",
+            hideRuntime:
+                "Sembunyikan status Antigravity",
 
             showQuotaAnalytics:
                 "Tampilkan analisis kuota 7 hari",
@@ -1014,6 +1022,15 @@
 
             vaultInfo:
                 "Tersimpan di Brankas Token terenkripsi untuk pergantian 1-klik tanpa login browser",
+
+            plan:
+                "Paket",
+
+            accountPlan:
+                "Paket Akun",
+
+            selectPlan:
+                "Pilih Paket",
         },
     };
 
@@ -1798,6 +1815,36 @@
                             aria-label="Clear color"
                         >×</button>
                     ` : ""}
+                <div class="label-editor-plans">
+                    <span class="label-editor-meta-title">${escapeHtml(t("plan"))}:</span>
+                    <div class="plan-pills-row">
+                        ${(() => {
+                            const standardPlans = [
+                                "Google AI Plus",
+                                "Google AI Ultra",
+                                "Google AI Pro",
+                                "Google AI Free",
+                            ];
+                            return standardPlans.map(p => `
+                                <button
+                                    type="button"
+                                    class="plan-tag-btn ${ui.editPlan === p ? "selected" : ""}"
+                                    data-action="select-edit-plan"
+                                    data-plan="${escapeHtml(p)}"
+                                >${escapeHtml(p)}</button>
+                            `).join("");
+                        })()}
+                        ${ui.editPlan ? `
+                            <button
+                                type="button"
+                                class="color-clear-btn"
+                                data-action="select-edit-plan"
+                                data-plan=""
+                                title="Auto / Reset"
+                                aria-label="Auto / Reset"
+                            >×</button>
+                        ` : ""}
+                    </div>
                 </div>
 
                 <div class="label-editor-groups">
@@ -1952,6 +1999,71 @@
                         : ""
                 }
             </div>
+        `;
+    }
+    function resolveAccountPlanInfo(account) {
+        if (!account) {
+            return null;
+        }
+        const raw = (account.plan || account.g1Tier || "").trim();
+        const isPro = account.isPro === true;
+
+        let planName = "";
+        let planClass = "plan-free";
+        let iconSymbol = "";
+
+        const upper = raw.toUpperCase();
+        if (upper.includes("ULTRA")) {
+            planName = "Google AI Ultra";
+            planClass = "plan-ultra";
+            iconSymbol = "🌟";
+        } else if (upper.includes("PLUS")) {
+            planName = "Google AI Plus";
+            planClass = "plan-plus";
+            iconSymbol = "✨";
+        } else if (upper.includes("AI_PREMIUM") || upper.includes("PREMIUM")) {
+            planName = "Google AI Plus";
+            planClass = "plan-plus";
+            iconSymbol = "✨";
+        } else if (upper.includes("PRO") || isPro) {
+            planName = "Google AI Pro";
+            planClass = "plan-pro";
+            iconSymbol = "⚡";
+        } else if (upper.includes("ENTERPRISE")) {
+            planName = "Google AI Enterprise";
+            planClass = "plan-pro";
+            iconSymbol = "🏢";
+        } else if (upper.includes("FREE") || upper.includes("STANDARD")) {
+            planName = "Google AI Free";
+            planClass = "plan-free";
+            iconSymbol = "✦";
+        } else if (raw) {
+            planName = raw.replace(/^G1_TIER_/, "").replace(/_/g, " ");
+            planClass = "plan-custom";
+            iconSymbol = "✨";
+        } else {
+            planName = "Google AI Free";
+            planClass = "plan-free";
+            iconSymbol = "✦";
+        }
+
+        return {
+            name: planName,
+            className: planClass,
+            icon: iconSymbol,
+        };
+    }
+
+    function renderPlanBadge(account) {
+        const info = resolveAccountPlanInfo(account);
+        if (!info || !info.name) {
+            return "";
+        }
+        return `
+            <span class="plan-pill ${escapeHtml(info.className)}" title="${escapeHtml(`Plan: ${info.name}`)}">
+                <span class="plan-icon" aria-hidden="true">${info.icon}</span>
+                <span class="plan-text">${escapeHtml(info.name)}</span>
+            </span>
         `;
     }
 
@@ -2727,8 +2839,8 @@
     }
     function renderCurrent() {
         if (
-            !state.preferences
-                ?.showCurrent
+            state.preferences?.hideCurrent === true ||
+            state.preferences?.showCurrent === false
         ) {
             return "";
         }
@@ -2874,6 +2986,8 @@
                                                 <span class="account-label">
                                                     ${escapeHtml(localLabel)}
                                                 </span>
+
+                                                ${renderPlanBadge(managed?.plan ? managed : state.current)}
 
                                                 ${
                                                     managed?.group
@@ -3311,6 +3425,8 @@
                                         ${escapeHtml(account.email)}
                                     </div>
 
+                                    ${renderPlanBadge(account)}
+
                                     ${
                                         state.vaultedEmails?.includes(normalizeEmail(account.email))
                                             ? `
@@ -3435,8 +3551,8 @@
 
     function renderSaved() {
         if (
-            !state.preferences
-                ?.showSaved
+            state.preferences?.hideSaved === true ||
+            state.preferences?.showSaved === false
         ) {
             return "";
         }
@@ -3640,7 +3756,8 @@
     }
     function renderRuntimeTrigger() {
         if (
-            !state.preferences?.showRuntime
+            state.preferences?.hideRuntime === true ||
+            state.preferences?.showRuntime === false
         ) {
             return "";
         }
@@ -3705,19 +3822,6 @@
                     <span class="runtime-status-pill-label">Antigravity:</span>
                     <span class="runtime-status-pill-value">${escapeHtml(summaryText)}</span>
                 </button>
-
-                ${state.preferences?.showQuotaMatrix ? `
-                <button
-                    type="button"
-                    class="quota-matrix-trigger-btn"
-                    data-action="open-quota-matrix"
-                    title="${escapeHtml(t("quotaMatrixTitle"))}"
-                    aria-label="${escapeHtml(t("quotaMatrixTitle"))}"
-                >
-                    ${icon("matrix", "matrix-icon")}
-                    <span>${escapeHtml(t("quotaMatrix"))}</span>
-                </button>
-                ` : ""}
             </div>
         `;
     }
@@ -4014,6 +4118,7 @@
                                 <div class="matrix-email-row" title="${escapeHtml(account.email)}">${escapeHtml(account.email)}</div>
                                 <div class="matrix-tags-row">
                                     ${state.vaultedEmails?.includes(normalizeEmail(account.email)) ? `<span class="vault-pill" title="${escapeHtml(t("vaultInfo"))}">⚡ ${escapeHtml(t("instantBadge"))}</span>` : ""}
+                                    ${renderPlanBadge(isActive ? (state.current || account) : account)}
                                     ${localLabel ? `<span class="account-label">${escapeHtml(localLabel)}</span>` : ""}
                                     ${account.group ? `<span class="group-pill" title="Group: ${escapeHtml(account.group)}">🏷️ ${escapeHtml(account.group)}</span>` : ""}
                                 </div>
@@ -4230,33 +4335,25 @@
 
                             ${
                                 renderCheckbox(
-                                    "showRuntime",
-                                    t("showRuntime"),
-                                    draft.showRuntime
+                                    "hideRuntime",
+                                    t("hideRuntime"),
+                                    draft.hideRuntime === true || draft.showRuntime === false
                                 )
                             }
 
                             ${
                                 renderCheckbox(
-                                    "showCurrent",
-                                    t("showCurrent"),
-                                    draft.showCurrent
+                                    "hideCurrent",
+                                    t("hideCurrent"),
+                                    draft.hideCurrent === true || draft.showCurrent === false
                                 )
                             }
 
                             ${
                                 renderCheckbox(
-                                    "showSaved",
-                                    t("showSaved"),
-                                    draft.showSaved
-                                )
-                            }
-
-                            ${
-                                renderCheckbox(
-                                    "showQuotaMatrix",
-                                    t("showQuotaMatrix"),
-                                    draft.showQuotaMatrix === true
+                                    "hideSaved",
+                                    t("hideSaved"),
+                                    draft.hideSaved === true || draft.showSaved === false
                                 )
                             }
 
@@ -4771,6 +4868,9 @@
         ui.editGroup =
             account.group || "";
 
+        ui.editPlan =
+            account.plan || "";
+
         ui.customGroupInputOpen =
             false;
 
@@ -4791,6 +4891,9 @@
             "";
 
         ui.editGroup =
+            "";
+
+        ui.editPlan =
             "";
 
         ui.customGroupInputOpen =
@@ -4828,6 +4931,8 @@
                 ui.editColorTag,
             group:
                 ui.editGroup,
+            plan:
+                ui.editPlan || undefined,
         });
     }
 
@@ -4844,17 +4949,14 @@
                 preferences.language ||
                 "auto",
 
-            showCurrent:
-                preferences.showCurrent !== false,
+            hideCurrent:
+                preferences.hideCurrent === true || preferences.showCurrent === false,
 
-            showSaved:
-                preferences.showSaved !== false,
+            hideSaved:
+                preferences.hideSaved === true || preferences.showSaved === false,
 
-            showRuntime:
-                preferences.showRuntime !== false,
-
-            showQuotaMatrix:
-                preferences.showQuotaMatrix === true,
+            hideRuntime:
+                preferences.hideRuntime === true || preferences.showRuntime === false,
 
             showQuotaAnalytics:
                 preferences.showQuotaAnalytics === true,
@@ -4916,6 +5018,9 @@
             type: "saveSettings",
             preferences: {
                 ...ui.settingsDraft,
+                showCurrent: !ui.settingsDraft.hideCurrent,
+                showSaved: !ui.settingsDraft.hideSaved,
+                showRuntime: !ui.settingsDraft.hideRuntime,
             },
         });
     }
@@ -5231,6 +5336,13 @@
             if (action === "select-edit-group") {
                 const group = target.dataset.group || "";
                 ui.editGroup = ui.editGroup === group ? "" : group;
+                render();
+                return;
+            }
+
+            if (action === "select-edit-plan") {
+                const plan = target.dataset.plan || "";
+                ui.editPlan = ui.editPlan === plan ? "" : plan;
                 render();
                 return;
             }

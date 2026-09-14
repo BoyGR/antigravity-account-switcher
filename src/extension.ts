@@ -116,9 +116,20 @@ export function activate(
             },
         );
 
+    const focusViewCommand =
+        vscode.commands.registerCommand(
+            "boygr.antigravityAccountSwitcher.focusView",
+            async () => {
+                await vscode.commands.executeCommand(
+                    "boygr.antigravityAccountSwitcher.accountsView.focus",
+                );
+            },
+        );
+
     context.subscriptions.push(
         statusBarManager,
         statusBarMenuCommand,
+        focusViewCommand,
         diagnoseCommand,
         refreshCommand,
         exportAnalyticsCommand,

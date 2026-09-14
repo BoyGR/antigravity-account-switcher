@@ -11,3 +11,6 @@ release/
 
 out/
 dist/**/*.map
+
+# Internal private workspace (docs, operational artifacts, private notes)
+internal/

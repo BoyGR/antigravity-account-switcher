@@ -17,6 +17,9 @@ export interface ManagedAntigravityAccount {
     displayName?: string;
     colorTag?: string;
     group?: string;
+    plan?: string;
+    g1Tier?: string;
+    isPro?: boolean;
     firstSeenAt: string;
     lastSeenAt: string;
 }
@@ -110,6 +113,11 @@ export async function saveCurrentAccountMetadata(
             current.displayName ||
             existing?.displayName ||
             undefined,
+        colorTag: existing?.colorTag,
+        group: existing?.group,
+        plan: existing?.plan || current.plan,
+        g1Tier: current.g1Tier || existing?.g1Tier,
+        isPro: typeof current.isPro === "boolean" ? current.isPro : existing?.isPro,
         firstSeenAt:
             existing?.firstSeenAt || now,
         lastSeenAt: now,
@@ -167,6 +175,7 @@ export async function updateManagedAccountLabel(
     label?: string,
     colorTag?: string,
     group?: string,
+    plan?: string,
 ): Promise<ManagedAntigravityAccount> {
     const normalized = normalizeEmail(email);
 
@@ -206,11 +215,17 @@ export async function updateManagedAccountLabel(
             ? (group.trim() || undefined)
             : existing.group;
 
+    const normalizedPlan =
+        plan !== undefined
+            ? (plan.trim() || undefined)
+            : existing.plan;
+
     const updated: ManagedAntigravityAccount = {
         ...existing,
         label: normalizedLabel,
         colorTag: normalizedColorTag,
         group: normalizedGroup,
+        plan: normalizedPlan,
     };
 
     await context.globalState.update(
@@ -493,6 +508,9 @@ export async function importManagedAccounts(
         displayName?: string;
         colorTag?: string;
         group?: string;
+        plan?: string;
+        g1Tier?: string;
+        isPro?: boolean;
         firstSeenAt?: string;
         lastSeenAt?: string;
     }>,
@@ -524,6 +542,9 @@ export async function importManagedAccounts(
                 displayName: item.displayName !== undefined ? item.displayName.trim() || undefined : existing.displayName,
                 colorTag: item.colorTag !== undefined ? item.colorTag.trim() || undefined : existing.colorTag,
                 group: item.group !== undefined ? item.group.trim() || undefined : existing.group,
+                plan: item.plan !== undefined ? item.plan.trim() || undefined : existing.plan,
+                g1Tier: item.g1Tier !== undefined ? item.g1Tier : existing.g1Tier,
+                isPro: typeof item.isPro === "boolean" ? item.isPro : existing.isPro,
                 lastSeenAt: item.lastSeenAt || existing.lastSeenAt || now,
             };
             updated++;
@@ -534,6 +555,9 @@ export async function importManagedAccounts(
                 displayName: item.displayName?.trim() || undefined,
                 colorTag: item.colorTag?.trim() || undefined,
                 group: item.group?.trim() || undefined,
+                plan: item.plan?.trim() || undefined,
+                g1Tier: item.g1Tier?.trim() || undefined,
+                isPro: typeof item.isPro === "boolean" ? item.isPro : undefined,
                 firstSeenAt: item.firstSeenAt || now,
                 lastSeenAt: item.lastSeenAt || now,
             };

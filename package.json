@@ -2,7 +2,7 @@
     "name": "antigravity-account-switcher",
     "displayName": "Antigravity Account Switcher",
     "description": "Manage and switch Google accounts used by Google Antigravity in Visual Studio Code through Antigravity's existing authentication flow.",
-    "version": "1.2.2",
+    "version": "1.2.4",
     "publisher": "boygr",
     "author": {
         "name": "Boy Gilang Ramadhan",
@@ -43,6 +43,11 @@
     "main": "./dist/extension.js",
     "contributes": {
         "commands": [
+            {
+                "command": "boygr.antigravityAccountSwitcher.focusView",
+                "title": "Focus Account Switcher View",
+                "category": "Antigravity Account Switcher"
+            },
             {
                 "command": "boygr.antigravityAccountSwitcher.diagnose",
                 "title": "Diagnose",
@@ -257,16 +262,11 @@
                         "percentageOnly"
                     ],
                     "enumDescriptions": [
-                        "Compact (e.g. AGY: 85%)",
-                        "Detailed with countdown (e.g. AGY: 85% (1h 45m))",
+                        "Compact (e.g. Antigravity Account Switcher: 85%)",
+                        "Detailed with countdown (e.g. Antigravity Account Switcher: 85% (1h 45m))",
                         "Percentage only (e.g. 85%)"
                     ],
                     "description": "Display format for the Antigravity quota indicator in the status bar."
-                },
-                "boygr.antigravityAccountSwitcher.showQuotaMatrix": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Show the Quota Matrix overview button in the Antigravity status bar section."
                 },
                 "boygr.antigravityAccountSwitcher.showQuotaAnalytics": {
                     "type": "boolean",

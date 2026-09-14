@@ -966,8 +966,63 @@ export interface AntigravityCurrentAccount {
     displayName?: string;
     g1Tier?: string;
     isPro?: boolean;
+    plan?: string;
     hasUsedAntigravity?: boolean;
     profilePictureUrl?: string;
+}
+
+export function formatAccountPlan(
+    g1Tier?: string,
+    isPro?: boolean,
+    rawPlan?: string,
+): string {
+    if (rawPlan && rawPlan.trim()) {
+        const trimmed = rawPlan.trim();
+        const upper = trimmed.toUpperCase();
+        if (upper.includes("ULTRA")) {
+            return "Google AI Ultra";
+        }
+        if (upper.includes("PLUS")) {
+            return "Google AI Plus";
+        }
+        if (upper.includes("AI_PREMIUM") || upper.includes("PREMIUM")) {
+            return "Google AI Plus";
+        }
+        if (upper.includes("PRO")) {
+            return "Google AI Pro";
+        }
+        if (upper.includes("ENTERPRISE")) {
+            return "Google AI Enterprise";
+        }
+        if (upper.includes("FREE") || upper.includes("STANDARD")) {
+            return "Google AI Free";
+        }
+        return trimmed;
+    }
+
+    const raw = (g1Tier || "").toUpperCase().trim();
+    if (raw.includes("ULTRA")) {
+        return "Google AI Ultra";
+    }
+    if (raw.includes("PLUS")) {
+        return "Google AI Plus";
+    }
+    if (raw.includes("AI_PREMIUM") || raw.includes("PREMIUM")) {
+        return "Google AI Plus";
+    }
+    if (raw.includes("PRO") || isPro === true) {
+        return "Google AI Pro";
+    }
+    if (raw.includes("ENTERPRISE")) {
+        return "Google AI Enterprise";
+    }
+    if (raw.includes("FREE") || raw.includes("STANDARD")) {
+        return "Google AI Free";
+    }
+    if (raw) {
+        return raw.replace(/^G1_TIER_/, "").replace(/_/g, " ");
+    }
+    return "Google AI Free";
 }
 
 interface GetUserStatusResponse {
@@ -975,6 +1030,10 @@ interface GetUserStatusResponse {
         email?: string;
         name?: string;
         g1Tier?: string;
+        tier?: string;
+        userTier?: string;
+        subscriptionTier?: string;
+        plan?: string;
         pro?: boolean;
         hasUsedAntigravity?: boolean;
         profilePictureUrl?: string;
@@ -1030,6 +1089,25 @@ export async function getAntigravityCurrentAccount():
             );
         }
 
+        const rawTier =
+            userStatus.g1Tier?.trim() ||
+            userStatus.tier?.trim() ||
+            userStatus.userTier?.trim() ||
+            userStatus.subscriptionTier?.trim() ||
+            undefined;
+
+        const isPro =
+            typeof userStatus.pro === "boolean"
+                ? userStatus.pro
+                : undefined;
+
+        const rawPlan =
+            typeof userStatus.plan === "string"
+                ? userStatus.plan.trim()
+                : undefined;
+
+        const plan = formatAccountPlan(rawTier, isPro, rawPlan);
+
         return {
             email,
 
@@ -1037,14 +1115,11 @@ export async function getAntigravityCurrentAccount():
                 userStatus.name?.trim() ||
                 undefined,
 
-            g1Tier:
-                userStatus.g1Tier?.trim() ||
-                undefined,
+            g1Tier: rawTier,
 
-            isPro:
-                typeof userStatus.pro === "boolean"
-                    ? userStatus.pro
-                    : undefined,
+            isPro,
+
+            plan,
 
             hasUsedAntigravity:
                 typeof userStatus.hasUsedAntigravity === "boolean"

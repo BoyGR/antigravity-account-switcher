@@ -60,13 +60,17 @@ interface AccountSwitcherPreferences {
 
     language: LanguagePreference;
 
-    showCurrent: boolean;
+    hideCurrent: boolean;
 
-    showSaved: boolean;
+    hideSaved: boolean;
 
-    showRuntime: boolean;
+    hideRuntime: boolean;
 
-    showQuotaMatrix?: boolean;
+    showCurrent?: boolean;
+
+    showSaved?: boolean;
+
+    showRuntime?: boolean;
 
     showQuotaAnalytics?: boolean;
 
@@ -115,6 +119,7 @@ type WebviewMessage =
           label: string;
           colorTag?: string;
           group?: string;
+          plan?: string;
       }
     | {
           type: "updateColorTag";
@@ -207,10 +212,12 @@ const DEFAULT_PREFERENCES: AccountSwitcherPreferences = {
     version: 1,
     theme: "vscode",
     language: "auto",
+    hideCurrent: false,
+    hideSaved: false,
+    hideRuntime: false,
     showCurrent: true,
     showSaved: true,
     showRuntime: true,
-    showQuotaMatrix: false,
     showQuotaAnalytics: false,
     autoRefreshIntervalMinutes: 5,
     enableLowQuotaReminder: true,
@@ -858,6 +865,7 @@ export class AntigravityAccountWebviewProvider
                     message.label,
                     message.colorTag,
                     message.group,
+                    message.plan,
                 );
 
                 await this.refreshLocalAccounts();
@@ -1077,30 +1085,37 @@ export class AntigravityAccountWebviewProvider
                 ? input.enableInstantSwitch
                 : DEFAULT_PREFERENCES.enableInstantSwitch;
 
+        const hideCurrent =
+            typeof input.hideCurrent === "boolean"
+                ? input.hideCurrent
+                : (typeof input.showCurrent === "boolean" ? !input.showCurrent : false);
+
+        const hideSaved =
+            typeof input.hideSaved === "boolean"
+                ? input.hideSaved
+                : (typeof input.showSaved === "boolean" ? !input.showSaved : false);
+
+        const hideRuntime =
+            typeof input.hideRuntime === "boolean"
+                ? input.hideRuntime
+                : (typeof input.showRuntime === "boolean" ? !input.showRuntime : false);
+
+        const showQuotaAnalytics =
+            typeof input.showQuotaAnalytics === "boolean"
+                ? input.showQuotaAnalytics
+                : false;
+
         return {
             version: 1,
             theme,
             language,
-            showCurrent:
-                typeof input.showCurrent === "boolean"
-                    ? input.showCurrent
-                    : true,
-            showSaved:
-                typeof input.showSaved === "boolean"
-                    ? input.showSaved
-                    : true,
-            showRuntime:
-                typeof input.showRuntime === "boolean"
-                    ? input.showRuntime
-                    : true,
-            showQuotaMatrix:
-                typeof input.showQuotaMatrix === "boolean"
-                    ? input.showQuotaMatrix
-                    : false,
-            showQuotaAnalytics:
-                typeof input.showQuotaAnalytics === "boolean"
-                    ? input.showQuotaAnalytics
-                    : false,
+            hideCurrent,
+            hideSaved,
+            hideRuntime,
+            showCurrent: !hideCurrent,
+            showSaved: !hideSaved,
+            showRuntime: !hideRuntime,
+            showQuotaAnalytics,
             autoRefreshIntervalMinutes,
             enableLowQuotaReminder,
             lowQuotaThresholdPercent,
@@ -1145,10 +1160,12 @@ export class AntigravityAccountWebviewProvider
         input: {
             theme: ThemePreference;
             language: LanguagePreference;
-            showCurrent: boolean;
-            showSaved: boolean;
-            showRuntime: boolean;
-            showQuotaMatrix?: boolean;
+            hideCurrent?: boolean;
+            hideSaved?: boolean;
+            hideRuntime?: boolean;
+            showCurrent?: boolean;
+            showSaved?: boolean;
+            showRuntime?: boolean;
             showQuotaAnalytics?: boolean;
             autoRefreshIntervalMinutes?: number;
             enableLowQuotaReminder?: boolean;
@@ -1181,9 +1198,6 @@ export class AntigravityAccountWebviewProvider
 
         const config = vscode.workspace.getConfiguration("boygr.antigravityAccountSwitcher");
         await config.update("enableInstantSwitch", preferences.enableInstantSwitch, vscode.ConfigurationTarget.Global).then(undefined, () => undefined);
-        if (typeof preferences.showQuotaMatrix === "boolean") {
-            await config.update("showQuotaMatrix", preferences.showQuotaMatrix, vscode.ConfigurationTarget.Global).then(undefined, () => undefined);
-        }
         if (typeof preferences.showQuotaAnalytics === "boolean") {
             await config.update("showQuotaAnalytics", preferences.showQuotaAnalytics, vscode.ConfigurationTarget.Global).then(undefined, () => undefined);
         }

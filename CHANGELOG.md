@@ -4,6 +4,37 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.2.4] - 2026-09-14
+
+### Added & Improved
+- **Account Plan & Subscription Tier Badges**:
+  - Automatically identifies, detects, and formats subscription plans per account (e.g. `Google AI Plus`, `Google AI Ultra`, `Google AI Pro`, `Google AI Free`, and Google One tiers) from Antigravity user status & language server RPC.
+  - Displayed stylish, theme-adaptive plan badges across all account views: **Current Account**, **Saved Accounts**, and the **Quota Matrix Modal**.
+  - Added interactive Plan selection buttons inside the account editor (Edit Modal) allowing users to switch or customize account plans with 1 click.
+  - Full persistence of plan info in local account registry, export/import JSON backups, and workspace account mappings.
+- **Smart Quota Fallback Default & Interaction**:
+  - Clarified and preserved `smartQuotaFallback` enabled (`true`) by default: it initiates a non-disruptive notification with a 1-click confirmation button (`Switch to <Candidate>`), ensuring account switching only occurs upon explicit user click.
+
+---
+
+## [1.2.3] - 2026-09-14
+
+### Improved & Enhanced
+- **Status Bar Integration & Focus Flow**:
+  - Upgraded status bar label and icon from generic `AGY` to `$(account) Antigravity Account Switcher`.
+  - Clicking the status bar item now seamlessly focuses and opens the Antigravity Account Switcher view in the Activity Bar rather than opening the command palette.
+- **Interface Streamlining & Quota Matrix De-duplication**:
+  - Removed redundant Quota Matrix trigger pill from the webview status bar, avoiding duplicate buttons since a dedicated Quota Matrix icon already exists directly in the Activity Bar view header (`view/title`).
+- **Inverted Visibility Toggles in Settings ("Hide ...")**:
+  - Converted previously pre-checked visibility options into intuitive `Hide ...` toggles:
+    - `Hide Antigravity status` (default: unchecked / visible)
+    - `Hide current account` (default: unchecked / visible)
+    - `Hide saved accounts` (default: unchecked / visible)
+    - `Show 7-day quota analytics` (default: unchecked / hidden)
+  - All layout checkboxes now default to unchecked for consistent user expectation.
+
+---
+
 ## [1.2.2] - 2026-09-14
 
 ### Improved & Fixed

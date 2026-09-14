@@ -26,7 +26,7 @@ export class AntigravityStatusBarManager implements vscode.Disposable {
             100,
         );
         this.statusBarItem.command =
-            "boygr.antigravityAccountSwitcher.statusBarMenu";
+            "boygr.antigravityAccountSwitcher.focusView";
 
         this.disposables.push(this.statusBarItem);
 
@@ -139,18 +139,18 @@ export class AntigravityStatusBarManager implements vscode.Disposable {
         }
 
         if (!this.lastIsRunning) {
-            this.statusBarItem.text = "$(hubot) AGY: Offline";
+            this.statusBarItem.text = "$(account) Antigravity Account Switcher: Offline";
             this.statusBarItem.tooltip =
-                "Antigravity Hub is not running. Click to view options.";
+                "Antigravity Hub is not running. Click to open Antigravity Account Switcher in Activity Bar.";
             this.statusBarItem.backgroundColor = undefined;
             this.statusBarItem.show();
             return;
         }
 
         if (!this.lastAccount || !this.lastAccount.email) {
-            this.statusBarItem.text = "$(account) AGY: No Account";
+            this.statusBarItem.text = "$(account) Antigravity Account Switcher: No Account";
             this.statusBarItem.tooltip =
-                "No active Google account detected in Antigravity. Click to sign in or switch account.";
+                "No active Google account detected in Antigravity. Click to open Antigravity Account Switcher in Activity Bar.";
             this.statusBarItem.backgroundColor = undefined;
             this.statusBarItem.show();
             return;
@@ -178,20 +178,20 @@ export class AntigravityStatusBarManager implements vscode.Disposable {
         if (pct !== undefined) {
             switch (settings.format) {
                 case "percentageOnly":
-                    this.statusBarItem.text = `$(hubot) ${pct}%`;
+                    this.statusBarItem.text = `$(account) ${pct}%`;
                     break;
                 case "detailed":
                     this.statusBarItem.text = countdownStr
-                        ? `$(hubot) AGY: ${pct}% (${countdownStr})`
-                        : `$(hubot) AGY: ${pct}%`;
+                        ? `$(account) Antigravity Account Switcher: ${pct}% (${countdownStr})`
+                        : `$(account) Antigravity Account Switcher: ${pct}%`;
                     break;
                 case "compact":
                 default:
-                    this.statusBarItem.text = `$(hubot) AGY: ${pct}%`;
+                    this.statusBarItem.text = `$(account) Antigravity Account Switcher: ${pct}%`;
                     break;
             }
         } else {
-            this.statusBarItem.text = "$(hubot) AGY: Active";
+            this.statusBarItem.text = "$(account) Antigravity Account Switcher: Active";
         }
 
         // 2. Dynamic Warning / Error Background
@@ -248,7 +248,7 @@ export class AntigravityStatusBarManager implements vscode.Disposable {
 
         md.appendMarkdown(`---\n\n`);
         md.appendMarkdown(
-            `*Click to switch accounts, refresh quota, or open dashboard.*`,
+            `*Click to open Antigravity Account Switcher in Activity Bar.*`,
         );
 
         this.statusBarItem.tooltip = md;

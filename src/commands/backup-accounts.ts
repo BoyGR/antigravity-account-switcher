@@ -20,6 +20,9 @@ interface AccountsBackupPayload {
         displayName?: string;
         colorTag?: string;
         group?: string;
+        plan?: string;
+        g1Tier?: string;
+        isPro?: boolean;
         firstSeenAt?: string;
         lastSeenAt?: string;
     }>;
@@ -65,6 +68,9 @@ export function registerBackupAccountsCommands(
                         displayName: a.displayName,
                         colorTag: a.colorTag,
                         group: a.group,
+                        plan: a.plan,
+                        g1Tier: a.g1Tier,
+                        isPro: a.isPro,
                         firstSeenAt: a.firstSeenAt,
                         lastSeenAt: a.lastSeenAt,
                     })),
@@ -124,6 +130,10 @@ export function registerBackupAccountsCommands(
                     label?: string;
                     displayName?: string;
                     colorTag?: string;
+                    group?: string;
+                    plan?: string;
+                    g1Tier?: string;
+                    isPro?: boolean;
                     firstSeenAt?: string;
                     lastSeenAt?: string;
                 }> = [];
