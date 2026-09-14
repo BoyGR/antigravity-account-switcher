@@ -48,3 +48,4 @@ coverage/**
 # Internal private workspace - strictly excluded from packaging
 internal/**
 internal-docs/**
+PUBLISHING.md
