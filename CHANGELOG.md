@@ -4,6 +4,16 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.2.7] - 2026-09-14
+
+### Changed & Improved
+- **Saved Accounts Default Sorting (`Last used`)**:
+  - Changed the default sorting strategy of saved accounts in both the Webview and Status Bar menu to **Last used** (`recent`).
+  - Positioned the "Last used" option first in the sort selection dropdown for seamless, intuitive account list navigation.
+  - Preserved explicit user preferences when manually switching between Quota, Name, or Last used.
+
+---
+
 ## [1.2.6] - 2026-09-14
 
 ### Improved & Enhanced

@@ -41,6 +41,12 @@ export function registerStatusBarMenuCommand(
                         return aIsActive ? -1 : 1;
                     }
 
+                    const aTime = a.lastSeenAt ? new Date(a.lastSeenAt).getTime() : 0;
+                    const bTime = b.lastSeenAt ? new Date(b.lastSeenAt).getTime() : 0;
+                    if (bTime !== aTime) {
+                        return bTime - aTime;
+                    }
+
                     const aPercent = getAccountRemainingPercent(
                         usageSnapshots[a.email.toLowerCase()],
                     );

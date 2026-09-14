@@ -45,7 +45,7 @@
         vaultedEmails: [],
 
         meta: {
-            version: "1.2.6",
+            version: "1.2.7",
             developer: "Boy Gilang Ramadhan",
             website: "https://boygr.com",
             iconUri: "",
@@ -59,9 +59,12 @@
                 : "",
 
         sortBy:
-            typeof persisted.sortBy === "string"
+            persisted.sortCustomized && typeof persisted.sortBy === "string"
                 ? persisted.sortBy
-                : "quota",
+                : "recent",
+
+        sortCustomized:
+            Boolean(persisted.sortCustomized),
 
         currentCollapsed:
             Boolean(
@@ -1313,6 +1316,9 @@
             sortBy:
                 ui.sortBy,
 
+            sortCustomized:
+                ui.sortCustomized,
+
             currentCollapsed:
                 ui.currentCollapsed,
 
@@ -1563,7 +1569,7 @@
                 return aIsActive ? -1 : 1;
             }
 
-            const sortBy = ui.sortBy || "quota";
+            const sortBy = ui.sortBy || "recent";
             if (sortBy === "quota") {
                 const aPercent = getAccountQuotaPercent(a);
                 const bPercent = getAccountQuotaPercent(b);
@@ -3638,9 +3644,9 @@
                                                             aria-label="${escapeHtml(t("sortBy"))}"
                                                             title="${escapeHtml(t("sortBy"))}"
                                                         >
+                                                            <option value="recent" ${ui.sortBy === "recent" ? "selected" : ""}>${escapeHtml(t("sortRecent"))}</option>
                                                             <option value="quota" ${ui.sortBy === "quota" ? "selected" : ""}>${escapeHtml(t("sortQuota"))}</option>
                                                             <option value="name" ${ui.sortBy === "name" ? "selected" : ""}>${escapeHtml(t("sortName"))}</option>
-                                                            <option value="recent" ${ui.sortBy === "recent" ? "selected" : ""}>${escapeHtml(t("sortRecent"))}</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -5069,6 +5075,7 @@
                 target.dataset.action === "change-sort"
             ) {
                 ui.sortBy = target.value;
+                ui.sortCustomized = true;
                 persistUi();
                 updateSavedListOnly();
                 return;
