@@ -26,19 +26,7 @@
         "Machine Learning"
     ],
     "activationEvents": [
-        "onCommand:boygr.antigravityAccountSwitcher.diagnose",
-        "onCommand:boygr.antigravityAccountSwitcher.status",
-        "onCommand:boygr.antigravityAccountSwitcher.inspectBridge",
-        "onCommand:boygr.antigravityAccountSwitcher.authStatus",
-        "onCommand:boygr.antigravityAccountSwitcher.signIn",
-        "onCommand:boygr.antigravityAccountSwitcher.reAuth",
-        "onCommand:boygr.antigravityAccountSwitcher.signOut",
-        "onCommand:boygr.antigravityAccountSwitcher.currentAccount",
-        "onCommand:boygr.antigravityAccountSwitcher.saveCurrentAccount",
-        "onCommand:boygr.antigravityAccountSwitcher.manageAccounts",
-        "onView:boygr.antigravityAccountSwitcher.accountsView",
-        "onCommand:boygr.antigravityAccountSwitcher.addAccount",
-        "onCommand:boygr.antigravityAccountSwitcher.statusBarMenu"
+        "onStartupFinished"
     ],
     "main": "./dist/extension.js",
     "contributes": {
@@ -205,6 +193,7 @@
                     "id": "boygr.antigravityAccountSwitcher.accountsView",
                     "name": "Antigravity Account Switcher",
                     "type": "webview",
+                    "icon": "media/antigravity.svg",
                     "contextualTitle": "Antigravity Account Switcher"
                 }
             ]
