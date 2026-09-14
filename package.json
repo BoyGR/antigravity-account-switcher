@@ -206,14 +206,9 @@
                     "group": "navigation@1"
                 },
                 {
-                    "command": "boygr.antigravityAccountSwitcher.quotaOverview",
-                    "when": "view == boygr.antigravityAccountSwitcher.accountsView",
-                    "group": "navigation@2"
-                },
-                {
                     "command": "boygr.antigravityAccountSwitcher.openSettings",
                     "when": "view == boygr.antigravityAccountSwitcher.accountsView",
-                    "group": "navigation@3"
+                    "group": "navigation@2"
                 }
             ]
         },

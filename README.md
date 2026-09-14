@@ -116,7 +116,7 @@ An extension for Visual Studio Code, Cursor, and Google Antigravity IDE to manag
 
 ### 14. Multi-Account Quota Matrix Dashboard
 - Full-screen modal comparison matrix displaying real-time 5-hour and weekly quota progress bars, exact reset countdowns, profile pictures, plan badges, and 1-click switch buttons for all saved accounts side-by-side.
-- Dedicated "Quota Matrix" icon button directly in the Activity Bar title bar (`view/title`).
+- Dedicated "Quota Matrix" trigger button directly in the webview runtime status bar, right beside the Antigravity status pill.
 - Accessible via command `boygr.antigravityAccountSwitcher.quotaOverview`.
 
 ### 15. Auto-Round-Robin Account Rotation

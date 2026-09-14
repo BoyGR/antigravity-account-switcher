@@ -335,7 +335,7 @@
                     </div>
                 </div>
             </div>
-        `}function ye(e){if(typeof e!="string")return"";try{const s=new URL(e),n=s.hostname.toLowerCase(),i=n==="googleusercontent.com"||n.endsWith(".googleusercontent.com")||n==="ggpht.com"||n.endsWith(".ggpht.com")||n==="gstatic.com"||n.endsWith(".gstatic.com")||n==="google.com"||n.endsWith(".google.com");return s.protocol!=="https:"||!i?"":s.toString()}catch{return""}}function F(e,s,n,i="",u=""){const l=ye(n),c=`
+        `}function $e(e){if(typeof e!="string")return"";try{const s=new URL(e),n=s.hostname.toLowerCase(),i=n==="googleusercontent.com"||n.endsWith(".googleusercontent.com")||n==="ggpht.com"||n.endsWith(".ggpht.com")||n==="gstatic.com"||n.endsWith(".gstatic.com")||n==="google.com"||n.endsWith(".google.com");return s.protocol!=="https:"||!i?"":s.toString()}catch{return""}}function F(e,s,n,i="",u=""){const l=$e(n),c=`
             <span class="avatar-fallback">
                 ${t(fe(e,s))}
             </span>
@@ -359,7 +359,7 @@
 
                 ${u}
             </div>
-        `}function $e(e){if(!e)return null;const s=typeof e.plan=="string"?e.plan.trim():"",n=typeof e.g1Tier=="string"?e.g1Tier.trim():"",i=s||n,u=e.isPro===!0;if(!i&&!u)return null;let l="",c="plan-free",d="";const p=i.toUpperCase();if(p.includes("ULTRA"))l="Google AI Ultra",c="plan-ultra",d="\u{1F31F}";else if(p.includes("PLUS"))l="Google AI Plus",c="plan-plus",d="\u2728";else if(p.includes("AI_PREMIUM")||p.includes("PREMIUM"))l="Google AI Plus",c="plan-plus",d="\u2728";else if(p.includes("PRO")||u)l="Google AI Pro",c="plan-pro",d="\u26A1";else if(p.includes("ENTERPRISE"))l="Google AI Enterprise",c="plan-pro",d="\u{1F3E2}";else if(p.includes("FREE")||p.includes("STANDARD"))l="Google AI Free",c="plan-free",d="\u2726";else if(i)l=i.replace(/^G1_TIER_/,"").replace(/_/g," "),c="plan-custom",d="\u2728";else return null;return{name:l,className:c,icon:d}}function V(e){try{const s=$e(e);return!s||!s.name?"":`
+        `}function ye(e){if(!e)return null;const s=typeof e.plan=="string"?e.plan.trim():"",n=typeof e.g1Tier=="string"?e.g1Tier.trim():"",i=s||n,u=e.isPro===!0;if(!i&&!u)return null;let l="",c="plan-free",d="";const p=i.toUpperCase();if(p.includes("ULTRA"))l="Google AI Ultra",c="plan-ultra",d="\u{1F31F}";else if(p.includes("PLUS"))l="Google AI Plus",c="plan-plus",d="\u2728";else if(p.includes("AI_PREMIUM")||p.includes("PREMIUM"))l="Google AI Plus",c="plan-plus",d="\u2728";else if(p.includes("PRO")||u)l="Google AI Pro",c="plan-pro",d="\u26A1";else if(p.includes("ENTERPRISE"))l="Google AI Enterprise",c="plan-pro",d="\u{1F3E2}";else if(p.includes("FREE")||p.includes("STANDARD"))l="Google AI Free",c="plan-free",d="\u2726";else if(i)l=i.replace(/^G1_TIER_/,"").replace(/_/g," "),c="plan-custom",d="\u2728";else return null;return{name:l,className:c,icon:d}}function V(e){try{const s=ye(e);return!s||!s.name?"":`
                 <span class="plan-pill ${t(s.className)}" title="${t(`Plan: ${s.name}`)}">
                     <span class="plan-icon" aria-hidden="true">${s.icon}</span>
                     <span class="plan-text">${t(s.name)}</span>
@@ -455,10 +455,10 @@
                             </div>
                         `}
             </div>
-        `}function Me(){const e=[],s=new Date;for(let n=6;n>=0;n--){const i=new Date(s);i.setDate(i.getDate()-n);const u=i.toISOString().split("T")[0],l=i.toLocaleDateString(E()==="id"?"id-ID":"en-US",{weekday:"short"});e.push({date:u,label:l})}return e}function Te(e){if(!e)return"";const s=r.quotaHistory||{},n=g(e),i=s[n]||[],l=Me().map(c=>{const d=i.find(R=>R.date===c.date),p=d&&typeof d.lowestRemainingPercent=="number",v=p?d.lowestRemainingPercent:null;let $="history-empty";p&&($=v<=15?"history-critical":v<=35?"history-warn":"history-healthy");const w=p?`${Math.max(12,v)}%`:"4px",T=p?`${c.label} (${c.date}): ${v}% ${a("remaining")}`:`${c.label} (${c.date}): -`;return`
+        `}function Me(){const e=[],s=new Date;for(let n=6;n>=0;n--){const i=new Date(s);i.setDate(i.getDate()-n);const u=i.toISOString().split("T")[0],l=i.toLocaleDateString(E()==="id"?"id-ID":"en-US",{weekday:"short"});e.push({date:u,label:l})}return e}function Te(e){if(!e)return"";const s=r.quotaHistory||{},n=g(e),i=s[n]||[],l=Me().map(c=>{const d=i.find(R=>R.date===c.date),p=d&&typeof d.lowestRemainingPercent=="number",v=p?d.lowestRemainingPercent:null;let y="history-empty";p&&(y=v<=15?"history-critical":v<=35?"history-warn":"history-healthy");const w=p?`${Math.max(12,v)}%`:"4px",T=p?`${c.label} (${c.date}): ${v}% ${a("remaining")}`:`${c.label} (${c.date}): -`;return`
                 <div class="history-bar-col" title="${t(T)}">
                     <div class="history-bar-track">
-                        <div class="history-bar-fill ${$}" style="height: ${w};"></div>
+                        <div class="history-bar-fill ${y}" style="height: ${w};"></div>
                     </div>
                     <span class="history-bar-label">${t(c.label)}</span>
                     <span class="history-bar-pct">${p?`${v}%`:"-"}</span>
@@ -643,7 +643,7 @@
                     ${r.preferences?.showQuotaAnalytics?Te(r.current.email):""}
                 </div>
             </section>
-        `}function ne(e,s){return(Array.isArray(e?.groups)?e.groups:[]).find(i=>s(String(i.displayName||"").toLowerCase()))}function se(e,s){return(Array.isArray(e?.buckets)?e.buckets:[]).find(n=>String(n.window||"").toLowerCase()===s)}function He(e){return X(e?.remainingFraction)}function ie(e,s){if(!s)return"";const n=se(s,"weekly"),i=se(s,"5h"),u=I(n?.resetTime),l=I(i?.resetTime),c=(d,p,v,$)=>`
+        `}function ne(e,s){return(Array.isArray(e?.groups)?e.groups:[]).find(i=>s(String(i.displayName||"").toLowerCase()))}function se(e,s){return(Array.isArray(e?.buckets)?e.buckets:[]).find(n=>String(n.window||"").toLowerCase()===s)}function He(e){return X(e?.remainingFraction)}function ie(e,s){if(!s)return"";const n=se(s,"weekly"),i=se(s,"5h"),u=I(n?.resetTime),l=I(i?.resetTime),c=(d,p,v,y)=>`
                 <div class="saved-quota-pair">
                     <div class="saved-usage-metric">
                         <span class="saved-usage-metric-label">
@@ -657,7 +657,7 @@
 
                     ${v?`
                                 <div
-                                    class="saved-quota-reset ${t($)}"
+                                    class="saved-quota-reset ${t(y)}"
                                     data-reset-at="${t(p?.resetTime||"")}"
                                     data-reset-prefix=""
                                 >
@@ -1005,21 +1005,31 @@
                     ${t(u)}
                 </div>
             </div>
-        `}function Ie(){if(r.preferences?.hideRuntime===!0||r.preferences?.showRuntime===!1)return"";const e=!!r.loading,s=r.runtime||{},n=s.extension||{},i=s.process||null,u=s.health||null,l=!!n.installed,c=!!i,d=!!u?.reachable,p=l&&c&&d,v=e?"checking":p?"healthy":"warning",$=a(e?"checking":p?"ready":"disconnected");return`
+        `}function Ie(){if(r.preferences?.hideRuntime===!0||r.preferences?.showRuntime===!1)return"";const e=!!r.loading,s=r.runtime||{},n=s.extension||{},i=s.process||null,u=s.health||null,l=!!n.installed,c=!!i,d=!!u?.reachable,p=l&&c&&d,v=e?"checking":p?"healthy":"warning",y=a(e?"checking":p?"ready":"disconnected");return`
             <div class="runtime-status-bar">
                 <button
                     type="button"
                     class="runtime-status-pill ${t(v)}"
                     data-action="open-runtime-modal"
-                    title="${t(a("antigravityStatus"))} \xB7 ${t($)}"
+                    title="${t(a("antigravityStatus"))} \xB7 ${t(y)}"
                     aria-label="${t(a("antigravityStatus"))}"
                 >
                     <span class="status-dot"></span>
                     <span class="runtime-status-pill-label">Antigravity:</span>
-                    <span class="runtime-status-pill-value">${t($)}</span>
+                    <span class="runtime-status-pill-value">${t(y)}</span>
+                </button>
+                <button
+                    type="button"
+                    class="quota-matrix-trigger-btn"
+                    data-action="open-quota-matrix"
+                    title="${t(a("quotaMatrixTitle"))}"
+                    aria-label="${t(a("quotaMatrixTitle"))}"
+                >
+                    ${h("matrix","quota-matrix-icon")}
+                    <span>${t(a("quotaMatrix"))}</span>
                 </button>
             </div>
-        `}function Ge(){if(!o.runtimeModalOpen)return"";const e=!!r.loading,s=r.runtime||{},n=s.extension||{},i=s.process||null,u=s.health||null,l=!!n.installed,c=!!i,d=!!u?.reachable,p=l&&c&&d,v=e?"checking":p?"healthy":"warning",$=a(e?"checking":p?"ready":"disconnected");return`
+        `}function Ge(){if(!o.runtimeModalOpen)return"";const e=!!r.loading,s=r.runtime||{},n=s.extension||{},i=s.process||null,u=s.health||null,l=!!n.installed,c=!!i,d=!!u?.reachable,p=l&&c&&d,v=e?"checking":p?"healthy":"warning",y=a(e?"checking":p?"ready":"disconnected");return`
             <div
                 class="runtime-modal-backdrop"
                 data-action="runtime-modal-backdrop"
@@ -1080,11 +1090,11 @@
                     </div>
                 </section>
             </div>
-        `}function Pe(){if(!o.quotaMatrixOpen)return"";const e=r.accounts||[],s=r.usageSnapshots||{},n=g(r.current?.email||""),i=[...e].sort((l,c)=>{const d=g(l.email),p=g(c.email);if(d===n)return-1;if(p===n)return 1;const v=Q(l),$=Q(c),w=typeof v=="number"?v:-1,T=typeof $=="number"?$:-1;return w!==T?T-w:(l.label||l.displayName||l.email).localeCompare(c.label||c.displayName||c.email)}),u=i.length===0?`
+        `}function Pe(){if(!o.quotaMatrixOpen)return"";const e=r.accounts||[],s=r.usageSnapshots||{},n=g(r.current?.email||""),i=[...e].sort((l,c)=>{const d=g(l.email),p=g(c.email);if(d===n)return-1;if(p===n)return 1;const v=Q(l),y=Q(c),w=typeof v=="number"?v:-1,T=typeof y=="number"?y:-1;return w!==T?T-w:(l.label||l.displayName||l.email).localeCompare(c.label||c.displayName||c.email)}),u=i.length===0?`
                 <div class="matrix-empty secondary-text">
                     ${t(a("noSaved"))}
                 </div>
-            `:i.map(l=>{const c=g(l.email),d=!!(n&&c===n),p=d&&r.usage||s[c],v=l.displayName||l.label||l.email,$=l.label||(d?a("currentAccountLabel"):"");let w=null,T="",R=null,z="";if(p?.buckets&&Array.isArray(p.buckets))for(const y of p.buckets){const K=(y.displayName||y.bucketId||"").toLowerCase(),N=(y.window||y.description||"").toLowerCase(),Ve=K.includes("5-hour")||K.includes("5h")||N.includes("5 hour")||N.includes("5h"),pe=K.includes("week")||N.includes("week")||N.includes("7 day");if(typeof y.remainingFraction=="number"&&!y.disabled){const me=Math.max(0,Math.min(100,Math.round(y.remainingFraction*100))),ge=y.resetTime?I(y.resetTime):"";Ve||w===null&&!pe?(w=me,T=ge):pe&&(R=me,z=ge)}}if(w===null){const y=Q(l);typeof y=="number"&&(w=y)}const de=y=>typeof y!="number"?"tone-empty":y<=15?"tone-critical":y<=35?"tone-warn":"tone-healthy";return`
+            `:i.map(l=>{const c=g(l.email),d=!!(n&&c===n),p=d&&r.usage||s[c],v=l.displayName||l.label||l.email,y=l.label||(d?a("currentAccountLabel"):"");let w=null,T="",R=null,z="";if(p?.buckets&&Array.isArray(p.buckets))for(const $ of p.buckets){const K=($.displayName||$.bucketId||"").toLowerCase(),N=($.window||$.description||"").toLowerCase(),Ve=K.includes("5-hour")||K.includes("5h")||N.includes("5 hour")||N.includes("5h"),pe=K.includes("week")||N.includes("week")||N.includes("7 day");if(typeof $.remainingFraction=="number"&&!$.disabled){const me=Math.max(0,Math.min(100,Math.round($.remainingFraction*100))),ge=$.resetTime?I($.resetTime):"";Ve||w===null&&!pe?(w=me,T=ge):pe&&(R=me,z=ge)}}if(w===null){const $=Q(l);typeof $=="number"&&(w=$)}const de=$=>typeof $!="number"?"tone-empty":$<=15?"tone-critical":$<=35?"tone-warn":"tone-healthy";return`
                     <div class="matrix-card ${d?"active-matrix-card":""}">
                         <div class="matrix-identity-col">
                             ${F(v,l.email,l.profilePictureUrl||(d?r.current?.profilePictureUrl:void 0),l.colorTag?`matrix-avatar tag-${t(l.colorTag)}`:"matrix-avatar")}
@@ -1098,7 +1108,7 @@
                                 <div class="matrix-tags-row">
                                     ${r.vaultedEmails?.includes(g(l.email))?`<span class="vault-pill" title="${t(a("vaultInfo"))}">\u26A1 ${t(a("instantBadge"))}</span>`:""}
                                     ${V(d&&r.current||l)}
-                                    ${$?`<span class="account-label">${t($)}</span>`:""}
+                                    ${y?`<span class="account-label">${t(y)}</span>`:""}
                                     ${l.group?`<span class="group-pill" title="Group: ${t(l.group)}">\u{1F3F7}\uFE0F ${t(l.group)}</span>`:""}
                                 </div>
                             </div>

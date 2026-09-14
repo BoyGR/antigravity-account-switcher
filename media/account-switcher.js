@@ -3912,6 +3912,16 @@
                     <span class="runtime-status-pill-label">Antigravity:</span>
                     <span class="runtime-status-pill-value">${escapeHtml(summaryText)}</span>
                 </button>
+                <button
+                    type="button"
+                    class="quota-matrix-trigger-btn"
+                    data-action="open-quota-matrix"
+                    title="${escapeHtml(t("quotaMatrixTitle"))}"
+                    aria-label="${escapeHtml(t("quotaMatrixTitle"))}"
+                >
+                    ${icon("matrix", "quota-matrix-icon")}
+                    <span>${escapeHtml(t("quotaMatrix"))}</span>
+                </button>
             </div>
         `;
     }
