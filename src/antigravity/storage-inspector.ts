@@ -48,6 +48,8 @@ export function getCandidateStoragePaths(): CandidatePath[] {
     path.join(userProfile, ".gemini", "antigravity-ide"),
 
     path.join(appData, "Antigravity IDE", "User", "globalStorage"),
+    path.join(appData, "Cursor", "User", "globalStorage"),
+    path.join(appData, "Cursor", "User", "workspaceStorage"),
     path.join(
       userProfile,
       "AppData",
