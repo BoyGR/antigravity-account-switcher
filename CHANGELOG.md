@@ -4,6 +4,20 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.2.1] - 2026-09-14
+
+### Added
+- **Quota Matrix & 7-Day Analytics Display Controls**:
+  - Added user-configurable settings to toggle the visibility of the Quota Matrix overview button (`showQuotaMatrix`, default: `false`) and the 7-day quota usage analytics chart (`showQuotaAnalytics`, default: `false`).
+  - Default view is now cleaner, more streamlined, and focuses on the active account and fast switching.
+- **Universal Theme Naming & Reordered Options**:
+  - Replaced editor-specific `"Follow VS Code"` wording with universal `"Follow Editor / IDE Theme"` (ID: `"Ikuti Tema Editor / IDE"`).
+  - Reordered theme options logically: Follow Editor/IDE Theme, Dark, Light, System.
+- **Reorganized Settings Hierarchy**:
+  - Restructured the Settings modal and package configurations into intuitive functional groups: Appearance & Language, Layout & Display, Quota & Notifications, Account Switching & Automation, Backup & Vault, and About.
+
+---
+
 ## [1.2.0] - 2026-09-14
 
 ### Added
