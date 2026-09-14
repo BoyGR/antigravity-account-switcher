@@ -1,8 +1,8 @@
 {
     "name": "antigravity-account-switcher",
     "displayName": "Antigravity Account Switcher",
-    "description": "Manage and switch Google accounts used by Google Antigravity across Visual Studio Code, Cursor, and Antigravity IDE through Antigravity's existing authentication flow.",
-    "version": "1.2.10",
+    "description": "Manage and switch Google accounts used by Google Antigravity across Visual Studio Code, Google Antigravity IDE, Cursor, and other VS Code-compatible editors through Antigravity's existing authentication flow.",
+    "version": "1.2.11",
     "publisher": "boygr",
     "author": {
         "name": "Boy Gilang Ramadhan",
@@ -148,18 +148,6 @@
                 "icon": "$(debug-restart)"
             },
             {
-                "command": "boygr.antigravityAccountSwitcher.setWorkspaceAccount",
-                "title": "Set Default Account for Workspace...",
-                "category": "Antigravity Account Switcher",
-                "icon": "$(folder-active)"
-            },
-            {
-                "command": "boygr.antigravityAccountSwitcher.clearWorkspaceAccount",
-                "title": "Clear Default Account for Workspace",
-                "category": "Antigravity Account Switcher",
-                "icon": "$(folder)"
-            },
-            {
                 "command": "boygr.antigravityAccountSwitcher.exportQuotaAnalytics",
                 "title": "Export Quota Analytics (CSV/JSON)...",
                 "category": "Antigravity Account Switcher",
@@ -271,11 +259,6 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Automatically rotate to the best available backup account when active account hits rate limit (0% remaining)."
-                },
-                "boygr.antigravityAccountSwitcher.autoPromptWorkspaceAccount": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Automatically prompt to switch to the linked account when opening a project workspace."
                 },
                 "boygr.antigravityAccountSwitcher.autoSyncOfficialUi": {
                     "type": "boolean",

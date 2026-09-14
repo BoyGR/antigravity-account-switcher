@@ -33,10 +33,6 @@ import { QuotaMonitorService } from "../antigravity/quota-monitor-service";
 import { syncAntigravityUi } from "../antigravity/ui-sync";
 import { AntigravityStatusBarManager } from "../status-bar/status-bar-manager";
 import {
-    getCurrentWorkspacePath,
-    getWorkspaceAccount,
-} from "../antigravity/workspace-association";
-import {
     DailyQuotaRecord,
     getAllAccountsQuotaHistory,
     recordUsageSnapshotIfAvailable,
@@ -136,8 +132,6 @@ type WebviewMessage =
     | { type: "importAccounts" }
     | { type: "reconnectHub" }
     | { type: "restartBackend" }
-    | { type: "setWorkspaceAccount" }
-    | { type: "clearWorkspaceAccount" }
     | { type: "exportQuotaAnalytics" }
     | { type: "clearTokenVault" }
     | {
@@ -176,12 +170,6 @@ interface AccountSwitcherSnapshot {
     usageError?: string;
 
     error?: string;
-
-    workspace?: {
-        folderPath: string;
-        folderName: string;
-        linkedEmail?: string;
-    };
 
     quotaHistory?: Record<string, DailyQuotaRecord[]>;
 
@@ -259,22 +247,10 @@ export class AntigravityAccountWebviewProvider
         private readonly statusBarManager?: AntigravityStatusBarManager,
         private readonly tokenVault?: TokenVaultService,
     ) {
-        const currentPath = getCurrentWorkspacePath();
-        const workspaceLinkedEmail = currentPath
-            ? getWorkspaceAccount(this.context, currentPath)
-            : undefined;
-
         this.snapshot = {
             accounts: getManagedAccounts(this.context),
             usageSnapshots: getManagedAccountUsageSnapshots(this.context),
             quotaHistory: getAllAccountsQuotaHistory(this.context, 7),
-            workspace: currentPath
-                ? {
-                      folderPath: currentPath,
-                      folderName: vscode.workspace.name || "Workspace",
-                      linkedEmail: workspaceLinkedEmail,
-                  }
-                : undefined,
         };
 
         const prefs = this.getStoredPreferences();
@@ -568,11 +544,6 @@ export class AntigravityAccountWebviewProvider
             }
         }
 
-        const currentPath = getCurrentWorkspacePath();
-        const workspaceLinkedEmail = currentPath
-            ? getWorkspaceAccount(this.context, currentPath)
-            : undefined;
-
         let vaultedEmails: string[] = [];
         if (this.tokenVault) {
             if (current?.email && this.tokenVault.isSupported()) {
@@ -589,13 +560,6 @@ export class AntigravityAccountWebviewProvider
             usageSnapshots,
             usageError,
             error,
-            workspace: currentPath
-                ? {
-                      folderPath: currentPath,
-                      folderName: vscode.workspace.name || "Workspace",
-                      linkedEmail: workspaceLinkedEmail,
-                  }
-                : undefined,
             quotaHistory: getAllAccountsQuotaHistory(this.context, 7),
             vaultedEmails,
             isVaultSupported: this.tokenVault?.isSupported() === true,
@@ -671,11 +635,6 @@ export class AntigravityAccountWebviewProvider
     }
 
     private async refreshLocalAccounts(): Promise<void> {
-        const currentPath = getCurrentWorkspacePath();
-        const workspaceLinkedEmail = currentPath
-            ? getWorkspaceAccount(this.context, currentPath)
-            : undefined;
-
         this.snapshot = {
             ...this.snapshot,
 
@@ -690,14 +649,6 @@ export class AntigravityAccountWebviewProvider
                 ),
 
             quotaHistory: getAllAccountsQuotaHistory(this.context, 7),
-
-            workspace: currentPath
-                ? {
-                      folderPath: currentPath,
-                      folderName: vscode.workspace.name || "Workspace",
-                      linkedEmail: workspaceLinkedEmail,
-                  }
-                : undefined,
         };
 
         await this.postState(
@@ -894,20 +845,6 @@ export class AntigravityAccountWebviewProvider
                 );
 
                 await this.refreshLocalAccounts();
-                return;
-
-            case "setWorkspaceAccount":
-                await vscode.commands.executeCommand(
-                    "boygr.antigravityAccountSwitcher.setWorkspaceAccount",
-                );
-                await this.refresh(false);
-                return;
-
-            case "clearWorkspaceAccount":
-                await vscode.commands.executeCommand(
-                    "boygr.antigravityAccountSwitcher.clearWorkspaceAccount",
-                );
-                await this.refresh(false);
                 return;
 
             case "clearTokenVault":

@@ -557,18 +557,6 @@
             noSnapshotYet:
                 "No quota data yet",
 
-            workspace:
-                "Workspace",
-
-            workspaceLinked:
-                "Workspace linked",
-
-            linkWorkspace:
-                "Link Workspace",
-
-            unlinkWorkspace:
-                "Unlink",
-
             instantSwitch:
                 "Instant Switch (No Browser)",
 
@@ -1046,18 +1034,6 @@
 
             noSnapshotYet:
                 "Belum ada data kuota",
-
-            workspace:
-                "Workspace",
-
-            workspaceLinked:
-                "Tertaut ke workspace",
-
-            linkWorkspace:
-                "Tautkan Workspace",
-
-            unlinkWorkspace:
-                "Lepas",
 
             instantSwitch:
                 "Switch Instan (Tanpa Browser)",
@@ -2766,63 +2742,6 @@
         `;
     }
 
-    function renderWorkspaceBar() {
-        if (!state.workspace || !state.workspace.folderPath) {
-            return "";
-        }
-
-        const currentEmail = normalizeEmail(state.current?.email || "");
-        const linkedEmail = normalizeEmail(state.workspace.linkedEmail || "");
-        const isLinkedToCurrent = Boolean(linkedEmail && linkedEmail === currentEmail);
-
-        return `
-            <div class="workspace-link-bar ${isLinkedToCurrent ? "linked-active" : ""}">
-                <div class="workspace-link-icon" aria-hidden="true">📁</div>
-                <div class="workspace-link-info">
-                    <div class="workspace-link-name" title="${escapeHtml(state.workspace.folderPath)}">
-                        <strong>${escapeHtml(state.workspace.folderName)}</strong>
-                    </div>
-                    <div class="workspace-link-detail secondary-text">
-                        ${
-                            isLinkedToCurrent
-                                ? `<span class="workspace-linked-tag">✓ ${escapeHtml(t("workspaceLinked"))}</span>`
-                                : linkedEmail
-                                ? `<span>Linked to ${escapeHtml(linkedEmail)}</span>`
-                                : `<span>No account linked</span>`
-                        }
-                    </div>
-                </div>
-                <div class="workspace-link-actions">
-                    ${
-                        isLinkedToCurrent
-                            ? `
-                                <button
-                                    type="button"
-                                    class="btn subtle-btn compact"
-                                    data-action="clearWorkspaceAccount"
-                                    title="${escapeHtml(t("unlinkWorkspace"))}"
-                                    ${isBusy() ? "disabled" : ""}
-                                >
-                                    ${escapeHtml(t("unlinkWorkspace"))}
-                                </button>
-                            `
-                            : `
-                                <button
-                                    type="button"
-                                    class="btn subtle-btn compact"
-                                    data-action="setWorkspaceAccount"
-                                    title="${escapeHtml(t("linkWorkspace"))}"
-                                    ${isBusy() ? "disabled" : ""}
-                                >
-                                    ${escapeHtml(t("linkWorkspace"))}
-                                </button>
-                            `
-                    }
-                </div>
-            </div>
-        `;
-    }
-
     function bindAvatarFallback() {
         document
             .querySelectorAll(
@@ -3121,7 +3040,6 @@
                         </button>
                     </div>
 
-                    ${renderWorkspaceBar()}
                     ${renderUsage()}
                     ${state.preferences?.showQuotaAnalytics ? renderQuotaHistory(state.current.email) : ""}
                 </div>
@@ -3495,53 +3413,45 @@
                                         ${escapeHtml(account.email)}
                                     </div>
 
-                                    ${renderPlanBadge(account)}
-                                    ${lastSeenHtml}
+                                    <div class="saved-badges-row">
+                                        ${renderPlanBadge(account)}
 
-                                    ${
-                                        state.vaultedEmails?.includes(normalizeEmail(account.email))
-                                            ? `
-                                                <span class="vault-pill" title="${escapeHtml(t("vaultInfo"))}">
-                                                    ⚡ ${escapeHtml(t("instantBadge"))}
-                                                </span>
-                                            `
-                                            : ""
-                                    }
+                                        ${
+                                            state.vaultedEmails?.includes(normalizeEmail(account.email))
+                                                ? `
+                                                    <span class="vault-pill" title="${escapeHtml(t("vaultInfo"))}">
+                                                        ⚡ ${escapeHtml(t("instantBadge"))}
+                                                    </span>
+                                                `
+                                                : ""
+                                        }
 
-                                    ${
-                                        account.group
-                                            ? `
-                                                <span class="group-pill" title="Group: ${escapeHtml(account.group)}">
-                                                    🏷️ ${escapeHtml(account.group)}
-                                                </span>
-                                            `
-                                            : ""
-                                    }
+                                        ${
+                                            account.group
+                                                ? `
+                                                    <span class="group-pill" title="Group: ${escapeHtml(account.group)}">
+                                                        🏷️ ${escapeHtml(account.group)}
+                                                    </span>
+                                                `
+                                                : ""
+                                        }
 
-                                    ${
-                                        state.workspace?.linkedEmail &&
-                                        normalizeEmail(state.workspace.linkedEmail) === normalizeEmail(account.email)
-                                            ? `
-                                                <span class="workspace-pill" title="${escapeHtml(`${t("workspaceLinked")} (${state.workspace.folderName})`)}">
-                                                    📁 ${escapeHtml(state.workspace.folderName)}
-                                                </span>
-                                            `
-                                            : ""
-                                    }
+                                        ${lastSeenHtml}
 
-                                    ${
-                                        updated
-                                            ? `
-                                                <span
-                                                    class="saved-updated"
-                                                    data-snapshot-fetched-at="${escapeHtml(snapshot.fetchedAt)}"
-                                                    title="${escapeHtml(`${t("updated")} ${updated}`)}"
-                                                >
-                                                    ${escapeHtml(`${t("updated")} ${updated}`)}
-                                                </span>
-                                            `
-                                            : ""
-                                    }
+                                        ${
+                                            updated
+                                                ? `
+                                                    <span
+                                                        class="saved-updated"
+                                                        data-snapshot-fetched-at="${escapeHtml(snapshot.fetchedAt)}"
+                                                        title="${escapeHtml(`${t("updated")} ${updated}`)}"
+                                                    >
+                                                        ${escapeHtml(`${t("updated")} ${updated}`)}
+                                                    </span>
+                                                `
+                                                : ""
+                                        }
+                                    </div>
                                 </div>
 
 
@@ -5659,12 +5569,6 @@
 
                 signout:
                     "signout",
-
-                setWorkspaceAccount:
-                    "setWorkspaceAccount",
-
-                clearWorkspaceAccount:
-                    "clearWorkspaceAccount",
             };
 
             if (
@@ -5685,12 +5589,6 @@
 
                     signout:
                         "signout",
-
-                    setWorkspaceAccount:
-                        "refresh",
-
-                    clearWorkspaceAccount:
-                        "refresh",
                 };
 
                 setOperation({

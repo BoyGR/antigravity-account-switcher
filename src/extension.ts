@@ -22,10 +22,6 @@ import { registerTokenVaultCommands } from "./commands/token-vault-commands";
 import { AntigravityStatusBarManager } from "./status-bar/status-bar-manager";
 import { registerAntigravityAccountWebview } from "./views/account-webview-provider";
 import { TokenVaultService } from "./antigravity/token-vault-service";
-import {
-    checkAndPromptWorkspaceAccount,
-    registerWorkspaceAssociationCommands,
-} from "./antigravity/workspace-association";
 
 export function activate(
     context: vscode.ExtensionContext,
@@ -99,13 +95,6 @@ export function activate(
         },
     );
 
-    const workspaceCommands = registerWorkspaceAssociationCommands(
-        context,
-        async () => {
-            await accountWebview.refresh();
-        },
-    );
-
     const exportAnalyticsCommand = registerExportAnalyticsCommand(context);
 
     const quotaOverviewCommand =
@@ -137,11 +126,7 @@ export function activate(
         ...tokenVaultCommands,
         ...backupCommands,
         ...recoveryCommands,
-        ...workspaceCommands,
     );
-
-    // Prompt user if current workspace folder has a linked account
-    void checkAndPromptWorkspaceAccount(context);
 }
 
 export function deactivate(): void {

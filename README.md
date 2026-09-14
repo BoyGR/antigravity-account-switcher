@@ -4,29 +4,29 @@
   <img src="media/icon.png" width="128" height="128" alt="Antigravity Account Switcher Logo" />
 </p>
 
-An extension for Visual Studio Code, Cursor, and Google Antigravity IDE to manage, monitor quota, and switch Google accounts used by Google Antigravity.
+An extension for Visual Studio Code, Google Antigravity Standalone IDE, Cursor, and other VS Code-compatible editors to manage, monitor quota, and switch Google accounts used by Google Antigravity.
 
 ---
 
 ## Overview
 
-**Antigravity Account Switcher** is an all-in-one account management and quota monitoring extension designed for modern AI coding workflows across **Visual Studio Code**, **Cursor**, and the standalone **Google Antigravity IDE**. It extends the official Google Antigravity experience with an interactive sidebar dashboard, real-time quota tracking, background low-quota alerts, instant UI synchronization, and effortless 1-click switching between multiple Google accounts.
+**Antigravity Account Switcher** is an all-in-one account management and quota monitoring extension designed for modern AI coding workflows across **Visual Studio Code**, the standalone **Google Antigravity IDE**, **Cursor**, and other VS Code-compatible editors. It extends the official Google Antigravity experience with an interactive sidebar dashboard, real-time quota tracking, background low-quota alerts, instant UI synchronization, and effortless 1-click switching between multiple Google accounts.
 
 ### Status
 
-- **Version**: `1.2.10`
+- **Version**: `1.2.11`
 - **Supported Platforms**: Windows (with Instant Token Swapping), macOS, Linux
-- **Supported IDEs**: Visual Studio Code, Cursor, Google Antigravity Standalone IDE, and other VS Code-compatible editors
+- **Supported IDEs**: Visual Studio Code, Google Antigravity Standalone IDE, Cursor, and other VS Code-compatible editors
 - **Compatibility**: Official Google Antigravity extension `1.3.0+`, AGY backend `1.2.2+`
 
 ---
 
 ## Key Features
 
-### 1. Universal Multi-IDE Support (VS Code, Cursor & Antigravity IDE) 🚀
-- **Dual-Mode Engine**: Automatically detects and adapts whether running inside standard **Visual Studio Code / Cursor** (via `agy.exe --hub` process) or standalone **Google Antigravity IDE** (via direct `language_server_windows_x64.exe` Connect-RPC).
+### 1. Universal Multi-IDE Support (VS Code, Antigravity IDE & Cursor) 🚀
+- **Dual-Mode Engine**: Automatically detects and adapts whether running inside standard **Visual Studio Code**, standalone **Google Antigravity IDE**, or **Cursor** (via `agy.exe --hub` process or direct `language_server_windows_x64.exe` Connect-RPC).
 - **Direct Connect-RPC & CSRF Discovery**: Dynamically extracts HTTPS listener ports and process CSRF tokens to query account status (`GetUserStatus`) and quotas (`RetrieveUserQuotaSummary`) directly without requiring an active hub process.
-- **100% Backward Compatibility**: Zero breaking changes for existing VS Code and Cursor setups.
+- **100% Backward Compatibility**: Zero breaking changes for existing Visual Studio Code, Antigravity IDE, and Cursor setups.
 
 ### 2. Interactive Sidebar Dashboard (Activity Bar)
 - **Runtime Status Indicator**: Live status pill showing Antigravity connection health, PID, Hub port, and Language Server port in a detailed modal.
@@ -41,8 +41,7 @@ An extension for Visual Studio Code, Cursor, and Google Antigravity IDE to manag
 - **Saved Accounts List**:
   - **Smart Default Sorting**: Defaults to **Last used** (`recent`) so your most relevant accounts are always up top, with 1-click toggling between Quota and Name.
   - **Fast Search & Instant Clear**: Real-time filtering with an inline `✕` clear button and empty-state filter recovery.
-  - **Relative Timestamp Badges**: Theme-adaptive time pills (`Active now`, `5m ago`, `2h ago`, `3d ago`) for each account.
-  - **Status & Plan Badges**: Shows active status, subscription tiers, color accent dots, and `⚡ Instant` vault indicators.
+  - **Compact Horizontal Badge Row**: Neatly presents subscription plan, `⚡ Instant` vault indicator, custom group tag (`🏷️ Work`), relative last-used badge (`Active now`, `5m ago`), and snapshot updated timestamp in a clean horizontal flow.
   - **Custom Account Groups**: Assign default tags (`Personal`, `Work`) or create inline `+ Custom` groups (up to 24 characters) with rapid keyboard shortcuts (**Enter** / **Escape**).
   - Inline label editing and secure account removal dialogs.
   - Dedicated scrollable container with skeleton loading on startup.
@@ -87,49 +86,44 @@ An extension for Visual Studio Code, Cursor, and Google Antigravity IDE to manag
 - Renders colored indicator dots next to account labels and colored avatar ring accents on both Current Account and Saved Accounts cards.
 - Preserves color tags during JSON export and import.
 
-### 9. Workspace / Project Folder Association
-- Link specific project folders or workspaces to preferred Antigravity accounts.
-- Automatic prompt upon opening workspace to switch to the linked account (`boygr.antigravityAccountSwitcher.autoPromptWorkspaceAccount`).
-- Dedicated workspace link banner in the dashboard and workspace badge tags in the Saved Accounts list.
-
-### 10. 7-Day Quota Usage History & Analytics
+### 9. 7-Day Quota Usage History & Analytics
 - Automatically records daily minimum remaining quota for each account.
 - Renders an interactive 7-day mini bar chart in the accounts view with color-coded health indicators (Healthy, Warning, Critical).
 - Detailed hover tooltips showing weekday, date, and minimum remaining quota percentage.
 
-### 11. Account Grouping & Profile Filters
+### 10. Account Grouping & Profile Filters
 - Categorize accounts into groups (`Personal`, `Work`, or custom group tags).
 - Interactive filter chips above Saved Accounts allow 1-click filtering by category.
 - Group badge chips visually displayed on both Current and Saved account cards.
 - Search accounts dynamically by group tag name.
 - Group assignments preserved across JSON backups and imports.
 
-### 12. Rate Limit Auto-Switch Detection
+### 11. Rate Limit Auto-Switch Detection
 - Detects complete quota exhaustion (0% remaining / rate limit) immediately upon background refresh or model check.
 - Triggers an instant error modal with a 1-click switch prompt to the best available backup account.
 - Configurable via `boygr.antigravityAccountSwitcher.autoSwitchOnExhaustion`.
 
-### 13. Quota Analytics CSV & JSON Export
+### 12. Quota Analytics CSV & JSON Export
 - Export full historical quota records across all accounts to standard `.csv` or formatted `.json`.
 - Direct "Export" button in the 7-Day Quota Analytics dashboard header.
 - Accessible via command `boygr.antigravityAccountSwitcher.exportQuotaAnalytics`.
 
-### 14. Multi-Account Quota Matrix Dashboard
+### 13. Multi-Account Quota Matrix Dashboard
 - Full-screen modal comparison matrix displaying real-time 5-hour and weekly quota progress bars, exact reset countdowns, profile pictures, plan badges, and 1-click switch buttons for all saved accounts side-by-side.
 - Dedicated "Quota Matrix" trigger button directly in the webview runtime status bar, right beside the Antigravity status pill.
 - Accessible via command `boygr.antigravityAccountSwitcher.quotaOverview`.
 
-### 15. Auto-Round-Robin Account Rotation
+### 14. Auto-Round-Robin Account Rotation
 - Automatically switches to the best backup account with the highest available quota when active account quota drops to 0% exhaustion or encounters rate limit errors.
 - Built-in 60-second cooldown protection against rapid switching loops.
 - Configurable via `boygr.antigravityAccountSwitcher.autoRoundRobin`.
 
-### 16. Subtle Quota Audio Chimes
+### 15. Subtle Quota Audio Chimes
 - Pure synthesized Web Audio API (`AudioContext`) melodic feedback for quota restoration (ascending chime) and critical quota warnings (gentle descending tone).
 - Zero external audio files required, completely lightweight and non-intrusive.
 - Configurable via `boygr.antigravityAccountSwitcher.enableQuotaAudio`.
 
-### 17. Instant Token Swapping (Switch Tanpa Login Browser) ⚡
+### 16. Instant Token Swapping (Switch Tanpa Login Browser) ⚡
 - **True 1-Click Seamless Switching**: Switch between saved accounts instantly without opening a browser or repeating the Google OAuth login sequence.
 - **Windows Credential Manager Interop**: Uses native Win32 `Advapi32.dll` credential APIs (`CredReadW`, `CredWriteW`) to back up and swap Google Antigravity authentication tokens directly under target `gemini:antigravity`.
 - **Zero Third-Party Dependencies**: No external compiled binaries or node-gyp packages required; executes via lightweight PowerShell P/Invoke script.
@@ -162,8 +156,6 @@ Access these commands via the Command Palette in your IDE (`Ctrl+Shift+P` / `Cmd
 | `boygr.antigravityAccountSwitcher.quotaOverview` | **View Multi-Account Quota Matrix...** | | Open full-screen quota comparison matrix for all accounts |
 | `boygr.antigravityAccountSwitcher.switchAccount` | **Switch Account** | | Switch to a saved account directly (instant token swap or browser login) |
 | `boygr.antigravityAccountSwitcher.clearTokenVault` | **Clear Stored Token Vault...** | | Securely delete all stored account tokens from secret storage |
-| `boygr.antigravityAccountSwitcher.setWorkspaceAccount` | **Set Default Account for Workspace...** | | Link active project folder to a default Antigravity account |
-| `boygr.antigravityAccountSwitcher.clearWorkspaceAccount` | **Clear Default Account for Workspace** | | Remove project folder account link |
 | `boygr.antigravityAccountSwitcher.exportAccounts` | **Export Saved Accounts...** | | Export saved accounts metadata to JSON file |
 | `boygr.antigravityAccountSwitcher.importAccounts` | **Import Saved Accounts...** | | Import and merge saved accounts from JSON file |
 | `boygr.antigravityAccountSwitcher.exportQuotaAnalytics` | **Export Quota Analytics (CSV/JSON)...** | | Export historical quota records to CSV or JSON file |
@@ -214,9 +206,6 @@ Customize behavior via your IDE Settings (`settings.json`):
   // Notify when a low or exhausted account's quota reset window has finished (default: true)
   "boygr.antigravityAccountSwitcher.notifyQuotaReset": true,
 
-  // Automatically prompt to switch to the linked account when opening a project workspace (default: true)
-  "boygr.antigravityAccountSwitcher.autoPromptWorkspaceAccount": true,
-
   // Automatically sync official Antigravity UI on account changes (default: true)
   "boygr.antigravityAccountSwitcher.autoSyncOfficialUi": true,
 
@@ -237,9 +226,9 @@ Customize behavior via your IDE Settings (`settings.json`):
 
 ### From GitHub Releases / VSIX Package
 
-1. Download the latest `antigravity-account-switcher-1.2.10.vsix` from [GitHub Releases](https://github.com/BoyGR/antigravity-account-switcher/releases).
+1. Download the latest `antigravity-account-switcher-1.2.11.vsix` from [GitHub Releases](https://github.com/BoyGR/antigravity-account-switcher/releases).
 
-2. **Via Graphical Interface (VS Code, Cursor, or Antigravity IDE)**:
+2. **Via Graphical Interface (VS Code, Antigravity IDE, or Cursor)**:
    - Open **Extensions** (`Ctrl+Shift+X` / `Cmd+Shift+X`).
    - Click the `...` menu at the top right of the Extensions view.
    - Select **Install from VSIX...**.
@@ -248,15 +237,15 @@ Customize behavior via your IDE Settings (`settings.json`):
 3. **Via Terminal / Command Line**:
    - **Visual Studio Code**:
      ```powershell
-     code --install-extension antigravity-account-switcher-1.2.10.vsix
-     ```
-   - **Cursor**:
-     ```powershell
-     cursor --install-extension antigravity-account-switcher-1.2.10.vsix
+     code --install-extension antigravity-account-switcher-1.2.11.vsix
      ```
    - **Google Antigravity Standalone IDE**:
      ```powershell
-     antigravity --install-extension antigravity-account-switcher-1.2.10.vsix
+     antigravity --install-extension antigravity-account-switcher-1.2.11.vsix
+     ```
+   - **Cursor**:
+     ```powershell
+     cursor --install-extension antigravity-account-switcher-1.2.11.vsix
      ```
 
 ---

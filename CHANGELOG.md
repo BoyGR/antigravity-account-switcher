@@ -4,6 +4,21 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.2.11] - 2026-09-14
+
+### Changed & Improved
+- **Saved Accounts Metadata Redesign**:
+  - Replaced the vertical metadata stack with a compact, modern horizontal badge row (`saved-badges-row`).
+  - Optimized the visual hierarchy across all saved account cards: Subscription Plan badge $\rightarrow$ `⚡ Instant` vault indicator $\rightarrow$ `🏷️ Custom Group` tag $\rightarrow$ `⏱ Last used` pill $\rightarrow$ `Updated snapshot` timestamp.
+  - Ensures responsive wrapping and clean alignment without vertical clutter.
+- **Removed Workspace Association**:
+  - Retired the workspace/folder association feature (`setWorkspaceAccount`, `clearWorkspaceAccount`, `autoPromptWorkspaceAccount`) to eliminate startup popups and reduce cognitive overhead.
+  - Users switch accounts seamlessly with 1 click using Instant Token Swapping.
+- **Refined IDE Support Hierarchy**:
+  - Aligned documentation, manifest, and setup instructions to standard hierarchy: **Visual Studio Code**, **Google Antigravity Standalone IDE**, **Cursor**, and other VS Code-compatible editors.
+
+---
+
 ## [1.2.10] - 2026-09-14
 
 ### Changed & Improved (UI/UX)
