@@ -4,6 +4,16 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.2.5] - 2026-09-14
+
+### Fixed & Hardened
+- **Safe Tier & Plan Parsing**:
+  - Resolved `e.userTier?.trim is not a function` error when inspecting Antigravity account status by adding robust `safeExtractString` validation for all Language Server RPC payload fields (`userTier`, `g1Tier`, `tier`, `subscriptionTier`, `email`, `name`, `profilePictureUrl`).
+  - Added safe fallbacks for accounts without identifiable plan metadata: instead of throwing runtime exceptions or forcing unverified plan badges, the extension gracefully hides the badge or defaults safely.
+  - Hardened webview plan badge renderer and account registry import with safe string checks.
+
+---
+
 ## [1.2.4] - 2026-09-14
 
 ### Added & Improved

@@ -591,7 +591,7 @@ export async function getAntigravityAuthStatus():
                 session.csrfToken,
                 {}
             );
-            const email = userResponse.userStatus?.email?.trim().toLowerCase();
+            const email = safeExtractString(userResponse.userStatus?.email)?.toLowerCase();
             const hasValidAuth = Boolean(email);
 
             return {
@@ -971,21 +971,44 @@ export interface AntigravityCurrentAccount {
     profilePictureUrl?: string;
 }
 
+export function safeExtractString(value: unknown): string | undefined {
+    if (typeof value === "string") {
+        const trimmed = value.trim();
+        return trimmed.length > 0 ? trimmed : undefined;
+    }
+    if (typeof value === "number" && Number.isFinite(value)) {
+        return String(value);
+    }
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+        const obj = value as Record<string, unknown>;
+        for (const key of ["tier", "name", "id", "displayName", "plan", "code", "value"]) {
+            if (typeof obj[key] === "string" && (obj[key] as string).trim()) {
+                return (obj[key] as string).trim();
+            }
+        }
+    }
+    return undefined;
+}
+
 export function formatAccountPlan(
-    g1Tier?: string,
-    isPro?: boolean,
-    rawPlan?: string,
-): string {
-    if (rawPlan && rawPlan.trim()) {
-        const trimmed = rawPlan.trim();
-        const upper = trimmed.toUpperCase();
+    g1Tier?: unknown,
+    isPro?: unknown,
+    rawPlan?: unknown,
+): string | undefined {
+    const cleanPlan = safeExtractString(rawPlan);
+    const cleanTier = safeExtractString(g1Tier);
+    const proFlag = isPro === true;
+
+    if (cleanPlan) {
+        const upper = cleanPlan.toUpperCase();
         if (upper.includes("ULTRA")) {
             return "Google AI Ultra";
         }
-        if (upper.includes("PLUS")) {
-            return "Google AI Plus";
-        }
-        if (upper.includes("AI_PREMIUM") || upper.includes("PREMIUM")) {
+        if (
+            upper.includes("PLUS") ||
+            upper.includes("AI_PREMIUM") ||
+            upper.includes("PREMIUM")
+        ) {
             return "Google AI Plus";
         }
         if (upper.includes("PRO")) {
@@ -997,46 +1020,55 @@ export function formatAccountPlan(
         if (upper.includes("FREE") || upper.includes("STANDARD")) {
             return "Google AI Free";
         }
-        return trimmed;
+        return cleanPlan;
     }
 
-    const raw = (g1Tier || "").toUpperCase().trim();
-    if (raw.includes("ULTRA")) {
-        return "Google AI Ultra";
-    }
-    if (raw.includes("PLUS")) {
-        return "Google AI Plus";
-    }
-    if (raw.includes("AI_PREMIUM") || raw.includes("PREMIUM")) {
-        return "Google AI Plus";
-    }
-    if (raw.includes("PRO") || isPro === true) {
+    if (proFlag) {
         return "Google AI Pro";
     }
-    if (raw.includes("ENTERPRISE")) {
-        return "Google AI Enterprise";
+
+    if (cleanTier) {
+        const upper = cleanTier.toUpperCase();
+        if (upper.includes("ULTRA")) {
+            return "Google AI Ultra";
+        }
+        if (
+            upper.includes("PLUS") ||
+            upper.includes("AI_PREMIUM") ||
+            upper.includes("PREMIUM")
+        ) {
+            return "Google AI Plus";
+        }
+        if (upper.includes("PRO")) {
+            return "Google AI Pro";
+        }
+        if (upper.includes("ENTERPRISE")) {
+            return "Google AI Enterprise";
+        }
+        if (upper.includes("FREE") || upper.includes("STANDARD")) {
+            return "Google AI Free";
+        }
+        return cleanTier.replace(/^G1_TIER_/, "").replace(/_/g, " ");
     }
-    if (raw.includes("FREE") || raw.includes("STANDARD")) {
-        return "Google AI Free";
-    }
-    if (raw) {
-        return raw.replace(/^G1_TIER_/, "").replace(/_/g, " ");
-    }
-    return "Google AI Free";
+
+    // Fallback: Jika tidak ada data tier/plan yang terdeteksi, jangan kembalikan label palsu
+    // Kembalikan undefined agar UI tidak menampilkan badge yang salah atau memaksa label Free
+    return undefined;
 }
 
 interface GetUserStatusResponse {
     userStatus?: {
-        email?: string;
-        name?: string;
-        g1Tier?: string;
-        tier?: string;
-        userTier?: string;
-        subscriptionTier?: string;
-        plan?: string;
-        pro?: boolean;
-        hasUsedAntigravity?: boolean;
-        profilePictureUrl?: string;
+        email?: unknown;
+        name?: unknown;
+        g1Tier?: unknown;
+        tier?: unknown;
+        userTier?: unknown;
+        subscriptionTier?: unknown;
+        plan?: unknown;
+        pro?: unknown;
+        hasUsedAntigravity?: unknown;
+        profilePictureUrl?: unknown;
+        [key: string]: unknown;
     };
 }
 
@@ -1078,10 +1110,7 @@ export async function getAntigravityCurrentAccount():
             );
         }
 
-        const email =
-            userStatus.email
-                ?.trim()
-                .toLowerCase();
+        const email = safeExtractString(userStatus.email)?.toLowerCase();
 
         if (!email) {
             throw new Error(
@@ -1090,10 +1119,10 @@ export async function getAntigravityCurrentAccount():
         }
 
         const rawTier =
-            userStatus.g1Tier?.trim() ||
-            userStatus.tier?.trim() ||
-            userStatus.userTier?.trim() ||
-            userStatus.subscriptionTier?.trim() ||
+            safeExtractString(userStatus.g1Tier) ||
+            safeExtractString(userStatus.tier) ||
+            safeExtractString(userStatus.userTier) ||
+            safeExtractString(userStatus.subscriptionTier) ||
             undefined;
 
         const isPro =
@@ -1101,19 +1130,20 @@ export async function getAntigravityCurrentAccount():
                 ? userStatus.pro
                 : undefined;
 
-        const rawPlan =
-            typeof userStatus.plan === "string"
-                ? userStatus.plan.trim()
-                : undefined;
+        const rawPlan = safeExtractString(userStatus.plan);
 
-        const plan = formatAccountPlan(rawTier, isPro, rawPlan);
+        let plan: string | undefined;
+        try {
+            plan = formatAccountPlan(rawTier, isPro, rawPlan);
+        } catch {
+            plan = undefined;
+        }
 
         return {
             email,
 
             displayName:
-                userStatus.name?.trim() ||
-                undefined,
+                safeExtractString(userStatus.name),
 
             g1Tier: rawTier,
 
@@ -1127,8 +1157,7 @@ export async function getAntigravityCurrentAccount():
                     : undefined,
 
             profilePictureUrl:
-                userStatus.profilePictureUrl?.trim() ||
-                undefined,
+                safeExtractString(userStatus.profilePictureUrl),
         };
     }
 /* ============================================================

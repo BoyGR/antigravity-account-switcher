@@ -44,3 +44,7 @@ coverage/**
 .env.*
 **/.env
 **/.env.*
+
+# Internal private workspace - strictly excluded from packaging
+internal/**
+internal-docs/**

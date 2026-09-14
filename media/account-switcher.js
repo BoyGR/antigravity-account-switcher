@@ -45,7 +45,7 @@
         vaultedEmails: [],
 
         meta: {
-            version: "1.2.4",
+            version: "1.2.5",
             developer: "Boy Gilang Ramadhan",
             website: "https://boygr.com",
             iconUri: "",
@@ -1815,6 +1815,8 @@
                             aria-label="Clear color"
                         >×</button>
                     ` : ""}
+                </div>
+
                 <div class="label-editor-plans">
                     <span class="label-editor-meta-title">${escapeHtml(t("plan"))}:</span>
                     <div class="plan-pills-row">
@@ -2005,8 +2007,14 @@
         if (!account) {
             return null;
         }
-        const raw = (account.plan || account.g1Tier || "").trim();
+        const planStr = typeof account.plan === "string" ? account.plan.trim() : "";
+        const g1TierStr = typeof account.g1Tier === "string" ? account.g1Tier.trim() : "";
+        const raw = planStr || g1TierStr;
         const isPro = account.isPro === true;
+
+        if (!raw && !isPro) {
+            return null;
+        }
 
         let planName = "";
         let planClass = "plan-free";
@@ -2042,9 +2050,7 @@
             planClass = "plan-custom";
             iconSymbol = "✨";
         } else {
-            planName = "Google AI Free";
-            planClass = "plan-free";
-            iconSymbol = "✦";
+            return null;
         }
 
         return {
@@ -2055,16 +2061,20 @@
     }
 
     function renderPlanBadge(account) {
-        const info = resolveAccountPlanInfo(account);
-        if (!info || !info.name) {
+        try {
+            const info = resolveAccountPlanInfo(account);
+            if (!info || !info.name) {
+                return "";
+            }
+            return `
+                <span class="plan-pill ${escapeHtml(info.className)}" title="${escapeHtml(`Plan: ${info.name}`)}">
+                    <span class="plan-icon" aria-hidden="true">${info.icon}</span>
+                    <span class="plan-text">${escapeHtml(info.name)}</span>
+                </span>
+            `;
+        } catch {
             return "";
         }
-        return `
-            <span class="plan-pill ${escapeHtml(info.className)}" title="${escapeHtml(`Plan: ${info.name}`)}">
-                <span class="plan-icon" aria-hidden="true">${info.icon}</span>
-                <span class="plan-text">${escapeHtml(info.name)}</span>
-            </span>
-        `;
     }
 
     function quotaPercent(

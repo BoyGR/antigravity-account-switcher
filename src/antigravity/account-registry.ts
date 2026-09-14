@@ -538,12 +538,12 @@ export async function importManagedAccounts(
         if (existing) {
             state.accounts[email] = {
                 ...existing,
-                label: item.label !== undefined ? item.label.trim() || undefined : existing.label,
-                displayName: item.displayName !== undefined ? item.displayName.trim() || undefined : existing.displayName,
-                colorTag: item.colorTag !== undefined ? item.colorTag.trim() || undefined : existing.colorTag,
-                group: item.group !== undefined ? item.group.trim() || undefined : existing.group,
-                plan: item.plan !== undefined ? item.plan.trim() || undefined : existing.plan,
-                g1Tier: item.g1Tier !== undefined ? item.g1Tier : existing.g1Tier,
+                label: typeof item.label === "string" ? item.label.trim() || undefined : existing.label,
+                displayName: typeof item.displayName === "string" ? item.displayName.trim() || undefined : existing.displayName,
+                colorTag: typeof item.colorTag === "string" ? item.colorTag.trim() || undefined : existing.colorTag,
+                group: typeof item.group === "string" ? item.group.trim() || undefined : existing.group,
+                plan: typeof item.plan === "string" ? item.plan.trim() || undefined : existing.plan,
+                g1Tier: typeof item.g1Tier === "string" ? item.g1Tier.trim() || undefined : existing.g1Tier,
                 isPro: typeof item.isPro === "boolean" ? item.isPro : existing.isPro,
                 lastSeenAt: item.lastSeenAt || existing.lastSeenAt || now,
             };
@@ -551,12 +551,12 @@ export async function importManagedAccounts(
         } else {
             state.accounts[email] = {
                 email,
-                label: item.label?.trim() || undefined,
-                displayName: item.displayName?.trim() || undefined,
-                colorTag: item.colorTag?.trim() || undefined,
-                group: item.group?.trim() || undefined,
-                plan: item.plan?.trim() || undefined,
-                g1Tier: item.g1Tier?.trim() || undefined,
+                label: typeof item.label === "string" ? item.label.trim() || undefined : undefined,
+                displayName: typeof item.displayName === "string" ? item.displayName.trim() || undefined : undefined,
+                colorTag: typeof item.colorTag === "string" ? item.colorTag.trim() || undefined : undefined,
+                group: typeof item.group === "string" ? item.group.trim() || undefined : undefined,
+                plan: typeof item.plan === "string" ? item.plan.trim() || undefined : undefined,
+                g1Tier: typeof item.g1Tier === "string" ? item.g1Tier.trim() || undefined : undefined,
                 isPro: typeof item.isPro === "boolean" ? item.isPro : undefined,
                 firstSeenAt: item.firstSeenAt || now,
                 lastSeenAt: item.lastSeenAt || now,
