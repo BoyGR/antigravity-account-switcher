@@ -29,6 +29,8 @@
             showCurrent: true,
             showSaved: true,
             showRuntime: true,
+            showQuotaMatrix: false,
+            showQuotaAnalytics: false,
             autoRefreshIntervalMinutes: 5,
             enableLowQuotaReminder: true,
             lowQuotaThresholdPercent: 20,
@@ -41,7 +43,7 @@
         vaultedEmails: [],
 
         meta: {
-            version: "1.0.1",
+            version: "1.2.0",
             developer: "Boy Gilang Ramadhan",
             website: "https://boygr.com",
             iconUri: "",
@@ -254,7 +256,7 @@
                 "Layout",
 
             followVsCode:
-                "Follow VS Code",
+                "Follow Editor / IDE Theme",
 
             light:
                 "Light",
@@ -282,6 +284,15 @@
 
             showRuntime:
                 "Show Antigravity status",
+
+            showQuotaMatrix:
+                "Show Quota Matrix button",
+
+            showQuotaAnalytics:
+                "Show 7-day quota analytics",
+
+            switchingAndAutomation:
+                "Switching & Automation",
 
             quotaAndReminders:
                 "Quota & Reminders",
@@ -690,7 +701,7 @@
                 "Tata letak",
 
             followVsCode:
-                "Ikuti VS Code",
+                "Ikuti Tema Editor / IDE",
 
             light:
                 "Terang",
@@ -718,6 +729,15 @@
 
             showRuntime:
                 "Tampilkan status Antigravity",
+
+            showQuotaMatrix:
+                "Tampilkan tombol Quota Matrix",
+
+            showQuotaAnalytics:
+                "Tampilkan analisis kuota 7 hari",
+
+            switchingAndAutomation:
+                "Peralihan & Otomatisasi",
 
             quotaAndReminders:
                 "Kuota & Pengingat",
@@ -2923,7 +2943,7 @@
 
                     ${renderWorkspaceBar()}
                     ${renderUsage()}
-                    ${renderQuotaHistory(state.current.email)}
+                    ${state.preferences?.showQuotaAnalytics ? renderQuotaHistory(state.current.email) : ""}
                 </div>
             </section>
         `;
@@ -3686,6 +3706,7 @@
                     <span class="runtime-status-pill-value">${escapeHtml(summaryText)}</span>
                 </button>
 
+                ${state.preferences?.showQuotaMatrix ? `
                 <button
                     type="button"
                     class="quota-matrix-trigger-btn"
@@ -3696,6 +3717,7 @@
                     ${icon("matrix", "matrix-icon")}
                     <span>${escapeHtml(t("quotaMatrix"))}</span>
                 </button>
+                ` : ""}
             </div>
         `;
     }
@@ -4141,16 +4163,9 @@
                                 >
                                     <option
                                         value="vscode"
-                                        ${draft.theme === "vscode" ? "selected" : ""}
+                                        ${draft.theme === "vscode" || draft.theme === "editor" ? "selected" : ""}
                                     >
                                         ${escapeHtml(t("followVsCode"))}
-                                    </option>
-
-                                    <option
-                                        value="light"
-                                        ${draft.theme === "light" ? "selected" : ""}
-                                    >
-                                        ${escapeHtml(t("light"))}
                                     </option>
 
                                     <option
@@ -4158,6 +4173,13 @@
                                         ${draft.theme === "dark" ? "selected" : ""}
                                     >
                                         ${escapeHtml(t("dark"))}
+                                    </option>
+
+                                    <option
+                                        value="light"
+                                        ${draft.theme === "light" ? "selected" : ""}
+                                    >
+                                        ${escapeHtml(t("light"))}
                                     </option>
 
                                     <option
@@ -4199,6 +4221,52 @@
                                     </option>
                                 </select>
                             </label>
+                        </div>
+
+                        <div class="settings-group">
+                            <h3>
+                                ${escapeHtml(t("layout"))}
+                            </h3>
+
+                            ${
+                                renderCheckbox(
+                                    "showRuntime",
+                                    t("showRuntime"),
+                                    draft.showRuntime
+                                )
+                            }
+
+                            ${
+                                renderCheckbox(
+                                    "showCurrent",
+                                    t("showCurrent"),
+                                    draft.showCurrent
+                                )
+                            }
+
+                            ${
+                                renderCheckbox(
+                                    "showSaved",
+                                    t("showSaved"),
+                                    draft.showSaved
+                                )
+                            }
+
+                            ${
+                                renderCheckbox(
+                                    "showQuotaMatrix",
+                                    t("showQuotaMatrix"),
+                                    draft.showQuotaMatrix === true
+                                )
+                            }
+
+                            ${
+                                renderCheckbox(
+                                    "showQuotaAnalytics",
+                                    t("showQuotaAnalytics"),
+                                    draft.showQuotaAnalytics === true
+                                )
+                            }
                         </div>
 
                         <div class="settings-group">
@@ -4316,6 +4384,28 @@
 
                             ${
                                 renderCheckbox(
+                                    "enableQuotaAudio",
+                                    t("enableQuotaAudio"),
+                                    draft.enableQuotaAudio !== false
+                                )
+                            }
+                        </div>
+
+                        <div class="settings-group">
+                            <h3>
+                                ${escapeHtml(t("switchingAndAutomation"))}
+                            </h3>
+
+                            ${
+                                renderCheckbox(
+                                    "enableInstantSwitch",
+                                    t("instantSwitch"),
+                                    draft.enableInstantSwitch !== false
+                                )
+                            }
+
+                            ${
+                                renderCheckbox(
                                     "smartQuotaFallback",
                                     t("smartQuotaFallback"),
                                     draft.smartQuotaFallback !== false
@@ -4327,52 +4417,6 @@
                                     "autoRoundRobin",
                                     t("autoRoundRobin"),
                                     draft.autoRoundRobin === true
-                                )
-                            }
-
-                            ${
-                                renderCheckbox(
-                                    "enableQuotaAudio",
-                                    t("enableQuotaAudio"),
-                                    draft.enableQuotaAudio !== false
-                                )
-                            }
-
-                            ${
-                                renderCheckbox(
-                                    "enableInstantSwitch",
-                                    t("instantSwitch"),
-                                    draft.enableInstantSwitch !== false
-                                )
-                            }
-                        </div>
-
-                        <div class="settings-group">
-                            <h3>
-                                ${escapeHtml(t("layout"))}
-                            </h3>
-
-                            ${
-                                renderCheckbox(
-                                    "showRuntime",
-                                    t("showRuntime"),
-                                    draft.showRuntime
-                                )
-                            }
-
-                            ${
-                                renderCheckbox(
-                                    "showCurrent",
-                                    t("showCurrent"),
-                                    draft.showCurrent
-                                )
-                            }
-
-                            ${
-                                renderCheckbox(
-                                    "showSaved",
-                                    t("showSaved"),
-                                    draft.showSaved
                                 )
                             }
                         </div>
@@ -4808,6 +4852,12 @@
 
             showRuntime:
                 preferences.showRuntime !== false,
+
+            showQuotaMatrix:
+                preferences.showQuotaMatrix === true,
+
+            showQuotaAnalytics:
+                preferences.showQuotaAnalytics === true,
 
             autoRefreshIntervalMinutes:
                 typeof preferences.autoRefreshIntervalMinutes === "number"

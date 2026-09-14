@@ -243,6 +243,66 @@
         "configuration": {
             "title": "Antigravity Account Switcher",
             "properties": {
+                "boygr.antigravityAccountSwitcher.showStatusBarItem": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Show Antigravity active account quota indicator in the status bar."
+                },
+                "boygr.antigravityAccountSwitcher.statusBarFormat": {
+                    "type": "string",
+                    "default": "compact",
+                    "enum": [
+                        "compact",
+                        "detailed",
+                        "percentageOnly"
+                    ],
+                    "enumDescriptions": [
+                        "Compact (e.g. AGY: 85%)",
+                        "Detailed with countdown (e.g. AGY: 85% (1h 45m))",
+                        "Percentage only (e.g. 85%)"
+                    ],
+                    "description": "Display format for the Antigravity quota indicator in the status bar."
+                },
+                "boygr.antigravityAccountSwitcher.showQuotaMatrix": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Show the Quota Matrix overview button in the Antigravity status bar section."
+                },
+                "boygr.antigravityAccountSwitcher.showQuotaAnalytics": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Show the 7-day quota usage analytics and history chart under the active account."
+                },
+                "boygr.antigravityAccountSwitcher.enableInstantSwitch": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable instant account switching without opening the browser by securely caching credentials in the Token Vault."
+                },
+                "boygr.antigravityAccountSwitcher.smartQuotaFallback": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Suggest a 1-click switch to your saved account with the highest remaining quota when active quota is low."
+                },
+                "boygr.antigravityAccountSwitcher.autoSwitchOnExhaustion": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Suggest an immediate 1-click switch to your best available backup account when active quota is completely exhausted (0%)."
+                },
+                "boygr.antigravityAccountSwitcher.autoRoundRobin": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Automatically rotate to the best available backup account when active account hits rate limit (0% remaining)."
+                },
+                "boygr.antigravityAccountSwitcher.autoPromptWorkspaceAccount": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically prompt to switch to the linked account when opening a project workspace."
+                },
+                "boygr.antigravityAccountSwitcher.autoSyncOfficialUi": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically synchronize Antigravity's official sidebar after switching accounts or modifying authentication."
+                },
                 "boygr.antigravityAccountSwitcher.autoRefreshIntervalMinutes": {
                     "type": "integer",
                     "default": 5,
@@ -282,65 +342,15 @@
                     ],
                     "description": "Remaining quota percentage threshold that triggers a low quota warning notification."
                 },
-                "boygr.antigravityAccountSwitcher.smartQuotaFallback": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Suggest a 1-click switch to your saved account with the highest remaining quota when active quota is low."
-                },
                 "boygr.antigravityAccountSwitcher.notifyQuotaReset": {
                     "type": "boolean",
                     "default": true,
                     "description": "Notify when a low or exhausted account's quota reset window has finished and quota is restored."
                 },
-                "boygr.antigravityAccountSwitcher.autoSwitchOnExhaustion": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Suggest an immediate 1-click switch to your best available backup account when active quota is completely exhausted (0%)."
-                },
-                "boygr.antigravityAccountSwitcher.autoRoundRobin": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Automatically rotate to the best available backup account when active account hits rate limit (0% remaining)."
-                },
                 "boygr.antigravityAccountSwitcher.enableQuotaAudio": {
                     "type": "boolean",
                     "default": true,
                     "description": "Play subtle synthesized audio chimes when quota resets or reaches critical low thresholds."
-                },
-                "boygr.antigravityAccountSwitcher.enableInstantSwitch": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Enable instant account switching without opening the browser by securely caching credentials in the Token Vault."
-                },
-                "boygr.antigravityAccountSwitcher.autoPromptWorkspaceAccount": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Automatically prompt to switch to the linked account when opening a project workspace."
-                },
-                "boygr.antigravityAccountSwitcher.autoSyncOfficialUi": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Automatically synchronize Antigravity's official sidebar after switching accounts or modifying authentication."
-                },
-                "boygr.antigravityAccountSwitcher.showStatusBarItem": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Show Antigravity active account quota indicator in the status bar."
-                },
-                "boygr.antigravityAccountSwitcher.statusBarFormat": {
-                    "type": "string",
-                    "default": "compact",
-                    "enum": [
-                        "compact",
-                        "detailed",
-                        "percentageOnly"
-                    ],
-                    "enumDescriptions": [
-                        "Compact (e.g. AGY: 85%)",
-                        "Detailed with countdown (e.g. AGY: 85% (1h 45m))",
-                        "Percentage only (e.g. 85%)"
-                    ],
-                    "description": "Display format for the Antigravity quota indicator in the status bar."
                 }
             }
         }

@@ -66,6 +66,10 @@ interface AccountSwitcherPreferences {
 
     showRuntime: boolean;
 
+    showQuotaMatrix?: boolean;
+
+    showQuotaAnalytics?: boolean;
+
     autoRefreshIntervalMinutes: number;
 
     enableLowQuotaReminder: boolean;
@@ -206,6 +210,8 @@ const DEFAULT_PREFERENCES: AccountSwitcherPreferences = {
     showCurrent: true,
     showSaved: true,
     showRuntime: true,
+    showQuotaMatrix: false,
+    showQuotaAnalytics: false,
     autoRefreshIntervalMinutes: 5,
     enableLowQuotaReminder: true,
     lowQuotaThresholdPercent: 20,
@@ -1087,6 +1093,14 @@ export class AntigravityAccountWebviewProvider
                 typeof input.showRuntime === "boolean"
                     ? input.showRuntime
                     : true,
+            showQuotaMatrix:
+                typeof input.showQuotaMatrix === "boolean"
+                    ? input.showQuotaMatrix
+                    : false,
+            showQuotaAnalytics:
+                typeof input.showQuotaAnalytics === "boolean"
+                    ? input.showQuotaAnalytics
+                    : false,
             autoRefreshIntervalMinutes,
             enableLowQuotaReminder,
             lowQuotaThresholdPercent,
@@ -1134,6 +1148,8 @@ export class AntigravityAccountWebviewProvider
             showCurrent: boolean;
             showSaved: boolean;
             showRuntime: boolean;
+            showQuotaMatrix?: boolean;
+            showQuotaAnalytics?: boolean;
             autoRefreshIntervalMinutes?: number;
             enableLowQuotaReminder?: boolean;
             lowQuotaThresholdPercent?: number;
@@ -1165,6 +1181,12 @@ export class AntigravityAccountWebviewProvider
 
         const config = vscode.workspace.getConfiguration("boygr.antigravityAccountSwitcher");
         await config.update("enableInstantSwitch", preferences.enableInstantSwitch, vscode.ConfigurationTarget.Global).then(undefined, () => undefined);
+        if (typeof preferences.showQuotaMatrix === "boolean") {
+            await config.update("showQuotaMatrix", preferences.showQuotaMatrix, vscode.ConfigurationTarget.Global).then(undefined, () => undefined);
+        }
+        if (typeof preferences.showQuotaAnalytics === "boolean") {
+            await config.update("showQuotaAnalytics", preferences.showQuotaAnalytics, vscode.ConfigurationTarget.Global).then(undefined, () => undefined);
+        }
     }
 
     private getHtml(
