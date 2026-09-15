@@ -552,7 +552,23 @@ export class AntigravityAccountWebviewProvider
             vaultedEmails = await this.tokenVault.getVaultedEmails().catch(() => []);
         }
 
+        if (current && !current.profilePictureUrl) {
+            const normalizedCurrent = current.email.trim().toLowerCase();
+            const savedWithPhoto = accounts.find(
+                account =>
+                    account.email.trim().toLowerCase() === normalizedCurrent &&
+                    account.profilePictureUrl
+            );
+            if (savedWithPhoto?.profilePictureUrl) {
+                current = {
+                    ...current,
+                    profilePictureUrl: savedWithPhoto.profilePictureUrl,
+                };
+            }
+        }
+
         this.snapshot = {
+
             current,
             accounts,
             runtime,

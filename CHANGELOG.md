@@ -4,7 +4,33 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.2.13] - 2026-09-15
+
+### Fixed & Improved (UI/UX)
+- **Quota Matrix Modal Layout Overlap (Redesign)**:
+  - Redesigned `.matrix-card` from a single-row 3-column flex into a clean, modern **3-tiered vertical layout**:
+    1. **Header Tier**: Avatar + Display Name & Email on the left; Switch Button / `✓ Connected` pill on the right.
+    2. **Badges Tier**: Plan Badge, `⚡ Instant` vault indicator, Custom Group, and Label in a flexible horizontal row.
+    3. **Quota Tier**: Responsive 2-column grid displaying `5h` and `Weekly` quota bars side by side with full width, percentage, and reset details.
+  - Completely eliminates badge and progress bar collisions, cramped text ellipsis, and awkward wrapping on narrow sidebar widths.
+
+### Fixed & Real-Time Enhancements
+- **Real-Time Quota Replenishment on Expired Reset Windows**:
+  - Added `getEffectiveRemainingFraction(bucket)` helper: when a quota bucket's `resetTime` has arrived or passed (e.g. `Reset due (18:03)` when local clock is 18:09), the quota window has completed and Google has replenished the quota back to 100%.
+  - The UI now immediately reflects the restored status (100%) across **Current Account**, **Saved Accounts**, and **Quota Matrix Modal**.
+  - Updated reset status text from `Reset due (HH:MM)` to `Restored (HH:MM)` / `Dipulihkan (HH:MM)`.
+  - Timer interval (every 30 seconds) now automatically detects elapsed reset times, triggering a real-time re-render of progress bars without requiring a manual window click or reload.
+
+### Fixed (Avatars & Profile Photos)
+- **Google Profile Photo (Base64 Data URL Support)**:
+  - Antigravity's Connect-RPC `GetUserStatus` returns genuine Google profile photos in `data:image/png;base64,...` format.
+  - Fixed `safeProfilePictureUrl` validator which previously restricted URLs to `https:`, unblocking real Google profile avatars to render directly across the Active Account, Saved Accounts list, and Quota Matrix modal.
+  - Added fallback to saved registry avatars if the active session temporarily lacks the image payload.
+
+---
+
 ## [1.2.12] - 2026-09-14
+
 
 ### Changed & Improved (UI/UX)
 - **Current Account Layout Redesign**:

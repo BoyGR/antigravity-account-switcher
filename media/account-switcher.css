@@ -5906,9 +5906,8 @@ body {
 
 .matrix-card {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+    flex-direction: column;
+    gap: 8px;
     padding: 10px 12px;
     border: 1px solid var(--ag-card-border);
     border-radius: 8px;
@@ -5927,33 +5926,43 @@ body {
     box-shadow: inset 2px 0 0 var(--ag-focus);
 }
 
-.matrix-identity-col {
+/* Tier 1: Header Row (Left: Identity Avatar + Name/Email, Right: Switch / Connected) */
+.matrix-card-header {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 10px;
-    flex: 1 1 38%;
     min-width: 0;
 }
 
-.matrix-identity-col .matrix-avatar {
+.matrix-identity-group {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.matrix-identity-group .matrix-avatar {
     width: 32px;
     height: 32px;
-    font-size: 12px;
+    font-size: 11px;
     flex-shrink: 0;
 }
 
-.matrix-identity-info {
+.matrix-identity-text {
     display: flex;
     flex-direction: column;
     min-width: 0;
-    gap: 2px;
+    gap: 1px;
 }
 
 .matrix-name-row {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     min-width: 0;
+    flex-wrap: nowrap;
 }
 
 .matrix-account-name {
@@ -5973,26 +5982,52 @@ body {
     text-overflow: ellipsis;
 }
 
-.matrix-tags-row {
+.matrix-card-action {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.matrix-switch-btn {
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.matrix-connected-pill {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--ag-success, #10b981);
+    padding: 2px 7px;
+    border: 1px solid color-mix(in srgb, var(--ag-success, #10b981) 30%, transparent);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--ag-success, #10b981) 12%, transparent);
+    white-space: nowrap;
+}
+
+/* Tier 2: Badges Row */
+.matrix-badges-row {
     display: flex;
     align-items: center;
     gap: 4px;
     flex-wrap: wrap;
-    margin-top: 1px;
 }
 
-.matrix-quota-col {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    flex: 1 1 38%;
-    min-width: 110px;
+/* Tier 3: Quota Grid (5h & Weekly Side by Side) */
+.matrix-quota-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding-top: 4px;
+    border-top: 1px solid color-mix(in srgb, var(--ag-border) 40%, transparent);
 }
 
 .matrix-quota-block {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 3px;
+    min-width: 0;
 }
 
 .matrix-quota-label-row {
@@ -6005,6 +6040,7 @@ body {
 
 .matrix-quota-dim {
     color: var(--ag-muted);
+    font-weight: 500;
 }
 
 .matrix-quota-track {
@@ -6041,31 +6077,9 @@ body {
     font-size: 9px;
     color: var(--ag-muted);
     line-height: 1.1;
-}
-
-.matrix-action-col {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    flex: 0 0 auto;
-}
-
-.matrix-switch-btn {
-    padding: 3px 10px;
-    font-size: 11px;
-    font-weight: 600;
     white-space: nowrap;
-}
-
-.matrix-connected-pill {
-    font-size: 10.5px;
-    font-weight: 600;
-    color: var(--ag-success, #10b981);
-    padding: 2px 7px;
-    border: 1px solid color-mix(in srgb, var(--ag-success, #10b981) 30%, transparent);
-    border-radius: 10px;
-    background: color-mix(in srgb, var(--ag-success, #10b981) 12%, transparent);
-    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .matrix-modal-footer {

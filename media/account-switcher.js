@@ -503,7 +503,11 @@
             resetDue:
                 "Reset due",
 
+            quotaRestored:
+                "Restored",
+
             lastUpdated:
+
                 "Last updated",
 
             quotaSnapshot:
@@ -981,7 +985,11 @@
             resetDue:
                 "Waktunya reset",
 
+            quotaRestored:
+                "Dipulihkan",
+
             lastUpdated:
+
                 "Terakhir diperbarui",
 
             quotaSnapshot:
@@ -1953,9 +1961,22 @@
             return "";
         }
 
+        const trimmed = value.trim();
+
+        // Antigravity Connect-RPC GetUserStatus returns genuine Google profile
+        // photos as base64-encoded Data URLs (e.g. data:image/png;base64,...).
+        if (
+            trimmed.startsWith("data:image/png;base64,") ||
+            trimmed.startsWith("data:image/jpeg;base64,") ||
+            trimmed.startsWith("data:image/webp;base64,") ||
+            trimmed.startsWith("data:image/gif;base64,")
+        ) {
+            return trimmed;
+        }
+
         try {
             const url =
-                new URL(value);
+                new URL(trimmed);
 
             const hostname =
                 url.hostname
@@ -1983,6 +2004,7 @@
             return "";
         }
     }
+
 
     function renderAvatar(
         displayName,
@@ -2157,6 +2179,27 @@
         ) + "%";
     }
 
+    /**
+     * Calculates the real-time effective remaining fraction of a quota bucket.
+     * If the server-provided resetTime has arrived or passed, the quota window
+     * has elapsed and Google has replenished the quota back to 100%.
+     */
+    function getEffectiveRemainingFraction(bucket) {
+        if (!bucket || typeof bucket.remainingFraction !== "number" || !Number.isFinite(bucket.remainingFraction)) {
+            return null;
+        }
+
+        if (bucket.resetTime) {
+            const resetTs = new Date(bucket.resetTime).getTime();
+            if (Number.isFinite(resetTs) && resetTs <= Date.now()) {
+                return 1.0;
+            }
+        }
+
+        return bucket.remainingFraction;
+    }
+
+
     function formatDuration(
         milliseconds
     ) {
@@ -2262,8 +2305,10 @@
             const timeStr = isToday
                 ? `${hours}:${minutes}`
                 : `${d.getDate()}/${d.getMonth() + 1} ${hours}:${minutes}`;
-            return `${t("resetDue")} (${timeStr})`;
+            const label = t("quotaRestored") || t("resetDue");
+            return `${label} (${timeStr})`;
         }
+
 
         return (
             `${t("resetsIn")} ` +
@@ -2404,15 +2449,19 @@
     function renderQuotaBucket(
         bucket
     ) {
+        const effectiveFraction =
+            getEffectiveRemainingFraction(bucket);
+
         const percent =
             quotaPercent(
-                bucket.remainingFraction
+                effectiveFraction
             );
 
         const percentText =
             formatPercent(
-                bucket.remainingFraction
+                effectiveFraction
             );
+
 
         const resetText =
             formatResetTime(
@@ -2770,12 +2819,25 @@
     }
 
     function updateUsageTimeLabels() {
+        let hasElapsedReset = false;
+
         document
             .querySelectorAll(
                 "[data-reset-at]"
             )
             .forEach(
                 element => {
+                    const rawResetAt = element.dataset.resetAt;
+                    if (rawResetAt) {
+                        const ts = new Date(rawResetAt).getTime();
+                        if (Number.isFinite(ts) && ts <= Date.now()) {
+                            if (element.dataset.wasResetPassed !== "true") {
+                                element.dataset.wasResetPassed = "true";
+                                hasElapsedReset = true;
+                            }
+                        }
+                    }
+
                     const reset =
                         formatResetTime(
                             element.dataset
@@ -2821,7 +2883,15 @@
                         );
                 }
             );
+
+        if (hasElapsedReset) {
+            render();
+            if (state.current?.email) {
+                vscode.postMessage({ type: "refresh" });
+            }
+        }
     }
+
     function renderCurrent() {
         if (
             state.preferences?.hideCurrent === true ||
@@ -2930,12 +3000,13 @@
                             renderAvatar(
                                 displayName,
                                 state.current.email,
-                                state.current.profilePictureUrl,
+                                state.current.profilePictureUrl || managed?.profilePictureUrl,
                                 managed?.colorTag
                                     ? `current-avatar tag-${escapeHtml(managed.colorTag)}`
                                     : "current-avatar"
                             )
                         }
+
 
                         <div class="identity">
                             ${
@@ -3098,9 +3169,10 @@
         bucket
     ) {
         return formatPercent(
-            bucket?.remainingFraction
+            getEffectiveRemainingFraction(bucket)
         );
     }
+
 
     function renderSavedFamilyUsage(
         label,
@@ -4087,7 +4159,8 @@
                         const isWeekly = id.includes("week") || win.includes("week") || win.includes("7 day");
 
                         if (typeof b.remainingFraction === "number" && !b.disabled) {
-                            const pct = Math.max(0, Math.min(100, Math.round(b.remainingFraction * 100)));
+                            const effFrac = getEffectiveRemainingFraction(b);
+                            const pct = typeof effFrac === "number" ? Math.max(0, Math.min(100, Math.round(effFrac * 100))) : null;
                             const resetStr = b.resetTime ? formatResetTime(b.resetTime) : "";
 
                             if (is5h || (fiveHourPct === null && !isWeekly)) {
@@ -4115,30 +4188,53 @@
 
                 return `
                     <div class="matrix-card ${isActive ? "active-matrix-card" : ""}">
-                        <div class="matrix-identity-col">
-                            ${renderAvatar(
-                                displayName,
-                                account.email,
-                                account.profilePictureUrl || (isActive ? state.current?.profilePictureUrl : undefined),
-                                account.colorTag ? `matrix-avatar tag-${escapeHtml(account.colorTag)}` : "matrix-avatar"
-                            )}
-                            <div class="matrix-identity-info">
-                                <div class="matrix-name-row">
-                                    <span class="matrix-account-name" title="${escapeHtml(displayName)}">${escapeHtml(displayName)}</span>
-                                    ${account.colorTag ? `<span class="color-tag-dot dot-${escapeHtml(account.colorTag)}"></span>` : ""}
-                                    ${isActive ? `<span class="badge active-badge">${escapeHtml(t("active"))}</span>` : ""}
+                        <!-- Tier 1: Header Row (Identity Left, Action Right) -->
+                        <div class="matrix-card-header">
+                            <div class="matrix-identity-group">
+                                ${renderAvatar(
+                                    displayName,
+                                    account.email,
+                                    account.profilePictureUrl || (isActive ? state.current?.profilePictureUrl : undefined),
+                                    account.colorTag ? `matrix-avatar tag-${escapeHtml(account.colorTag)}` : "matrix-avatar"
+                                )}
+                                <div class="matrix-identity-text">
+                                    <div class="matrix-name-row">
+                                        <span class="matrix-account-name" title="${escapeHtml(displayName)}">${escapeHtml(displayName)}</span>
+                                        ${account.colorTag ? `<span class="color-tag-dot dot-${escapeHtml(account.colorTag)}"></span>` : ""}
+                                        ${isActive ? `<span class="saved-rail-badge active-badge">${escapeHtml(t("active"))}</span>` : ""}
+                                    </div>
+                                    <div class="matrix-email-row" title="${escapeHtml(account.email)}">${escapeHtml(account.email)}</div>
                                 </div>
-                                <div class="matrix-email-row" title="${escapeHtml(account.email)}">${escapeHtml(account.email)}</div>
-                                <div class="matrix-tags-row">
-                                    ${state.vaultedEmails?.includes(normalizeEmail(account.email)) ? `<span class="vault-pill" title="${escapeHtml(t("vaultInfo"))}">⚡ ${escapeHtml(t("instantBadge"))}</span>` : ""}
-                                    ${renderPlanBadge(isActive ? (state.current || account) : account)}
-                                    ${localLabel ? `<span class="account-label">${escapeHtml(localLabel)}</span>` : ""}
-                                    ${account.group ? `<span class="group-pill" title="Group: ${escapeHtml(account.group)}">🏷️ ${escapeHtml(account.group)}</span>` : ""}
-                                </div>
+                            </div>
+
+                            <div class="matrix-card-action">
+                                ${isActive
+                                    ? `<span class="matrix-connected-pill">✓ ${escapeHtml(t("connected"))}</span>`
+                                    : `
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary compact matrix-switch-btn"
+                                            data-action="switch"
+                                            data-email="${escapeHtml(account.email)}"
+                                            title="${escapeHtml(t("switch"))}"
+                                        >
+                                            ${escapeHtml(t("switchNow"))}
+                                        </button>
+                                    `
+                                }
                             </div>
                         </div>
 
-                        <div class="matrix-quota-col">
+                        <!-- Tier 2: Badges Row -->
+                        <div class="matrix-badges-row">
+                            ${renderPlanBadge(isActive ? (state.current || account) : account)}
+                            ${state.vaultedEmails?.includes(normalizeEmail(account.email)) ? `<span class="vault-pill" title="${escapeHtml(t("vaultInfo"))}">⚡ ${escapeHtml(t("instantBadge"))}</span>` : ""}
+                            ${localLabel ? `<span class="account-label">${escapeHtml(localLabel)}</span>` : ""}
+                            ${account.group ? `<span class="group-pill" title="Group: ${escapeHtml(account.group)}">🏷️ ${escapeHtml(account.group)}</span>` : ""}
+                        </div>
+
+                        <!-- Tier 3: Quota Grid (5h & Weekly Side by Side) -->
+                        <div class="matrix-quota-grid">
                             <div class="matrix-quota-block">
                                 <div class="matrix-quota-label-row">
                                     <span class="matrix-quota-dim">${escapeHtml(t("fiveHourShort") || "5h")}:</span>
@@ -4147,7 +4243,7 @@
                                 <div class="matrix-quota-track">
                                     <div class="matrix-quota-fill ${toneClass(fiveHourPct)}" style="width: ${typeof fiveHourPct === "number" ? fiveHourPct : 0}%;"></div>
                                 </div>
-                                ${fiveHourReset ? `<span class="matrix-reset-sub">${escapeHtml(fiveHourReset)}</span>` : ""}
+                                ${fiveHourReset ? `<span class="matrix-reset-sub" title="${escapeHtml(fiveHourReset)}">${escapeHtml(fiveHourReset)}</span>` : ""}
                             </div>
 
                             <div class="matrix-quota-block">
@@ -4158,29 +4254,13 @@
                                 <div class="matrix-quota-track">
                                     <div class="matrix-quota-fill ${toneClass(weeklyPct)}" style="width: ${typeof weeklyPct === "number" ? weeklyPct : 0}%;"></div>
                                 </div>
-                                ${weeklyReset ? `<span class="matrix-reset-sub">${escapeHtml(weeklyReset)}</span>` : ""}
+                                ${weeklyReset ? `<span class="matrix-reset-sub" title="${escapeHtml(weeklyReset)}">${escapeHtml(weeklyReset)}</span>` : ""}
                             </div>
-                        </div>
-
-                        <div class="matrix-action-col">
-                            ${isActive
-                                ? `<span class="matrix-connected-pill">✓ ${escapeHtml(t("connected"))}</span>`
-                                : `
-                                    <button
-                                        type="button"
-                                        class="btn btn-primary compact matrix-switch-btn"
-                                        data-action="switch"
-                                        data-email="${escapeHtml(account.email)}"
-                                        title="${escapeHtml(t("switch"))}"
-                                    >
-                                        ${escapeHtml(t("switchNow"))}
-                                    </button>
-                                `
-                            }
                         </div>
                     </div>
                 `;
             }).join("");
+
 
         return `
             <div class="matrix-modal-backdrop" data-action="close-quota-matrix">
