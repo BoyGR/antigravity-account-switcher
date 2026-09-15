@@ -119,7 +119,14 @@
 
         quotaMatrixOpen:
             false,
+
+        matrixSearch:
+            "",
+
+        matrixSort:
+            "quota",
     };
+
 
     let operation =
         null;
@@ -533,6 +540,22 @@
 
             quotaHistory:
                 "7-Day Quota Analytics",
+
+            searchAccountsPlaceholder:
+                "Filter by name, email, or group...",
+
+            highestQuota:
+                "Highest Quota",
+
+            earliestReset:
+                "Earliest Reset",
+
+            nameAZ:
+                "Name (A-Z)",
+
+            noMatchingAccounts:
+                "No accounts match your filter.",
+
 
             quotaHistorySub:
                 "Daily lowest remaining",
@@ -1015,6 +1038,22 @@
 
             quotaHistory:
                 "Analitik Kuota 7 Hari",
+
+            searchAccountsPlaceholder:
+                "Cari nama, email, atau grup...",
+
+            highestQuota:
+                "Kuota Tertinggi",
+
+            earliestReset:
+                "Reset Terdekat",
+
+            nameAZ:
+                "Nama (A-Z)",
+
+            noMatchingAccounts:
+                "Tidak ada akun yang cocok dengan filter.",
+
 
             quotaHistorySub:
                 "Sisa terendah harian",
@@ -4086,40 +4125,86 @@
         `;
     }
 
-    function renderQuotaMatrixModal() {
-        if (!ui.quotaMatrixOpen) {
-            return "";
+    function getEarliestResetTs(account, currentEmail, snapshots) {
+        const norm = normalizeEmail(account.email);
+        const usage = (norm === currentEmail && state.usage) ? state.usage : snapshots[norm];
+        if (!usage?.buckets || !Array.isArray(usage.buckets)) return Infinity;
+        let minTs = Infinity;
+        for (const b of usage.buckets) {
+            if (b.resetTime && !b.disabled) {
+                const ts = new Date(b.resetTime).getTime();
+                if (Number.isFinite(ts) && ts > Date.now() && ts < minTs) {
+                    minTs = ts;
+                }
+            }
         }
+        return minTs;
+    }
 
+    function renderMatrixCardsHtml() {
         const accounts = state.accounts || [];
         const snapshots = state.usageSnapshots || {};
         const currentEmail = normalizeEmail(state.current?.email || "");
 
-        const sorted = [...accounts].sort((a, b) => {
-            const aNorm = normalizeEmail(a.email);
-            const bNorm = normalizeEmail(b.email);
-            if (aNorm === currentEmail) return -1;
-            if (bNorm === currentEmail) return 1;
+            const q = (ui.matrixSearch || "").trim().toLowerCase();
+            let list = q
+                ? accounts.filter(account => {
+                    const haystack = [
+                        account.label,
+                        account.displayName,
+                        account.email,
+                        account.group,
+                    ].filter(Boolean).join(" ").toLowerCase();
+                    return haystack.includes(q);
+                })
+                : accounts.slice();
 
-            const aPct = getAccountQuotaPercent(a);
-            const bPct = getAccountQuotaPercent(b);
-            const aVal = typeof aPct === "number" ? aPct : -1;
-            const bVal = typeof bPct === "number" ? bPct : -1;
+            const sortBy = ui.matrixSort || "quota";
 
-            if (aVal !== bVal) {
-                return bVal - aVal;
+            const sorted = list.sort((a, b) => {
+                const aNorm = normalizeEmail(a.email);
+                const bNorm = normalizeEmail(b.email);
+                if (aNorm === currentEmail) return -1;
+                if (bNorm === currentEmail) return 1;
+
+                if (sortBy === "reset") {
+                    const aReset = getEarliestResetTs(a, currentEmail, snapshots);
+                    const bReset = getEarliestResetTs(b, currentEmail, snapshots);
+                    if (aReset !== bReset) {
+                        return aReset - bReset;
+                    }
+                } else if (sortBy === "quota") {
+                    const aPct = getAccountQuotaPercent(a);
+                    const bPct = getAccountQuotaPercent(b);
+                    const aVal = typeof aPct === "number" ? aPct : -1;
+                    const bVal = typeof bPct === "number" ? bPct : -1;
+                    if (aVal !== bVal) {
+                        return bVal - aVal;
+                    }
+                }
+
+                return (a.label || a.displayName || a.email).localeCompare(b.label || b.displayName || b.email);
+            });
+
+            if (sorted.length === 0) {
+                if (q) {
+                    return `
+                        <div class="search-empty-state">
+                            <span>${escapeHtml(t("noMatchingAccounts"))}</span>
+                            <button type="button" class="btn compact" data-action="clear-matrix-search">
+                                ${escapeHtml(t("clearSearch") || "Clear search")}
+                            </button>
+                        </div>
+                    `;
+                }
+                return `
+                    <div class="matrix-empty secondary-text">
+                        ${escapeHtml(t("noSaved"))}
+                    </div>
+                `;
             }
 
-            return (a.label || a.displayName || a.email).localeCompare(b.label || b.displayName || b.email);
-        });
-
-        const cardsHtml = sorted.length === 0
-            ? `
-                <div class="matrix-empty secondary-text">
-                    ${escapeHtml(t("noSaved"))}
-                </div>
-            `
-            : sorted.map(account => {
+            return sorted.map(account => {
                 const norm = normalizeEmail(account.email);
                 const isActive = Boolean(currentEmail && norm === currentEmail);
                 const usage = isActive ? (state.usage || snapshots[norm]) : snapshots[norm];
@@ -4241,7 +4326,15 @@
                     </div>
                 `;
             }).join("");
+    }
 
+    function renderQuotaMatrixModal() {
+        if (!ui.quotaMatrixOpen) {
+            return "";
+        }
+
+        const accounts = state.accounts || [];
+        const cardsHtml = renderMatrixCardsHtml();
 
         return `
             <div class="matrix-modal-backdrop" data-action="close-quota-matrix">
@@ -4268,13 +4361,67 @@
                     </header>
 
                     <div class="matrix-modal-body">
-                        <div class="matrix-list">
+                        ${accounts.length > 1 ? `
+                            <div class="matrix-filter-row">
+                                <div class="search-input-wrapper">
+                                    <span class="search-input-icon">${icon("search")}</span>
+                                    <input
+                                        id="matrix-search"
+                                        class="accounts-search-input"
+                                        type="search"
+                                        value="${escapeHtml(ui.matrixSearch || "")}"
+                                        placeholder="${escapeHtml(t("searchAccountsPlaceholder"))}"
+                                        autocomplete="off"
+                                        spellcheck="false"
+                                    >
+                                    ${ui.matrixSearch ? `
+                                        <button
+                                            type="button"
+                                            class="search-clear-btn"
+                                            data-action="clear-matrix-search"
+                                            title="${escapeHtml(t("clearSearch") || "Clear search")}"
+                                            aria-label="${escapeHtml(t("clearSearch") || "Clear search")}"
+                                        >✕</button>
+                                    ` : ""}
+                                </div>
+
+                                <div class="matrix-sort-chips">
+                                    <span class="matrix-sort-label">${escapeHtml(t("sortBy") || "Sort:")}</span>
+                                    <button
+                                        type="button"
+                                        class="matrix-sort-chip ${(!ui.matrixSort || ui.matrixSort === "quota") ? "active" : ""}"
+                                        data-action="set-matrix-sort"
+                                        data-sort="quota"
+                                    >
+                                        🟢 ${escapeHtml(t("highestQuota"))}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="matrix-sort-chip ${ui.matrixSort === "reset" ? "active" : ""}"
+                                        data-action="set-matrix-sort"
+                                        data-sort="reset"
+                                    >
+                                        ⏱ ${escapeHtml(t("earliestReset"))}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="matrix-sort-chip ${ui.matrixSort === "name" ? "active" : ""}"
+                                        data-action="set-matrix-sort"
+                                        data-sort="name"
+                                    >
+                                        🔤 ${escapeHtml(t("nameAZ"))}
+                                    </button>
+                                </div>
+                            </div>
+                        ` : ""}
+
+                        <div class="matrix-list" id="matrix-account-list">
                             ${cardsHtml}
                         </div>
                     </div>
 
                     <footer class="matrix-modal-footer">
-                        <span class="secondary-text">${sorted.length} ${escapeHtml(t("savedAccounts"))}</span>
+                        <span class="secondary-text">${accounts.length} ${escapeHtml(t("savedAccounts"))}</span>
                         <button
                             type="button"
                             class="btn"
@@ -4933,6 +5080,13 @@
         }
     }
 
+    function updateMatrixListOnly() {
+        const list = document.getElementById("matrix-account-list");
+        if (list) {
+            list.innerHTML = renderMatrixCardsHtml();
+        }
+    }
+
     function beginLabelEdit(
         email
     ) {
@@ -5118,13 +5272,28 @@
                 ui.search =
                     target.value;
 
-                const clearBtn = document.querySelector(".search-clear-btn");
+                const clearBtn = target.closest(".search-input-wrapper")?.querySelector(".search-clear-btn");
                 if (clearBtn) {
                     clearBtn.style.display = ui.search ? "inline-flex" : "none";
                 }
 
                 persistUi();
                 updateSavedListOnly();
+                return;
+            }
+
+            if (
+                target instanceof HTMLInputElement &&
+                target.id === "matrix-search"
+            ) {
+                ui.matrixSearch = target.value;
+
+                const clearBtn = target.closest(".search-input-wrapper")?.querySelector(".search-clear-btn");
+                if (clearBtn) {
+                    clearBtn.style.display = ui.matrixSearch ? "inline-flex" : "none";
+                }
+
+                updateMatrixListOnly();
                 return;
             }
 
@@ -5384,7 +5553,35 @@
                     return;
                 }
                 ui.quotaMatrixOpen = false;
+                ui.matrixSearch = "";
                 render();
+                return;
+            }
+
+            if (action === "clear-matrix-search") {
+                ui.matrixSearch = "";
+                const searchInput = document.getElementById("matrix-search");
+                if (searchInput) {
+                    searchInput.value = "";
+                    searchInput.focus();
+                }
+                const clearBtn = target.closest(".search-input-wrapper")?.querySelector(".search-clear-btn")
+                    || document.querySelector(".matrix-filter-row .search-clear-btn");
+                if (clearBtn) {
+                    clearBtn.style.display = "none";
+                }
+                updateMatrixListOnly();
+                return;
+            }
+
+            if (action === "set-matrix-sort") {
+                const sortType = target.dataset.sort || "quota";
+                ui.matrixSort = sortType;
+                const chips = document.querySelectorAll(".matrix-sort-chip");
+                chips.forEach(chip => {
+                    chip.classList.toggle("active", chip.dataset.sort === sortType);
+                });
+                updateMatrixListOnly();
                 return;
             }
 

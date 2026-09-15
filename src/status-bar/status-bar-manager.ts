@@ -26,7 +26,8 @@ export class AntigravityStatusBarManager implements vscode.Disposable {
             100,
         );
         this.statusBarItem.command =
-            "boygr.antigravityAccountSwitcher.focusView";
+            "boygr.antigravityAccountSwitcher.statusBarMenu";
+
 
         this.disposables.push(this.statusBarItem);
 
@@ -246,10 +247,10 @@ export class AntigravityStatusBarManager implements vscode.Disposable {
             md.appendMarkdown(`\n`);
         }
 
-        md.appendMarkdown(`---\n\n`);
         md.appendMarkdown(
-            `*Click to open Antigravity Account Switcher in Activity Bar.*`,
+            `*Click to switch accounts or view quota options.*`,
         );
+
 
         this.statusBarItem.tooltip = md;
         this.statusBarItem.show();

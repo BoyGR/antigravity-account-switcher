@@ -4,6 +4,24 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.3.0] - 2026-09-16
+
+### Added
+- **Quota Matrix Instant Search & Filter**:
+  - Integrated real-time search bar inside the Quota Matrix modal, matching the Saved Accounts search design.
+  - Instantly filters accounts across labels, display names, email addresses, and group tags without losing scroll or modal state.
+  - Includes search clear (`✕`) button and dedicated empty state with clear search shortcut.
+- **Quota Matrix Dynamic Sorting**:
+  - Added quick-sort chips to arrange accounts by:
+    - 🟢 **Highest Quota**: Prioritizes accounts with highest remaining quota percentage for fast switching when reaching quota limits.
+    - ⏱ **Earliest Reset**: Prioritizes accounts whose replenishment window expires next.
+    - 🔤 **Name A-Z**: Alphabetical sorting by account label or display name.
+  - Active account remains conveniently pinned to top for easy reference.
+- **Status Bar One-Click QuickSwitch**:
+  - Clicking the status bar item now directly opens the multi-account QuickPick (`statusBarMenu`) for instantaneous account switching or viewing quota breakdown, reducing clicks.
+
+---
+
 ## [1.2.14] - 2026-09-15
 
 ### Fixed (Performance)
