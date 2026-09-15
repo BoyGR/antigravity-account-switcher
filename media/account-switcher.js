@@ -2819,25 +2819,12 @@
     }
 
     function updateUsageTimeLabels() {
-        let hasElapsedReset = false;
-
         document
             .querySelectorAll(
                 "[data-reset-at]"
             )
             .forEach(
                 element => {
-                    const rawResetAt = element.dataset.resetAt;
-                    if (rawResetAt) {
-                        const ts = new Date(rawResetAt).getTime();
-                        if (Number.isFinite(ts) && ts <= Date.now()) {
-                            if (element.dataset.wasResetPassed !== "true") {
-                                element.dataset.wasResetPassed = "true";
-                                hasElapsedReset = true;
-                            }
-                        }
-                    }
-
                     const reset =
                         formatResetTime(
                             element.dataset
@@ -2883,14 +2870,8 @@
                         );
                 }
             );
-
-        if (hasElapsedReset) {
-            render();
-            if (state.current?.email) {
-                vscode.postMessage({ type: "refresh" });
-            }
-        }
     }
+
 
     function renderCurrent() {
         if (

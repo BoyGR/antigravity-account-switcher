@@ -4,7 +4,18 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.2.14] - 2026-09-15
+
+### Fixed (Performance)
+- **Resolved Quota Matrix Modal Opening Lag/Hang**:
+  - Eliminated a severe recursive re-render loop inside `updateUsageTimeLabels()`.
+  - When opening the modal, newly injected DOM elements previously triggered repeated synchronous `render()` invocations and high-frequency backend refresh messages, freezing the webview UI thread.
+  - `updateUsageTimeLabels()` now safely updates label text in place without recursive re-render cascades, restoring instant, lag-free opening of the Quota Matrix modal.
+
+---
+
 ## [1.2.13] - 2026-09-15
+
 
 ### Fixed & Improved (UI/UX)
 - **Quota Matrix Modal Layout Overlap (Redesign)**:
