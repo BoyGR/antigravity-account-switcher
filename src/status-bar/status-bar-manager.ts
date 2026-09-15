@@ -140,7 +140,7 @@ export class AntigravityStatusBarManager implements vscode.Disposable {
         }
 
         if (!this.lastIsRunning) {
-            this.statusBarItem.text = "$(account) Antigravity Account Switcher: Offline";
+            this.statusBarItem.text = "$(antigravity-logo) Antigravity Account Switcher: Offline";
             this.statusBarItem.tooltip =
                 "Antigravity Hub is not running. Click to open Antigravity Account Switcher in Activity Bar.";
             this.statusBarItem.backgroundColor = undefined;
@@ -149,7 +149,7 @@ export class AntigravityStatusBarManager implements vscode.Disposable {
         }
 
         if (!this.lastAccount || !this.lastAccount.email) {
-            this.statusBarItem.text = "$(account) Antigravity Account Switcher: No Account";
+            this.statusBarItem.text = "$(antigravity-logo) Antigravity Account Switcher: No Account";
             this.statusBarItem.tooltip =
                 "No active Google account detected in Antigravity. Click to open Antigravity Account Switcher in Activity Bar.";
             this.statusBarItem.backgroundColor = undefined;
@@ -179,20 +179,20 @@ export class AntigravityStatusBarManager implements vscode.Disposable {
         if (pct !== undefined) {
             switch (settings.format) {
                 case "percentageOnly":
-                    this.statusBarItem.text = `$(account) ${pct}%`;
+                    this.statusBarItem.text = `$(antigravity-logo) ${pct}%`;
                     break;
                 case "detailed":
                     this.statusBarItem.text = countdownStr
-                        ? `$(account) Antigravity Account Switcher: ${pct}% (${countdownStr})`
-                        : `$(account) Antigravity Account Switcher: ${pct}%`;
+                        ? `$(antigravity-logo) Antigravity Account Switcher: ${pct}% (${countdownStr})`
+                        : `$(antigravity-logo) Antigravity Account Switcher: ${pct}%`;
                     break;
                 case "compact":
                 default:
-                    this.statusBarItem.text = `$(account) Antigravity Account Switcher: ${pct}%`;
+                    this.statusBarItem.text = `$(antigravity-logo) Antigravity Account Switcher: ${pct}%`;
                     break;
             }
         } else {
-            this.statusBarItem.text = "$(account) Antigravity Account Switcher: Active";
+            this.statusBarItem.text = "$(antigravity-logo) Antigravity Account Switcher: Active";
         }
 
         // 2. Dynamic Warning / Error Background

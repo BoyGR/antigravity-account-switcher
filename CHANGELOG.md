@@ -4,6 +4,15 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.3.1] - 2026-09-16
+
+### Fixed & Improved (Brand Identity)
+- **Status Bar Custom Extension Logo**:
+  - Replaced the generic VS Code `$(account)` silhouette with the authentic **Antigravity Account Switcher** icon/logo (`$(antigravity-logo)`).
+  - Packaged a lightweight, sharp vector icon font (`antigravity.woff`) derived directly from `media/antigravity.svg` via `contributes.icons`, ensuring crisp rendering and theme-adaptive coloring across dark, light, and high-contrast status bars.
+
+---
+
 ## [1.3.0] - 2026-09-16
 
 ### Added
