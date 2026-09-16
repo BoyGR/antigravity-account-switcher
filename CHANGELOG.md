@@ -4,6 +4,16 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.3.2] - 2026-09-16
+
+### Improved
+- **Real-time Quota Sync for Active Account in Saved Accounts List**:
+  - The saved account card for the **currently active account** now displays real-time quota data (Gemini, Claude + GPT — both Weekly and 5h buckets) identical to the live "Current Account" section, instead of relying on a potentially stale snapshot.
+  - Falls back to the cached snapshot if live data is not yet available.
+  - Updated tooltip to reflect "Live data" label (vs "Snapshot updated") for the active account card to make the data source clear at a glance.
+
+---
+
 ## [1.3.1] - 2026-09-16
 
 ### Fixed & Improved (Brand Identity)

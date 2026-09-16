@@ -556,6 +556,8 @@
             noMatchingAccounts:
                 "No accounts match your filter.",
 
+            liveData:
+                "Live data",
 
             quotaHistorySub:
                 "Daily lowest remaining",
@@ -1054,6 +1056,8 @@
             noMatchingAccounts:
                 "Tidak ada akun yang cocok dengan filter.",
 
+            liveData:
+                "Data langsung",
 
             quotaHistorySub:
                 "Sisa terendah harian",
@@ -3381,10 +3385,15 @@
                 )
             ];
 
+        // For the currently active account, prefer live real-time usage data over the stale snapshot
+        const usageData = isActive
+            ? (state.usage || snapshot)
+            : snapshot;
+
         const updated =
-            snapshot?.fetchedAt
+            usageData?.fetchedAt
                 ? formatRelativeTime(
-                    snapshot.fetchedAt
+                    usageData.fetchedAt
                 )
                 : "";
 
@@ -3399,7 +3408,10 @@
             tooltipParts.push(`${t("lastUsed") || "Last used"}: ${new Date(account.lastSeenAt).toLocaleString()}`);
         }
         if (updated) {
-            tooltipParts.push(`${t("updated") || "Snapshot updated"}: ${updated}`);
+            const updatedLabel = isActive
+                ? (t("liveData") || "Live data")
+                : (t("updated") || "Snapshot updated");
+            tooltipParts.push(`${updatedLabel}: ${updated}`);
         }
         const lastSeenTooltip = tooltipParts.join(" • ");
 
@@ -3557,7 +3569,7 @@
                 </div>
 
                 <div class="saved-account-quota-area">
-                    ${renderSavedUsageSummary(snapshot)}
+                    ${renderSavedUsageSummary(usageData)}
                 </div>
             </article>
         `;
