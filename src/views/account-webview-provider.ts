@@ -609,8 +609,7 @@ export class AntigravityAccountWebviewProvider
             Boolean(current);
 
         await this.postState(
-            keepLoadingOnFailure &&
-            !success,
+            false,
         );
 
         return success;
@@ -760,7 +759,7 @@ export class AntigravityAccountWebviewProvider
     ): Promise<void> {
         switch (message.type) {
             case "ready":
-                await this.postState(this.snapshot.current === undefined);
+                await this.postState(false);
                 void this.refresh(this.snapshot.current !== undefined);
                 return;
 
@@ -799,7 +798,19 @@ export class AntigravityAccountWebviewProvider
                 );
                 return;
 
-            case "removeAccount":
+            case "removeAccount": {
+                const currentEmail = this.snapshot.current?.email;
+                if (
+                    currentEmail &&
+                    message.email &&
+                    currentEmail.trim().toLowerCase() === message.email.trim().toLowerCase()
+                ) {
+                    vscode.window.showWarningMessage(
+                        "Cannot remove the currently active account. Please sign out first.",
+                    );
+                    return;
+                }
+
                 await removeManagedAccount(
                     this.context,
                     message.email,
@@ -825,6 +836,7 @@ export class AntigravityAccountWebviewProvider
 
                 await this.refreshLocalAccounts();
                 return;
+            }
 
             case "openExternal": {
                 const uri =

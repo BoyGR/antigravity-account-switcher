@@ -6,6 +6,10 @@ import {
     updateManagedAccountLabel,
 } from "../antigravity/account-registry";
 
+import {
+    getAntigravityCurrentAccount,
+} from "../antigravity/hub-auth-client";
+
 export const EDIT_ACCOUNT_LABEL_COMMAND_ID =
     "boygr.antigravityAccountSwitcher.editAccountLabel";
 
@@ -119,6 +123,37 @@ export function registerAccountContextCommands(
                 try {
                     const account =
                         getAccount(argument);
+
+                    const current = await getAntigravityCurrentAccount().catch(() => undefined);
+                    if (
+                        current?.email &&
+                        current.email.trim().toLowerCase() === account.email.trim().toLowerCase()
+                    ) {
+                        const choice = await vscode.window.showWarningMessage(
+                            `Cannot remove ${account.email} because it is currently the active Antigravity account. Please sign out first.`,
+                            "Sign Out First",
+                            "Cancel",
+                        );
+
+                        if (choice === "Sign Out First") {
+                            await vscode.commands.executeCommand(
+                                "boygr.antigravityAccountSwitcher.signOut",
+                            );
+                            const removed = await removeManagedAccount(
+                                context,
+                                account.email,
+                            );
+                            if (removed) {
+                                vscode.window.showInformationMessage(
+                                    `Signed out and removed ${account.email} from Saved Accounts.`,
+                                );
+                            }
+                            await vscode.commands.executeCommand(
+                                "boygr.antigravityAccountSwitcher.refreshAccountsView",
+                            );
+                        }
+                        return;
+                    }
 
                     const confirmation =
                         await vscode.window.showWarningMessage(

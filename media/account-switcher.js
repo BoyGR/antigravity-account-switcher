@@ -222,6 +222,21 @@
             noSavedHint:
                 "Save the current Antigravity account or add another Google account.",
 
+            cannotRemoveActive:
+                "Active account cannot be removed. Sign out first.",
+
+            cannotRemoveActiveDetail:
+                "This account is currently active in Antigravity. Sign out before removing it.",
+
+            noActiveAccount:
+                "No Account Connected",
+
+            noActiveAccountHint:
+                "Sign in with your Google account to start using Google Antigravity and monitor quotas.",
+
+            signInGoogle:
+                "Sign In with Google",
+
             noMatches:
                 "No matching accounts",
 
@@ -748,6 +763,21 @@
 
             noSavedHint:
                 "Simpan akun Antigravity saat ini atau tambahkan akun Google lain.",
+
+            cannotRemoveActive:
+                "Akun aktif tidak dapat dihapus. Keluar (Sign out) terlebih dahulu.",
+
+            cannotRemoveActiveDetail:
+                "Akun ini sedang aktif di Antigravity. Keluar (Sign out) terlebih dahulu sebelum menghapusnya.",
+
+            noActiveAccount:
+                "Tidak Ada Akun Terhubung",
+
+            noActiveAccountHint:
+                "Masuk dengan akun Google Anda untuk mulai menggunakan Google Antigravity dan memantau kuota.",
+
+            signInGoogle:
+                "Masuk dengan Google",
 
             noMatches:
                 "Tidak ada akun yang cocok",
@@ -1404,6 +1434,19 @@
                 <svg ${common}>
                     <circle cx="5" cy="8" r="3" stroke="currentColor" stroke-width="1.2"/>
                     <path d="M7.8 8H14M11.5 8v2M13.5 8v1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                </svg>
+            `,
+
+            users: `
+                <svg ${common}>
+                    <circle cx="8" cy="5.2" r="2.8" stroke="currentColor" stroke-width="1.2"/>
+                    <path d="M2.5 13.5c0-2.4 2.5-4 5.5-4s5.5 1.6 5.5 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                </svg>
+            `,
+
+            star: `
+                <svg ${common}>
+                    <path d="M8 2.5l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9-3.6 1.9.7-4-2.9-2.8 4-.6z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
                 </svg>
             `,
         };
@@ -3007,36 +3050,73 @@
         `;
 
         if (!state.current) {
+            if (checking) {
+                return `
+                    <section class="section current-section">
+                        ${header}
+
+                        <div
+                            class="current-state-panel checking"
+                            role="status"
+                            aria-live="polite"
+                        >
+                            <div class="saved-loading-spinner-row" style="margin-bottom: 4px;">
+                                <span class="loading-spin-icon">${icon("refresh")}</span>
+                                <strong>${escapeHtml(t("loadingAccount"))}</strong>
+                            </div>
+
+                            <div class="secondary-text">
+                                ${escapeHtml(t("checkingAccount"))}
+                            </div>
+                        </div>
+                    </section>
+                `;
+            }
+
             return `
                 <section class="section current-section">
                     ${header}
 
                     <div
-                        class="current-state-panel ${checking ? "checking" : "error"}"
-                        role="status"
-                        aria-live="polite"
+                        class="current-state-panel empty-disconnected"
+                        role="region"
+                        aria-label="${escapeHtml(t("noActiveAccount"))}"
                     >
-                        <strong>
-                            ${
-                                escapeHtml(
-                                    checking
-                                        ? t("loadingAccount")
-                                        : t("unavailable")
-                                )
-                            }
+                        <div class="disconnected-header-row">
+                            <span class="connection-state inline disconnected">
+                                <span class="status-dot"></span>
+                                ${escapeHtml(t("disconnected"))}
+                            </span>
+                        </div>
+
+                        <strong class="disconnected-title">
+                            ${escapeHtml(t("noActiveAccount"))}
                         </strong>
 
-                        <div class="secondary-text">
-                            ${
-                                escapeHtml(
-                                    checking
-                                        ? t("checkingAccount")
-                                        : (
-                                            state.error ||
-                                            t("waiting")
-                                        )
-                                )
-                            }
+                        <div class="secondary-text disconnected-desc">
+                            ${escapeHtml(t("noActiveAccountHint"))}
+                        </div>
+
+                        <div class="disconnected-actions">
+                            <button
+                                type="button"
+                                class="btn primary-btn empty-cta-btn"
+                                data-action="add"
+                                ${isBusy() ? "disabled" : ""}
+                            >
+                                ${icon("plus")}
+                                <span>${escapeHtml(t("signInGoogle"))}</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn secondary-btn compact"
+                                data-action="refresh"
+                                ${isBusy() ? "disabled" : ""}
+                            >
+                                ${icon("refresh")}
+                                <span>${escapeHtml(t("refresh"))}</span>
+                            </button>
                         </div>
                     </div>
                 </section>
@@ -3585,12 +3665,12 @@
 
                                         <button
                                             type="button"
-                                            class="icon-btn compact delete-account-btn"
-                                            data-action="remove-account"
+                                            class="icon-btn compact delete-account-btn ${isActive ? "disabled is-active-locked" : ""}"
+                                            ${isActive ? 'data-action="active-locked-remove"' : 'data-action="remove-account"'}
                                             data-email="${escapeHtml(account.email)}"
-                                            title="${escapeHtml(t("removeSavedAccount"))}"
-                                            aria-label="${escapeHtml(t("removeSavedAccount"))}"
-                                            ${isBusy() ? "disabled" : ""}
+                                            title="${escapeHtml(isActive ? t("cannotRemoveActive") : t("removeSavedAccount"))}"
+                                            aria-label="${escapeHtml(isActive ? t("cannotRemoveActive") : t("removeSavedAccount"))}"
+                                            ${isActive ? 'aria-disabled="true"' : (isBusy() ? "disabled" : "")}
                                         >
                                             ${icon("trash")}
                                         </button>
@@ -3646,7 +3726,7 @@
         `;
     }
     function renderSavedList() {
-        if (state.loading && (!state.accounts || state.accounts.length === 0)) {
+        if (state.loading && !Array.isArray(state.accounts)) {
             return `
                 <div class="saved-loading-panel" role="status" aria-live="polite">
                     <div class="saved-loading-spinner-row">
@@ -3670,16 +3750,49 @@
             filteredAccounts();
 
         if (
+            !state.accounts ||
             state.accounts.length === 0
         ) {
             return `
-                <div class="empty-panel">
-                    <strong>
+                <div class="empty-panel saved-empty-card">
+                    <div class="empty-panel-icon">
+                        ${icon("users")}
+                    </div>
+
+                    <strong class="empty-panel-title">
                         ${escapeHtml(t("noSaved"))}
                     </strong>
 
-                    <div class="secondary-text">
+                    <div class="secondary-text empty-panel-desc">
                         ${escapeHtml(t("noSavedHint"))}
+                    </div>
+
+                    <div class="empty-panel-actions">
+                        ${
+                            state.current?.email
+                                ? `
+                                    <button
+                                        type="button"
+                                        class="btn primary-btn empty-cta-btn"
+                                        data-action="save"
+                                        ${isBusy() ? "disabled" : ""}
+                                    >
+                                        ${icon("star")}
+                                        <span>${escapeHtml(t("saveCurrent"))}</span>
+                                    </button>
+                                `
+                                : `
+                                    <button
+                                        type="button"
+                                        class="btn primary-btn empty-cta-btn"
+                                        data-action="add"
+                                        ${isBusy() ? "disabled" : ""}
+                                    >
+                                        ${icon("plus")}
+                                        <span>${escapeHtml(t("signInGoogle"))}</span>
+                                    </button>
+                                `
+                        }
                     </div>
                 </div>
             `;
@@ -5895,6 +6008,11 @@
                 return;
             }
 
+            if (action === "active-locked-remove") {
+                showFeedback(t("cannotRemoveActive"), "warning");
+                return;
+            }
+
             if (
                 action ===
                     "remove-account"
@@ -5908,6 +6026,12 @@
                     account &&
                     !isBusy()
                 ) {
+                    const currentEmail = normalizeEmail(state.current?.email);
+                    if (currentEmail && normalizeEmail(account.email) === currentEmail) {
+                        showFeedback(t("cannotRemoveActive"), "warning");
+                        return;
+                    }
+
                     ui.removeCandidate =
                         account;
 
@@ -5939,6 +6063,14 @@
                     account &&
                     !isBusy()
                 ) {
+                    const currentEmail = normalizeEmail(state.current?.email);
+                    if (currentEmail && normalizeEmail(account.email) === currentEmail) {
+                        ui.removeCandidate = null;
+                        render();
+                        showFeedback(t("cannotRemoveActive"), "warning");
+                        return;
+                    }
+
                     setOperation({
                         type: "remove",
                         email:

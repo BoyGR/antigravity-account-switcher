@@ -4,6 +4,23 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.4.2] - 2026-09-17
+
+### Added & Improved
+- **Active Account Deletion Protection**:
+  - Prevented the currently active Antigravity account (`Active now` / `Current account`) from being accidentally deleted from Saved Accounts.
+  - The delete button on the active account card is automatically locked with disabled styling, a descriptive tooltip (`Active account cannot be removed. Sign out first.`), and an interactive warning feedback banner if clicked.
+  - Added robust validation in backend handlers (`removeAccount` webview message, `removeSavedAccount` context command, and `manage-accounts` menu) to guarantee that an account in active use cannot be removed until the user explicitly signs out.
+- **Enhanced Empty State & Disconnected UX**:
+  - Resolved an issue where deleting all saved accounts or having no connected account caused an endless loading/skeleton spinner.
+  - Skeleton loader now only renders during initial uninitialized state and gracefully yields once data is loaded.
+  - Replaced bland error and empty boxes with structured empty state cards:
+    - **Saved Accounts Empty State**: Features an intuitive users badge, helpful description, and clear Call-to-Action button (`⭐ Save Current Account` if an active account exists, or `+ Sign In with Google` if no account is connected).
+    - **Current Account Disconnected State**: Features a clean `Disconnected` status indicator, informative explanation, and dual action buttons (`+ Sign In with Google` and `🔄 Refresh`).
+  - Added bilingual translations in English and Indonesian for all new empty state and protection messaging.
+
+---
+
 ## [1.4.1] - 2026-09-17
 
 ### Fixed & Improved

@@ -341,18 +341,19 @@ async function chooseAccountAction(
         });
     }
 
-    actions.push(
-        {
-            label:
-                "$(edit) Rename label",
+    actions.push({
+        label:
+            "$(edit) Rename label",
 
-            description:
-                "Change local display label",
+        description:
+            "Change local display label",
 
-            action:
-                "rename",
-        },
-        {
+        action:
+            "rename",
+    });
+
+    if (!isCurrent) {
+        actions.push({
             label:
                 "$(trash) Remove saved metadata",
 
@@ -361,15 +362,16 @@ async function chooseAccountAction(
 
             action:
                 "remove",
-        },
-        {
-            label:
-                "$(close) Close",
+        });
+    }
 
-            action:
-                "close",
-        },
-    );
+    actions.push({
+        label:
+            "$(close) Close",
+
+        action:
+            "close",
+    });
 
     const selected =
         await vscode.window.showQuickPick(
@@ -454,6 +456,13 @@ async function chooseAccountAction(
         selected.action ===
         "remove"
     ) {
+        if (isCurrent) {
+            vscode.window.showWarningMessage(
+                "Cannot remove the currently active account. Please sign out first.",
+            );
+            return false;
+        }
+
         const confirmation =
             await vscode.window.showWarningMessage(
                 `Remove saved metadata for ${account.email}?`,

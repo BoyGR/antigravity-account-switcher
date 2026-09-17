@@ -6439,6 +6439,137 @@ body {
     border-color: color-mix(in srgb, var(--ag-focus) 35%, transparent);
 }
 
+/*
+ * v1.4.2 — Active Account Protection & Empty State UI Polish
+ */
+.saved-title-actions .delete-account-btn.is-active-locked,
+.delete-account-btn.is-active-locked {
+    opacity: 0.3 !important;
+    cursor: not-allowed !important;
+    border-color: var(--ag-border) !important;
+    color: var(--ag-muted) !important;
+    background: var(--ag-raised) !important;
+}
+
+.saved-title-actions .delete-account-btn.is-active-locked:hover,
+.delete-account-btn.is-active-locked:hover {
+    border-color: var(--ag-border) !important;
+    color: var(--ag-muted) !important;
+    background: var(--ag-raised) !important;
+}
+
+/* Saved Accounts Empty State Card */
+.saved-empty-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 16px 14px !important;
+    margin: 4px 0 !important;
+    border: 1px dashed var(--ag-border) !important;
+    border-radius: 8px !important;
+    background: color-mix(in srgb, var(--ag-raised) 50%, transparent) !important;
+}
+
+.saved-empty-card .empty-panel-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--ag-border) 40%, transparent);
+    color: var(--ag-muted);
+    margin-bottom: 8px;
+}
+
+.saved-empty-card .empty-panel-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.saved-empty-card .empty-panel-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ag-fg);
+    margin-bottom: 4px;
+}
+
+.saved-empty-card .empty-panel-desc {
+    font-size: 10px;
+    line-height: 1.4;
+    color: var(--ag-muted);
+    max-width: 240px;
+    margin-bottom: 12px;
+}
+
+.saved-empty-card .empty-panel-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.empty-cta-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 5px 12px !important;
+    font-size: 10.5px !important;
+    font-weight: 600 !important;
+    border-radius: 6px !important;
+}
+
+.empty-cta-btn svg {
+    width: 13px;
+    height: 13px;
+}
+
+/* Current Account Disconnected Empty State Panel */
+.current-state-panel.empty-disconnected {
+    display: flex;
+    flex-direction: column;
+    padding: 14px 12px;
+    border: 1px solid var(--ag-border);
+    border-radius: 8px;
+    background: var(--ag-raised);
+    margin: 4px 0;
+}
+
+.current-state-panel.empty-disconnected .disconnected-header-row {
+    margin-bottom: 6px;
+}
+
+.connection-state.disconnected .status-dot {
+    background: var(--ag-muted);
+    box-shadow: none;
+}
+
+.connection-state.disconnected {
+    color: var(--ag-muted);
+}
+
+.current-state-panel.empty-disconnected .disconnected-title {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--ag-fg);
+    margin-bottom: 4px;
+}
+
+.current-state-panel.empty-disconnected .disconnected-desc {
+    font-size: 10px;
+    line-height: 1.4;
+    color: var(--ag-muted);
+    margin-bottom: 12px;
+}
+
+.current-state-panel.empty-disconnected .disconnected-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
 
 
 
