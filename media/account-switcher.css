@@ -2729,9 +2729,25 @@ a {
 }
 
 .current-usage-section .saved-usage-summary {
-    margin-top: 2px;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-items: stretch;
+    gap: 6px;
+    width: 100%;
+    min-width: 0;
+    margin-top: 5px;
     padding-top: 0;
     border-top: none;
+}
+
+.current-usage-section .saved-usage-family-column {
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    border: 1px solid var(--ag-card-border);
+    border-radius: 6px;
+    background: var(--ag-card-subtle);
+    margin-top: 0;
 }
 
 

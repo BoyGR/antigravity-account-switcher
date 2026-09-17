@@ -4,6 +4,14 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.3.4] - 2026-09-17
+
+### Improved
+- **Current Account Quota 2-Sided Card Display**:
+  - Arranged the Current Account quota section into two distinct side-by-side cards: **Gemini** on the left and **Claude + GPT** on the right, matching the saved accounts styling with card borders, backgrounds, and vertical limit hierarchies.
+
+---
+
 ## [1.3.3] - 2026-09-17
 
 ### Added & Improved
