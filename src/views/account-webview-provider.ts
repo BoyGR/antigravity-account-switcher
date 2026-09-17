@@ -268,6 +268,7 @@ export class AntigravityAccountWebviewProvider
                 this.snapshot = {
                     ...this.snapshot,
                     usage,
+                    usageSnapshots: getManagedAccountUsageSnapshots(this.context),
                     quotaHistory: getAllAccountsQuotaHistory(this.context, 7),
                 };
                 this.statusBarManager?.update(

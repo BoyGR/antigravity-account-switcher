@@ -2728,6 +2728,12 @@ a {
     font-size: 9px;
 }
 
+.current-usage-section .saved-usage-summary {
+    margin-top: 2px;
+    padding-top: 0;
+    border-top: none;
+}
+
 
 /* ========================================================= */
 /* Quota group                                               */

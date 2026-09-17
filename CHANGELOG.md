@@ -4,6 +4,18 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.3.3] - 2026-09-17
+
+### Added & Improved
+- **Consistent Compact Quota Layout Across Current & Saved Accounts**:
+  - Unified the quota layout between the **Current Account** section and **Saved Accounts** cards.
+  - The Current Account section now adopts the clean, compact 2-column vertical hierarchy (`Gemini` | `Claude + GPT`) with individual lines for `Weekly` and `5h` limits and reset countdown timers, maintaining aesthetic consistency across the entire extension.
+- **Dynamic Quota Replenishment & Automatic Snapshot Sync**:
+  - Saved accounts' snapshot data now auto-replenishes to 100% in real-time as soon as the server-allotted `resetTime` passes, preventing misleading stale percentages.
+  - Integrated `refreshExpiredManagedAccountUsageSnapshots` into background `QuotaMonitorService` cycles, ensuring all saved accounts' quota information stays accurate, realistic, and synchronized without requiring manual account switching.
+
+---
+
 ## [1.3.2] - 2026-09-16
 
 ### Improved

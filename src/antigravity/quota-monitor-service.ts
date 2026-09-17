@@ -9,6 +9,7 @@ import { getManagedAccounts } from "./account-registry";
 import {
     getAccountRemainingPercent,
     getManagedAccountUsageSnapshots,
+    refreshExpiredManagedAccountUsageSnapshots,
     saveManagedAccountUsageSnapshot,
 } from "./quota-summary-store";
 import { recordUsageSnapshotIfAvailable } from "./quota-history-store";
@@ -122,6 +123,12 @@ export class QuotaMonitorService implements vscode.Disposable {
                 current.email,
                 usage,
             );
+
+            // Auto-replenish expired snapshots of saved accounts whose resetTime has arrived
+            await refreshExpiredManagedAccountUsageSnapshots(
+                this.context,
+                current.email,
+            ).catch(() => false);
 
             // Notify UI listener
             if (this.onQuotaUpdated) {

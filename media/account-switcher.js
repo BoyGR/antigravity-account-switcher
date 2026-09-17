@@ -2718,8 +2718,21 @@
                 )
                 : "";
 
+        const usageHtml = groups.length > 0
+            ? renderSavedUsageSummary(usage)
+            : `
+                <div class="usage-empty secondary-text">
+                    ${
+                        escapeHtml(
+                            state.usageError ||
+                            t("quotaUnavailable")
+                        )
+                    }
+                </div>
+            `;
+
         return `
-            <div class="usage-section">
+            <div class="usage-section current-usage-section">
                 <div class="usage-heading">
                     <span class="usage-title">
                         ${escapeHtml(t("usage"))}
@@ -2740,30 +2753,9 @@
                     }
                 </div>
 
-                ${
-                    groups.length > 0
-                        ? `
-                            <div class="usage-body">
-                                ${
-                                    groups
-                                        .map(
-                                            renderUsageGroup
-                                        )
-                                        .join("")
-                                }
-                            </div>
-                        `
-                        : `
-                            <div class="usage-empty secondary-text">
-                                ${
-                                    escapeHtml(
-                                        state.usageError ||
-                                        t("quotaUnavailable")
-                                    )
-                                }
-                            </div>
-                        `
-                }
+                <div class="current-usage-body">
+                    ${usageHtml}
+                </div>
             </div>
         `;
     }
@@ -2883,6 +2875,24 @@
                         reset
                             ? prefix + reset
                             : "";
+                }
+            );
+
+        document
+            .querySelectorAll(
+                "[data-reset-time]"
+            )
+            .forEach(
+                element => {
+                    const resetTime = element.dataset.resetTime;
+                    if (resetTime) {
+                        const resetTs = new Date(resetTime).getTime();
+                        if (Number.isFinite(resetTs) && resetTs <= Date.now()) {
+                            element.textContent = "100%";
+                        } else if (element.dataset.initialPercent) {
+                            element.textContent = element.dataset.initialPercent;
+                        }
+                    }
                 }
             );
 
@@ -3241,7 +3251,11 @@
                             ${escapeHtml(quotaLabel)}
                         </span>
 
-                        <span class="saved-usage-metric-value">
+                        <span
+                            class="saved-usage-metric-value"
+                            ${bucket?.resetTime ? `data-reset-time="${escapeHtml(bucket.resetTime)}"` : ""}
+                            ${typeof bucket?.remainingFraction === "number" ? `data-initial-percent="${escapeHtml(compactQuotaValue(bucket))}"` : ""}
+                        >
                             ${escapeHtml(compactQuotaValue(bucket))}
                         </span>
                     </div>
