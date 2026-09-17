@@ -48,7 +48,7 @@
         vaultedEmails: [],
 
         meta: {
-            version: "1.4.0",
+            version: "1.4.1",
             developer: "Boy Gilang Ramadhan",
             website: "https://boygr.com",
             iconUri: "",
@@ -2810,7 +2810,7 @@
                     }
                 </div>
 
-                <div class="current-usage-body">
+                <div class="current-usage-body saved-account-quota-area">
                     ${usageHtml}
                 </div>
             </div>

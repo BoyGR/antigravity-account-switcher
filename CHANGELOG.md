@@ -4,6 +4,16 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.4.1] - 2026-09-17
+
+### Fixed & Improved
+- **Current Account Quota Cards Equal Height & Alignment**:
+  - Integrated the comprehensive `saved-account-quota-area` layout geometry into the Current Account usage container (`current-usage-body saved-account-quota-area`).
+  - Fixed uneven card heights between **Gemini** and **Claude + GPT** caused by unreset sibling margins. Both cards now strictly align to 100% matching height, matching the Saved Accounts quota cards.
+  - Standardized title headers (`28px` minimum height) so Weekly and 5h quota rows and reset countdowns across Gemini and Claude + GPT align down to the pixel.
+
+---
+
 ## [1.4.0] - 2026-09-17
 
 ### Added

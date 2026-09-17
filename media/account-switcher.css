@@ -2730,26 +2730,17 @@ a {
     font-size: 9px;
 }
 
-.current-usage-section .saved-usage-summary {
-    display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    align-items: stretch;
-    gap: 6px;
-    width: 100%;
-    min-width: 0;
+.current-usage-section .saved-account-quota-area {
     margin-top: 5px;
     padding-top: 0;
     border-top: none;
 }
 
-.current-usage-section .saved-usage-family-column {
-    min-width: 0;
-    box-sizing: border-box;
-    padding: 6px 8px;
-    border: 1px solid var(--ag-card-border);
-    border-radius: 6px;
-    background: var(--ag-card-subtle);
-    margin-top: 0;
+.current-usage-section .saved-usage-family-column,
+.current-usage-section .saved-usage-family-column + .saved-usage-family-column {
+    margin: 0 !important;
+    align-self: stretch !important;
+    height: 100% !important;
 }
 
 
