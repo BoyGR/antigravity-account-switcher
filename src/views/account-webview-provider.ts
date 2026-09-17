@@ -50,6 +50,11 @@ type LanguagePreference =
     | "en"
     | "id";
 
+type ProxyMode =
+    | "system"
+    | "manual"
+    | "direct";
+
 interface AccountSwitcherPreferences {
     version: 1;
 
@@ -84,6 +89,12 @@ interface AccountSwitcherPreferences {
     enableQuotaAudio?: boolean;
 
     enableInstantSwitch?: boolean;
+
+    proxyMode?: ProxyMode;
+
+    proxyUrl?: string;
+
+    proxyStrictSSL?: boolean;
 }
 
 interface ResolvedAccountSwitcherPreferences
@@ -149,6 +160,9 @@ type WebviewMessage =
               autoRoundRobin?: boolean;
               enableQuotaAudio?: boolean;
               enableInstantSwitch?: boolean;
+              proxyMode?: ProxyMode;
+              proxyUrl?: string;
+              proxyStrictSSL?: boolean;
           };
       };
 
@@ -215,6 +229,9 @@ const DEFAULT_PREFERENCES: AccountSwitcherPreferences = {
     autoRoundRobin: false,
     enableQuotaAudio: true,
     enableInstantSwitch: true,
+    proxyMode: "system",
+    proxyUrl: "",
+    proxyStrictSSL: true,
 };
 
 export class AntigravityAccountWebviewProvider
@@ -1064,6 +1081,21 @@ export class AntigravityAccountWebviewProvider
                 ? input.showQuotaAnalytics
                 : false;
 
+        const proxyMode =
+            ["system", "manual", "direct"].includes(input.proxyMode as string)
+                ? (input.proxyMode as ProxyMode)
+                : (DEFAULT_PREFERENCES.proxyMode ?? "system");
+
+        const proxyUrl =
+            typeof input.proxyUrl === "string"
+                ? input.proxyUrl.trim()
+                : (DEFAULT_PREFERENCES.proxyUrl ?? "");
+
+        const proxyStrictSSL =
+            typeof input.proxyStrictSSL === "boolean"
+                ? input.proxyStrictSSL
+                : (DEFAULT_PREFERENCES.proxyStrictSSL ?? true);
+
         return {
             version: 1,
             theme,
@@ -1082,6 +1114,9 @@ export class AntigravityAccountWebviewProvider
             autoRoundRobin,
             enableQuotaAudio,
             enableInstantSwitch,
+            proxyMode,
+            proxyUrl,
+            proxyStrictSSL,
         };
     }
 
@@ -1133,6 +1168,9 @@ export class AntigravityAccountWebviewProvider
             autoRoundRobin?: boolean;
             enableQuotaAudio?: boolean;
             enableInstantSwitch?: boolean;
+            proxyMode?: ProxyMode;
+            proxyUrl?: string;
+            proxyStrictSSL?: boolean;
         },
     ): Promise<void> {
         const preferences =
@@ -1159,6 +1197,15 @@ export class AntigravityAccountWebviewProvider
         await config.update("enableInstantSwitch", preferences.enableInstantSwitch, vscode.ConfigurationTarget.Global).then(undefined, () => undefined);
         if (typeof preferences.showQuotaAnalytics === "boolean") {
             await config.update("showQuotaAnalytics", preferences.showQuotaAnalytics, vscode.ConfigurationTarget.Global).then(undefined, () => undefined);
+        }
+        if (preferences.proxyMode) {
+            await config.update("proxyMode", preferences.proxyMode, vscode.ConfigurationTarget.Global).then(undefined, () => undefined);
+        }
+        if (typeof preferences.proxyUrl === "string") {
+            await config.update("proxyUrl", preferences.proxyUrl, vscode.ConfigurationTarget.Global).then(undefined, () => undefined);
+        }
+        if (typeof preferences.proxyStrictSSL === "boolean") {
+            await config.update("proxyStrictSSL", preferences.proxyStrictSSL, vscode.ConfigurationTarget.Global).then(undefined, () => undefined);
         }
     }
 

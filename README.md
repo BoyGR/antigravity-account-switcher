@@ -14,7 +14,7 @@ An extension for Visual Studio Code, Google Antigravity Standalone IDE, Cursor, 
 
 ### Status
 
-- **Version**: `1.3.4`
+- **Version**: `1.4.0`
 
 - **Supported Platforms**: Windows (with Instant Token Swapping), macOS, Linux
 - **Supported IDEs**: Visual Studio Code, Google Antigravity Standalone IDE, Cursor, and other VS Code-compatible editors
@@ -133,6 +133,14 @@ An extension for Visual Studio Code, Google Antigravity Standalone IDE, Cursor, 
 - **Graceful One-Time Fallback**: Accounts that haven't been vaulted yet simply open the browser once to authenticate; their credentials are then automatically vaulted for all subsequent 1-click instant switches.
 - **Configurable & Safe**: Can be disabled anytime via `boygr.antigravityAccountSwitcher.enableInstantSwitch`, and vault contents can be purged via `boygr.antigravityAccountSwitcher.clearTokenVault`.
 
+### 17. Advanced Proxy Configuration & Localhost Safety Guarantee 🌐
+- **Flexible Proxy Modes**: Configure network routing directly in the webview Settings modal or IDE settings:
+  - **System / VS Code** (*Default*): Automatically respects the IDE's proxy configuration (`http.proxy`) and system environment variables (`HTTPS_PROXY`, `HTTP_PROXY`).
+  - **Manual Custom Proxy**: Specify a custom HTTP or SOCKS5 proxy URL (e.g. `http://127.0.0.1:7890` or `socks5://127.0.0.1:10808`).
+  - **Direct**: Bypass proxying entirely for direct external connections.
+- **Strict SSL / TLS Certificate Toggle**: Option to toggle strict SSL verification, useful in enterprise MITM inspection or internal corporate environments.
+- **Localhost Safety Bypass**: Guarantees that internal communication with the Antigravity Language Server and Hub (`127.0.0.1` / `localhost`) unconditionally bypasses proxies, preventing connection failures or routing conflicts.
+
 ---
 
 ## Security Model
@@ -227,7 +235,7 @@ Customize behavior via your IDE Settings (`settings.json`):
 
 ### From GitHub Releases / VSIX Package
 
-1. Download the latest `antigravity-account-switcher-1.3.4.vsix` from [GitHub Releases](https://github.com/BoyGR/antigravity-account-switcher/releases).
+1. Download the latest `antigravity-account-switcher-1.4.0.vsix` from [GitHub Releases](https://github.com/BoyGR/antigravity-account-switcher/releases).
 
 2. **Via Graphical Interface (VS Code, Antigravity IDE, or Cursor)**:
    - Open **Extensions** (`Ctrl+Shift+X` / `Cmd+Shift+X`).
@@ -238,15 +246,15 @@ Customize behavior via your IDE Settings (`settings.json`):
 3. **Via Terminal / Command Line**:
    - **Visual Studio Code**:
      ```powershell
-     code --install-extension antigravity-account-switcher-1.3.4.vsix
+     code --install-extension antigravity-account-switcher-1.4.0.vsix
      ```
    - **Google Antigravity Standalone IDE**:
      ```powershell
-     antigravity --install-extension antigravity-account-switcher-1.3.4.vsix
+     antigravity --install-extension antigravity-account-switcher-1.4.0.vsix
      ```
    - **Cursor**:
      ```powershell
-     cursor --install-extension antigravity-account-switcher-1.3.4.vsix
+     cursor --install-extension antigravity-account-switcher-1.4.0.vsix
      ```
 
 

@@ -4,6 +4,21 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
 
 ---
 
+## [1.4.0] - 2026-09-17
+
+### Added
+- **Advanced Proxy Configuration & Routing**:
+  - Introduced a dedicated **"Advanced"** settings group in the Webview Settings modal with dynamic controls for proxy routing:
+    - **Proxy Mode**: Select between `System / VS Code Default` (`system`), `Manual Custom Proxy` (`manual`), and `Direct (No Proxy)` (`direct`).
+    - **Proxy Server URL**: Configure custom HTTP or SOCKS5 proxy endpoint (`http://127.0.0.1:7890`, `socks5://127.0.0.1:10808`), dynamically shown when manual mode is selected.
+    - **Strict SSL Verification**: Easily toggle strict SSL/TLS certificate checking for environments utilizing custom CA or internal corporate inspection proxies.
+  - Added full configuration properties in `package.json` (`boygr.antigravityAccountSwitcher.proxyMode`, `proxyUrl`, `proxyStrictSSL`), synchronizing seamlessly between IDE settings and webview preferences.
+  - Complete bilingual localization support in English (EN) and Indonesian (ID).
+- **Guaranteed Localhost Proxy Bypass**:
+  - Implemented strict localhost bypass validation ensuring all internal communications with Antigravity Language Server and Hub (`127.0.0.1`, `localhost`, `::1`) bypass any external or manual proxy configuration unconditionally, preventing routing conflicts or connection failures.
+
+---
+
 ## [1.3.4] - 2026-09-17
 
 ### Improved

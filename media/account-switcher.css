@@ -655,7 +655,8 @@ a {
 
 .label-input,
 .search-input,
-.field select {
+.field select,
+.field input[type="text"] {
     width: 100%;
     min-width: 0;
     color: var(--ag-input-fg);
@@ -1211,7 +1212,8 @@ a {
     font-size: 10px;
 }
 
-.field select {
+.field select,
+.field input[type="text"] {
     height: 30px;
     padding:
         3px

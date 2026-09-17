@@ -2,7 +2,7 @@
     "name": "antigravity-account-switcher",
     "displayName": "Antigravity Account Switcher",
     "description": "Manage and switch Google accounts used by Google Antigravity across Visual Studio Code, Google Antigravity IDE, Cursor, and other VS Code-compatible editors through Antigravity's existing authentication flow.",
-    "version": "1.3.4",
+    "version": "1.4.0",
     "publisher": "boygr",
     "author": {
         "name": "Boy Gilang Ramadhan",
@@ -322,6 +322,31 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Play subtle synthesized audio chimes when quota resets or reaches critical low thresholds."
+                },
+                "boygr.antigravityAccountSwitcher.proxyMode": {
+                    "type": "string",
+                    "default": "system",
+                    "enum": [
+                        "system",
+                        "manual",
+                        "direct"
+                    ],
+                    "enumDescriptions": [
+                        "Use system / VS Code proxy settings (default)",
+                        "Use custom manual proxy URL",
+                        "Direct connection without proxy"
+                    ],
+                    "description": "Proxy routing mode for external requests."
+                },
+                "boygr.antigravityAccountSwitcher.proxyUrl": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Custom proxy server URL (e.g. http://127.0.0.1:7890 or socks5://127.0.0.1:10808) when proxyMode is set to manual."
+                },
+                "boygr.antigravityAccountSwitcher.proxyStrictSSL": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enforce strict SSL/TLS certificate verification when routing through proxy."
                 }
             }
         }

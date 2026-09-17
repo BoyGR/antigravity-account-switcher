@@ -40,12 +40,15 @@
             autoRoundRobin: false,
             enableQuotaAudio: true,
             enableInstantSwitch: true,
+            proxyMode: "system",
+            proxyUrl: "",
+            proxyStrictSSL: true,
         },
 
         vaultedEmails: [],
 
         meta: {
-            version: "1.2.8",
+            version: "1.4.0",
             developer: "Boy Gilang Ramadhan",
             website: "https://boygr.com",
             iconUri: "",
@@ -636,6 +639,33 @@
 
             selectPlan:
                 "Select Plan",
+
+            advancedTitle:
+                "Advanced",
+
+            proxyMode:
+                "Proxy Mode",
+
+            proxyModeSystem:
+                "System / VS Code Default",
+
+            proxyModeManual:
+                "Manual Custom Proxy",
+
+            proxyModeDirect:
+                "Direct (No Proxy)",
+
+            proxyUrl:
+                "Proxy Server URL",
+
+            proxyUrlPlaceholder:
+                "http://127.0.0.1:7890 or socks5://...",
+
+            proxyStrictSSL:
+                "Strict SSL Verification",
+
+            proxyStrictSSLHint:
+                "Disable only if using internal self-signed proxy certs.",
         },
 
         id: {
@@ -1136,6 +1166,33 @@
 
             selectPlan:
                 "Pilih Paket",
+
+            advancedTitle:
+                "Lanjutan",
+
+            proxyMode:
+                "Mode Proxy",
+
+            proxyModeSystem:
+                "Bawaan Sistem / VS Code",
+
+            proxyModeManual:
+                "Proxy Kustom Manual",
+
+            proxyModeDirect:
+                "Langsung (Tanpa Proxy)",
+
+            proxyUrl:
+                "URL Server Proxy",
+
+            proxyUrlPlaceholder:
+                "http://127.0.0.1:7890 atau socks5://...",
+
+            proxyStrictSSL:
+                "Verifikasi SSL Ketat",
+
+            proxyStrictSSLHint:
+                "Nonaktifkan hanya jika menggunakan sertifikat proxy lokal/internal.",
         },
     };
 
@@ -4817,6 +4874,72 @@
                             </div>
                         </div>
 
+                        <div class="settings-group">
+                            <h3>
+                                ${escapeHtml(t("advancedTitle"))}
+                            </h3>
+
+                            <label class="field">
+                                <span>
+                                    ${escapeHtml(t("proxyMode"))}
+                                </span>
+
+                                <select
+                                    data-setting="proxyMode"
+                                >
+                                    <option
+                                        value="system"
+                                        ${draft.proxyMode === "system" || !draft.proxyMode ? "selected" : ""}
+                                    >
+                                        ${escapeHtml(t("proxyModeSystem"))}
+                                    </option>
+                                    <option
+                                        value="manual"
+                                        ${draft.proxyMode === "manual" ? "selected" : ""}
+                                    >
+                                        ${escapeHtml(t("proxyModeManual"))}
+                                    </option>
+                                    <option
+                                        value="direct"
+                                        ${draft.proxyMode === "direct" ? "selected" : ""}
+                                    >
+                                        ${escapeHtml(t("proxyModeDirect"))}
+                                    </option>
+                                </select>
+                            </label>
+
+                            ${
+                                draft.proxyMode === "manual"
+                                    ? `
+                                        <label class="field subfield">
+                                            <span>
+                                                ${escapeHtml(t("proxyUrl"))}
+                                            </span>
+
+                                            <input
+                                                type="text"
+                                                class="label-input"
+                                                data-setting="proxyUrl"
+                                                value="${escapeHtml(draft.proxyUrl || "")}"
+                                                placeholder="${escapeHtml(t("proxyUrlPlaceholder"))}"
+                                            />
+                                        </label>
+                                    `
+                                    : ""
+                            }
+
+                            ${
+                                draft.proxyMode !== "direct"
+                                    ? renderCheckbox(
+                                        "proxyStrictSSL",
+                                        t("proxyStrictSSL"),
+                                        draft.proxyStrictSSL !== false,
+                                        t("proxyStrictSSLHint")
+                                    )
+                                    : ""
+                            }
+                        </div>
+
                         <div class="settings-group about-group">
                             <h3>
                                 ${escapeHtml(t("about"))}
@@ -5244,6 +5367,15 @@
 
             enableInstantSwitch:
                 preferences.enableInstantSwitch !== false,
+
+            proxyMode:
+                preferences.proxyMode || "system",
+
+            proxyUrl:
+                preferences.proxyUrl || "",
+
+            proxyStrictSSL:
+                preferences.proxyStrictSSL !== false,
         };
 
         ui.settingsOpen =
@@ -5342,6 +5474,16 @@
                     target.value;
                 return;
             }
+
+            if (
+                target instanceof HTMLInputElement &&
+                target.dataset.setting === "proxyUrl"
+            ) {
+                if (ui.settingsDraft) {
+                    ui.settingsDraft.proxyUrl = target.value;
+                }
+                return;
+            }
         }
     );
 
@@ -5430,6 +5572,12 @@
                 key === "lowQuotaThresholdPercent"
             ) {
                 ui.settingsDraft[key] = Number.parseInt(target.value, 10);
+                return;
+            }
+
+            if (key === "proxyMode") {
+                ui.settingsDraft.proxyMode = target.value;
+                render();
                 return;
             }
 

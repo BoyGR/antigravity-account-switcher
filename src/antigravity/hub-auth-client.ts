@@ -149,6 +149,7 @@ function requestHttpText(
                 headers: {
                     "Cache-Control": "no-cache",
                 },
+                agent: undefined,
             },
             (response) => {
                 const chunks: Buffer[] = [];
@@ -201,6 +202,7 @@ function probeHttpsPort(
                 // AGY uses its own localhost TLS certificate.
                 // This client is restricted to 127.0.0.1 only.
                 rejectUnauthorized: false,
+                agent: undefined,
             },
             (response) => {
                 response.resume();
@@ -299,6 +301,7 @@ function invokeConnectJson<T>(
                 // AGY's localhost certificate is not trusted by
                 // the Windows public CA store.
                 rejectUnauthorized: false,
+                agent: undefined,
 
                 headers: {
                     "Content-Type": "application/json",
