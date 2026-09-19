@@ -2,6 +2,7 @@ node_modules/
 .runtime/
 .diagnostics/
 diagnostics/
+.vscode/
 release/
 *.vsix
 *.tgz
