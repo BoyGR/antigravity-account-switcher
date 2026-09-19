@@ -2,6 +2,16 @@
 
 All notable changes to the **Antigravity Account Switcher** extension will be documented in this file.
 
+## [1.4.4] - 2026-09-19
+
+### Fixed & Restored
+- **Account Switching Functionality**:
+  - Restored full, unrestricted clickability for the `Switch` button across all saved accounts.
+  - Removed unintended disabled lockouts and waiting state guards that previously prevented users from switching accounts while the backend connection state was initializing or disconnected.
+  - Refined backend connection state evaluation so reachable backend sessions without an active user correctly settle as `disconnected` rather than endlessly retrying in `connecting`.
+
+---
+
 ## [1.4.3] - 2026-09-19
 
 ### Added & Improved

@@ -621,8 +621,11 @@ export class AntigravityAccountWebviewProvider
             Boolean(runtime?.process),
         );
 
+        const reachable = Boolean(runtime?.health?.reachable);
         const success =
-            Boolean(current);
+            Boolean(current || reachable);
+
+        this.isProbing = false;
 
         await this.postState(
             false,
@@ -640,18 +643,12 @@ export class AntigravityAccountWebviewProvider
             return "not_installed";
         }
 
-        const process = this.snapshot.runtime?.process;
         const reachable = this.snapshot.runtime?.health?.reachable;
         const isRetrying =
             Boolean(this.retryTimer) ||
             (this.retryIndex > 0 && this.retryIndex < this.retryDelaysMs.length);
 
-        if (
-            loading ||
-            this.isProbing ||
-            isRetrying ||
-            (extension?.installed && !reachable && this.retryIndex < this.retryDelaysMs.length)
-        ) {
+        if (loading || isRetrying) {
             return "connecting";
         }
 
@@ -816,7 +813,6 @@ export class AntigravityAccountWebviewProvider
     ): Promise<void> {
         switch (message.type) {
             case "ready":
-                this.isProbing = this.snapshot.current === undefined;
                 await this.postState(false);
                 void this.refresh(this.snapshot.current !== undefined);
                 return;

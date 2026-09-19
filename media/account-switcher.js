@@ -3695,9 +3695,6 @@
                 (!state.accounts || state.accounts.length === 0)
             );
 
-        const isConnecting =
-            state.connectionState === "connecting" || checking;
-
         const snapshot =
             state.usageSnapshots?.[
                 normalizeEmail(
@@ -3782,14 +3779,13 @@
                             : `
                                 <button
                                     type="button"
-                                    class="saved-rail-badge switch-badge-btn ${isConnecting ? "waiting-connection" : ""}"
-                                    data-action="${isConnecting ? "waiting-switch" : "switch"}"
+                                    class="saved-rail-badge switch-badge-btn"
+                                    data-action="switch"
                                     data-email="${escapeHtml(account.email)}"
-                                    title="${escapeHtml(isConnecting ? t("waitingForConnection") : t("switch"))}"
-                                    aria-label="${escapeHtml(isConnecting ? t("waitingForConnection") : t("switch"))}"
+                                    title="${escapeHtml(t("switch"))}"
+                                    aria-label="${escapeHtml(t("switch"))}"
                                     ${
                                         checking ||
-                                        isConnecting ||
                                         isBusy()
                                             ? "disabled"
                                             : ""
@@ -3799,7 +3795,7 @@
                                         class="badge-icon"
                                         aria-hidden="true"
                                     >
-                                        ${isConnecting ? "⏳" : "⇄"}
+                                        ⇄
                                     </span>
                                     <span>${escapeHtml(t("switch"))}</span>
                                 </button>
@@ -6272,20 +6268,10 @@
                 return;
             }
 
-            if (action === "waiting-switch") {
-                showFeedback(t("waitingForConnection"), "info");
-                return;
-            }
-
             if (
                 action ===
                     "switch"
             ) {
-                if (state.connectionState === "connecting" || checking) {
-                    showFeedback(t("waitingForConnection"), "info");
-                    return;
-                }
-
                 const account =
                     findAccount(
                         email

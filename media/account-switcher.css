@@ -5301,11 +5301,6 @@ body {
     color: var(--ag-focus);
 }
 
-.saved-rail-badge.switch-badge-btn.waiting-connection {
-    opacity: 0.65;
-    cursor: wait !important;
-}
-
 .saved-rail-badge .badge-icon {
     font-size: 10px;
     line-height: 1;
