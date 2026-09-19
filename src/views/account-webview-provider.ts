@@ -813,8 +813,12 @@ export class AntigravityAccountWebviewProvider
     ): Promise<void> {
         switch (message.type) {
             case "ready":
-                await this.postState(false);
-                void this.refresh(this.snapshot.current !== undefined);
+                if (this.snapshot.current !== undefined) {
+                    await this.postState(false);
+                    void this.refresh(true);
+                } else {
+                    void this.refresh(false);
+                }
                 return;
 
             case "refresh":

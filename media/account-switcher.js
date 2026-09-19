@@ -48,7 +48,7 @@
         vaultedEmails: [],
 
         meta: {
-            version: "1.4.7",
+            version: "1.4.8",
             developer: "Boy Gilang Ramadhan (BoyGR)",
             website: "https://boygr.com",
             iconUri: "",
@@ -142,6 +142,20 @@
 
     let feedbackTimer =
         null;
+
+    let initialSavedLoading = true;
+    let initialSavedTimer = null;
+
+    function resolveInitialSavedLoading() {
+        if (!initialSavedLoading) {
+            return;
+        }
+        initialSavedLoading = false;
+        if (initialSavedTimer) {
+            clearTimeout(initialSavedTimer);
+            initialSavedTimer = null;
+        }
+    }
 
     const translations = {
         en: {
@@ -3925,7 +3939,7 @@
         `;
     }
     function renderSavedList() {
-        if (state.loading && !Array.isArray(state.accounts)) {
+        if (initialSavedLoading) {
             return `
                 <div class="saved-loading-panel" role="status" aria-live="polite">
                     <div class="saved-loading-spinner-row">
@@ -3933,6 +3947,13 @@
                         <strong>${escapeHtml(t("loadingSavedAccounts"))}</strong>
                     </div>
                     <div class="saved-skeleton-container">
+                        <div class="saved-skeleton-row">
+                            <div class="skeleton-avatar"></div>
+                            <div class="skeleton-lines">
+                                <div class="loading-line wide"></div>
+                                <div class="loading-line short"></div>
+                            </div>
+                        </div>
                         <div class="saved-skeleton-row">
                             <div class="skeleton-avatar"></div>
                             <div class="skeleton-lines">
@@ -4043,10 +4064,10 @@
             (state.accounts?.length || 0) > 3;
 
         const isInitialLoading =
-            Boolean(state.loading) && (!state.accounts || state.accounts.length === 0);
+            Boolean(initialSavedLoading);
 
         const isRefreshing =
-            Boolean(state.loading) && (state.accounts?.length || 0) > 0;
+            !isInitialLoading && Boolean(state.loading) && (state.accounts?.length || 0) > 0;
 
         const countText =
             isInitialLoading
@@ -4089,7 +4110,7 @@
                     data-action="add"
                     title="${escapeHtml(t("addGoogleAccount"))}"
                     aria-label="${escapeHtml(t("addGoogleAccount"))}"
-                    ${isBusy() ? "disabled" : ""}
+                    ${isBusy() || isInitialLoading ? "disabled" : ""}
                 >
                     ${icon("plus")}
                 </button>
@@ -4114,7 +4135,7 @@
                             <div class="saved-body">
                                 <div class="saved-controls">
                                     ${
-                                        (state.accounts?.length || 0) > 0
+                                        !isInitialLoading && (state.accounts?.length || 0) > 0
                                             ? `
                                                 <div class="saved-filter-row">
                                                     <div class="search-wrap">
@@ -4180,6 +4201,7 @@
                                     }
 
                                     ${
+                                        !isInitialLoading &&
                                         state.current &&
                                         !currentManagedAccount()
                                             ? `
@@ -6723,6 +6745,20 @@
             state =
                 message.state;
 
+            if (initialSavedLoading) {
+                const isCurrentLoaded = Boolean(state.current);
+                const isProbeFinished = !state.loading;
+                const isFailedOrOffline =
+                    state.connectionState === "offline" ||
+                    state.connectionState === "disconnected" ||
+                    state.connectionState === "not_installed";
+                const hasError = Boolean(state.error || state.usageError);
+
+                if (isCurrentLoaded || isProbeFinished || isFailedOrOffline || hasError) {
+                    resolveInitialSavedLoading();
+                }
+            }
+
             persistUi();
 
             clearOperation();
@@ -6816,6 +6852,13 @@
         },
         30000
     );
+
+    initialSavedTimer = window.setTimeout(() => {
+        if (initialSavedLoading) {
+            resolveInitialSavedLoading();
+            render();
+        }
+    }, 4000);
 
     render();
 

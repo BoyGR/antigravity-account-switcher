@@ -2,6 +2,19 @@
 
 All notable changes to the **Antigravity Account Switcher** extension will be documented in this file.
 
+## [1.4.8] - 2026-09-20
+
+### Added & Improved
+- **Startup Skeleton Loading on Saved Accounts**:
+  - Implemented an animated 2-row shimmer skeleton placeholder for the Saved Accounts section during cold startup.
+  - Saved accounts smoothly reveal when Current Account data finishes loading (email, quota, and connection status resolved).
+  - Built-in graceful fallback: automatically resolves and displays saved accounts immediately if Current Account loading fails, disconnects, or goes offline, ensuring uninterrupted access.
+  - Added a 4-second safety guard timeout to prevent any permanent loading lock.
+  - Refined webview initialization to eliminate initial connection status flicker.
+  - Added subtle fade-in transition (`agFadeIn`) when saved accounts list renders.
+
+---
+
 ## [1.4.7] - 2026-09-20
 
 ### Improved
