@@ -47,7 +47,7 @@ async function main() {
 
     // 5. Copy media assets
     const copyAssets = () => {
-        const filesToCopy = ["antigravity.svg", "icon.png", "antigravity.woff", "antigravity.woff2"];
+        const filesToCopy = ["antigravity.svg", "icon.png", "antigravity.woff"];
         for (const file of filesToCopy) {
             const src = path.join(__dirname, "media", file);
             const dest = path.join(__dirname, "dist", "media", file);

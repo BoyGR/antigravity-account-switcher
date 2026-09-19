@@ -5,7 +5,6 @@ esbuild.js
 out/**
 media/account-switcher.js
 media/account-switcher.css
-media/publisher-logo-128.png
 
 # Development configuration
 .vscode/**
