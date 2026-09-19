@@ -117,6 +117,9 @@
         removeCandidate:
             null,
 
+        switchCandidate:
+            null,
+
         runtimeModalOpen:
             false,
 
@@ -509,6 +512,15 @@
 
             removeSavedAccount:
                 "Remove saved account",
+
+            switchAccountQuestion:
+                "Switch active account?",
+
+            switchAccountExplanation:
+                "Antigravity will switch its active session to this account. Ongoing operations may refresh.",
+
+            confirmSwitch:
+                "Switch Account",
 
             removeSavedQuestion:
                 "Remove saved account?",
@@ -1075,6 +1087,15 @@
 
             removeSavedAccount:
                 "Hapus akun tersimpan",
+
+            switchAccountQuestion:
+                "Ganti akun aktif?",
+
+            switchAccountExplanation:
+                "Antigravity akan mengganti sesi aktif ke akun ini. Operasi yang sedang berjalan mungkin akan disegarkan.",
+
+            confirmSwitch:
+                "Ganti Akun",
 
             removeSavedQuestion:
                 "Hapus akun tersimpan?",
@@ -5431,6 +5452,77 @@
             </div>
         `;
     }
+    function renderSwitchDialog() {
+        const account =
+            ui.switchCandidate;
+
+        if (!account) {
+            return "";
+        }
+
+        return `
+            <div
+                class="dialog-backdrop"
+                data-action="cancel-switch"
+            >
+                <section
+                    class="confirm-dialog switch-dialog"
+                    role="alertdialog"
+                    aria-modal="true"
+                    aria-labelledby="switch-dialog-title"
+                    aria-describedby="switch-dialog-description"
+                >
+                    <header class="confirm-dialog-header">
+                        <div
+                            class="switch-symbol"
+                            aria-hidden="true"
+                        >
+                            ⇄
+                        </div>
+
+                        <div>
+                            <h2 id="switch-dialog-title">
+                                ${escapeHtml(t("switchAccountQuestion"))}
+                            </h2>
+
+                            <div class="confirm-account-name">
+                                ${escapeHtml(accountTitle(account))}
+                            </div>
+
+                            <div class="confirm-account-email">
+                                ${escapeHtml(account.email)}
+                            </div>
+                        </div>
+                    </header>
+
+                    <p
+                        id="switch-dialog-description"
+                        class="confirm-description"
+                    >
+                        ${escapeHtml(t("switchAccountExplanation"))}
+                    </p>
+
+                    <footer class="confirm-dialog-actions">
+                        <button
+                            type="button"
+                            class="btn"
+                            data-action="cancel-switch"
+                        >
+                            ${escapeHtml(t("cancel"))}
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn primary-btn"
+                            data-action="confirm-switch"
+                        >
+                            ${escapeHtml(t("confirmSwitch"))}
+                        </button>
+                    </footer>
+                </section>
+            </div>
+        `;
+    }
     function render() {
         applyTheme();
 
@@ -5459,6 +5551,7 @@
 
             ${renderSettings()}
             ${renderRemoveDialog()}
+            ${renderSwitchDialog()}
             ${renderRuntimeModal()}
             ${renderQuotaMatrixModal()}
         `;
@@ -6220,6 +6313,10 @@
                 action ===
                     "cancel-remove"
             ) {
+                if (target.classList.contains("dialog-backdrop") && rawTarget !== target) {
+                    return;
+                }
+
                 ui.removeCandidate =
                     null;
 
@@ -6264,10 +6361,6 @@
                 return;
             }
 
-            if (isBusy()) {
-                return;
-            }
-
             if (
                 action ===
                     "switch"
@@ -6277,7 +6370,46 @@
                         email
                     );
 
-                if (account) {
+                if (
+                    account &&
+                    !isBusy()
+                ) {
+                    ui.switchCandidate =
+                        account;
+                    render();
+                }
+
+                return;
+            }
+
+            if (
+                action ===
+                    "cancel-switch"
+            ) {
+                if (target.classList.contains("dialog-backdrop") && rawTarget !== target) {
+                    return;
+                }
+
+                ui.switchCandidate =
+                    null;
+                render();
+                return;
+            }
+
+            if (
+                action ===
+                    "confirm-switch"
+            ) {
+                const account =
+                    ui.switchCandidate;
+
+                ui.switchCandidate =
+                    null;
+
+                if (
+                    account &&
+                    !isBusy()
+                ) {
                     ui.quotaMatrixOpen = false;
                     setOperation({
                         type: "switch",
@@ -6292,6 +6424,11 @@
                     });
                 }
 
+                render();
+                return;
+            }
+
+            if (isBusy()) {
                 return;
             }
 
@@ -6369,6 +6506,18 @@
 
                 if (ui.runtimeModalOpen) {
                     ui.runtimeModalOpen = false;
+                    render();
+                    return;
+                }
+
+                if (ui.switchCandidate) {
+                    ui.switchCandidate = null;
+                    render();
+                    return;
+                }
+
+                if (ui.removeCandidate) {
+                    ui.removeCandidate = null;
                     render();
                     return;
                 }

@@ -2,6 +2,20 @@
 
 All notable changes to the **Antigravity Account Switcher** extension will be documented in this file.
 
+## [1.4.5] - 2026-09-19
+
+### Added & Improved
+- **Switch Account Confirmation Dialog**:
+  - Clicking the `Switch` button on any saved account now displays an interactive confirmation dialog modal before initiating the account change.
+  - Presents clear account details, target email, informative explanation, and dual `Cancel` / `Switch Account` actions.
+  - Fully cancelable via Cancel button, backdrop click, or keyboard Escape key.
+  - Complete bilingual localization across English (EN) and Indonesian (ID) with High Contrast support.
+- **Clean Developer-Centric Documentation**:
+  - Extensively rewritten `README.md` to remove marketing fluff, hyperbolic buzzwords, and emoji spam.
+  - Streamlined feature breakdown into 4 concise, functional pillars for clear developer onboarding.
+
+---
+
 ## [1.4.4] - 2026-09-19
 
 ### Fixed & Restored

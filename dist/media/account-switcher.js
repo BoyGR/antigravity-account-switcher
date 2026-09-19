@@ -1,4 +1,4 @@
-"use strict";(()=>{const k=acquireVsCodeApi(),R=document.getElementById("app");if(!R)return;const $=k.getState()||{};let l={loading:!0,current:$.current||null,accounts:Array.isArray($.accounts)?$.accounts:[],runtime:$.runtime||null,usage:$.usage||null,usageSnapshots:$.usageSnapshots||{},usageError:null,error:null,preferences:{version:1,theme:"vscode",language:"auto",effectiveLanguage:"en",hideCurrent:!1,hideSaved:!1,hideRuntime:!1,showCurrent:!0,showSaved:!0,showRuntime:!0,showQuotaAnalytics:!1,autoRefreshIntervalMinutes:5,enableLowQuotaReminder:!0,lowQuotaThresholdPercent:20,smartQuotaFallback:!0,autoRoundRobin:!1,enableQuotaAudio:!0,enableInstantSwitch:!0,proxyMode:"system",proxyUrl:"",proxyStrictSSL:!0},vaultedEmails:[],meta:{version:"1.4.1",developer:"Boy Gilang Ramadhan",website:"https://boygr.com",iconUri:""}},o={search:typeof $.search=="string"?$.search:"",sortBy:$.sortCustomized&&typeof $.sortBy=="string"?$.sortBy:"recent",sortCustomized:!!$.sortCustomized,currentCollapsed:!!$.currentCollapsed,savedCollapsed:!!$.savedCollapsed,runtimeCollapsed:$.runtimeCollapsed!==!1,usageCollapsed:!!$.usageCollapsed,settingsOpen:!1,settingsDraft:null,editingEmail:null,editValue:"",editColorTag:"",editGroup:"",customGroupInputOpen:!1,customGroupInputValue:"",groupFilter:"all",removeCandidate:null,runtimeModalOpen:!1,quotaMatrixOpen:!1,matrixSearch:"",matrixSort:"quota"},S=null,M=null,T=null;const Q={en:{appName:"Antigravity Account Switcher",accountManager:"Google account manager",settings:"Settings",currentAccount:"Current account",savedAccounts:"Saved accounts",antigravityStatus:"Antigravity status",refresh:"Refresh",connected:"Connected",active:"Active",switch:"Switch",reauth:"Re-auth",signout:"Sign out",addGoogleAccount:"Add Google Account",addGoogleAccountHint:"Sign in or switch account",saveCurrentAccount:"Save Current Account",unavailable:"Antigravity account unavailable",waiting:"Waiting for Antigravity...",checking:"Checking\u2026",loadingAccount:"Loading account\u2026",loadingSavedAccounts:"Loading saved accounts\u2026",updatingQuota:"Updating quota\u2026",checkingAccount:"Checking Antigravity account state\u2026",checkingExtension:"Checking extension status\u2026",checkingBackend:"Checking backend status\u2026",checkingHub:"Checking hub connection\u2026",noSaved:"No saved accounts",noSavedHint:"Save the current Antigravity account or add another Google account.",cannotRemoveActive:"Active account cannot be removed. Sign out first.",cannotRemoveActiveDetail:"This account is currently active in Antigravity. Sign out before removing it.",noActiveAccount:"No Account Connected",noActiveAccountHint:"Sign in with your Google account to start using Google Antigravity and monitor quotas.",signInGoogle:"Sign In with Google",connecting:"Connecting\u2026",connectingToAntigravity:"Connecting to Google Antigravity",connectingToAntigravityHint:"Establishing connection to Google servers. Your active account and quotas will load automatically.",waitingForConnection:"Waiting for Google Antigravity connection before switching accounts\u2026",antigravityOffline:"Antigravity Offline",antigravityOfflineHint:"Unable to connect to the Antigravity backend service.",antigravityNotInstalled:"Not Installed",antigravityNotInstalledHint:"Official Google Antigravity extension is not installed.",noMatches:"No matching accounts",noMatchesHint:"Try another label, display name, or email.",searchPlaceholder:"Search accounts",sortBy:"Sort by",sortQuota:"Highest quota",sortName:"Name (A-Z)",sortRecent:"Recently used",clearSearch:"Clear search",clearFilter:"Clear filter",activeNow:"Active now",lastUsed:"Last used",editLabel:"Edit label",save:"Save",cancel:"Cancel",removeLabel:"Clear label",accountActions:"Account actions",appearance:"Appearance",theme:"Theme",language:"Language",layout:"Layout",followVsCode:"Follow Editor / IDE Theme",light:"Light",dark:"Dark",system:"System",automatic:"Auto",english:"English",indonesian:"Bahasa Indonesia",hideCurrent:"Hide current account",hideSaved:"Hide saved accounts",hideRuntime:"Hide Antigravity status",showQuotaAnalytics:"Show 7-day quota analytics",switchingAndAutomation:"Switching & Automation",quotaAndReminders:"Quota & Reminders",autoRefreshQuota:"Auto-refresh quota",autoRefreshOff:"Off (Manual only)",every1Minute:"Every 1 minute",every5Minutes:"Every 5 minutes (Recommended)",every15Minutes:"Every 15 minutes",every30Minutes:"Every 30 minutes",every1Hour:"Every 1 hour",lowQuotaReminder:"Low quota notification",reminderThreshold:"Warning threshold",percentRemaining:"% remaining",smartQuotaFallback:"Smart Quota Fallback (1-click switch)",backupAndRestore:"Backup & Restore",backupDesc:"Export saved accounts metadata to JSON or restore them on another machine.",exportAccounts:"Export Accounts",importAccounts:"Import Accounts",reconnectHub:"Reconnect Hub",restartBackend:"Restart Backend",processRecovery:"Process Recovery",settingsHint:"Changes apply only after Save.",googleExtension:"Google Extension",officialExtension:"Official Antigravity extension",agyBackend:"AGY Backend",localBackend:"Local Antigravity backend",hub:"Hub",localHub:"Local Hub",hubConnection:"Antigravity hub connection",running:"Running",stopped:"Stopped",ready:"Ready",disconnected:"Unavailable",version:"Version",refreshing:"Refreshing account state...",adding:"Opening Google account flow...",saving:"Saving current account...",reauthenticating:"Re-authenticating...",signingOut:"Signing out...",switching:"Switching account...",updatingLabel:"Updating account label...",savingSettings:"Saving settings...",stateUpdated:"Account state updated.",labelUpdated:"Account label updated.",settingsSaved:"Settings saved.",collapse:"Collapse section",expand:"Expand section",currentAccountLabel:"Current account",developedBy:"Developed by",about:"About",developer:"Developer",website:"Website",removeSavedAccount:"Remove saved account",removeSavedQuestion:"Remove saved account?",removeSavedExplanation:"This only removes local Account Switcher metadata. It does not sign you out, delete your Google account, or remove Google credentials.",remove:"Remove",accountRemoved:"Saved account removed.",usage:"Usage",weeklyLimit:"Weekly limit",fiveHourLimit:"5-hour limit",weeklyShort:"Weekly",fiveHourShort:"5h",updated:"Updated",models:"models",remaining:"remaining",resetsIn:"Resets in",resetDue:"Reset due",quotaRestored:"Restored",lastUpdated:"Last updated",quotaSnapshot:"Quota snapshot",showAllModels:"Show all models",showLess:"Show less",justNow:"just now",ago:"ago",quotaUnavailable:"Usage unavailable",quotaUnavailableHint:"Antigravity did not return current quota information.",quotaHistory:"7-Day Quota Analytics",searchAccountsPlaceholder:"Filter by name, email, or group...",highestQuota:"Highest Quota",earliestReset:"Earliest Reset",nameAZ:"Name (A-Z)",noMatchingAccounts:"No accounts match your filter.",liveData:"Live data",quotaHistorySub:"Daily lowest remaining",exportAnalytics:"Export Analytics",autoRoundRobin:"Auto-Round-Robin (Switch on rate limit)",enableQuotaAudio:"Subtle Audio Alerts (Web Audio)",quotaMatrix:"Quota Matrix",quotaMatrixTitle:"Multi-Account Quota Matrix",quotaMatrixSub:"Real-time quota comparison across all accounts",switchNow:"Switch",noSnapshotYet:"No quota data yet",instantSwitch:"Instant Switch (No Browser)",instantSwitchHint:"Switch accounts seamlessly using saved session tokens without re-opening your browser.",smartQuotaFallbackHint:"Show a 1-click prompt to switch to an account with more quota before limits are reached.",autoRoundRobinHint:"Automatically rotate to the account with the highest quota when rate limits occur.",enableQuotaAudioHint:"Play gentle synthesized chimes on quota reset or critical alerts.",lowQuotaReminderHint:"Show a warning notification when remaining quota falls below threshold.",hideRuntimeHint:"Hide the Antigravity background status indicator from the bottom bar.",hideCurrentHint:"Hide the current active account panel from the main view.",hideSavedHint:"Hide the saved accounts list and manager.",showQuotaAnalyticsHint:"Display the 7-day lowest quota analytics bar chart.",instantBadge:"Instant",vaultTitle:"Token Vault",purgeVault:"Clear Token Vault...",vaultInfo:"Saved in encrypted Token Vault for 1-click seamless switching",plan:"Plan",accountPlan:"Account Plan",selectPlan:"Select Plan",advancedTitle:"Advanced",proxyMode:"Proxy Mode",proxyModeSystem:"System / VS Code Default",proxyModeManual:"Manual Custom Proxy",proxyModeDirect:"Direct (No Proxy)",proxyUrl:"Proxy Server URL",proxyUrlPlaceholder:"http://127.0.0.1:7890 or socks5://...",proxyStrictSSL:"Strict SSL Verification",proxyStrictSSLHint:"Disable only if using internal self-signed proxy certs."},id:{appName:"Antigravity Account Switcher",accountManager:"Pengelola akun Google",settings:"Pengaturan",currentAccount:"Akun saat ini",savedAccounts:"Akun tersimpan",antigravityStatus:"Status Antigravity",refresh:"Segarkan",connected:"Terhubung",active:"Aktif",switch:"Ganti",reauth:"Autentikasi ulang",signout:"Keluar",addGoogleAccount:"Tambah Akun Google",addGoogleAccountHint:"Masuk atau ganti akun",saveCurrentAccount:"Simpan Akun Saat Ini",unavailable:"Akun Antigravity tidak tersedia",waiting:"Menunggu Antigravity...",checking:"Memeriksa\u2026",loadingAccount:"Memuat akun\u2026",loadingSavedAccounts:"Memuat akun tersimpan\u2026",updatingQuota:"Memperbarui kuota\u2026",checkingAccount:"Memeriksa status akun Antigravity\u2026",checkingExtension:"Memeriksa status ekstensi\u2026",checkingBackend:"Memeriksa status backend\u2026",checkingHub:"Memeriksa koneksi hub\u2026",noSaved:"Belum ada akun tersimpan",noSavedHint:"Simpan akun Antigravity saat ini atau tambahkan akun Google lain.",cannotRemoveActive:"Akun aktif tidak dapat dihapus. Keluar (Sign out) terlebih dahulu.",cannotRemoveActiveDetail:"Akun ini sedang aktif di Antigravity. Keluar (Sign out) terlebih dahulu sebelum menghapusnya.",noActiveAccount:"Tidak Ada Akun Terhubung",noActiveAccountHint:"Masuk dengan akun Google Anda untuk mulai menggunakan Google Antigravity dan memantau kuota.",signInGoogle:"Masuk dengan Google",connecting:"Menghubungkan\u2026",connectingToAntigravity:"Menghubungkan ke Google Antigravity",connectingToAntigravityHint:"Sedang menyambungkan ke server Google. Akun aktif dan kuota Anda akan dimuat secara otomatis.",waitingForConnection:"Menunggu koneksi Google Antigravity siap sebelum dapat berpindah akun\u2026",antigravityOffline:"Antigravity Offline",antigravityOfflineHint:"Tidak dapat terhubung ke layanan backend Antigravity.",antigravityNotInstalled:"Belum Terpasang",antigravityNotInstalledHint:"Ekstensi resmi Google Antigravity belum terpasang.",noMatches:"Tidak ada akun yang cocok",noMatchesHint:"Coba label, nama, atau email lainnya.",searchPlaceholder:"Cari akun",sortBy:"Urutkan",sortQuota:"Sisa kuota",sortName:"Nama (A-Z)",sortRecent:"Terakhir dipakai",clearSearch:"Hapus pencarian",clearFilter:"Hapus filter",activeNow:"Sedang aktif",lastUsed:"Terakhir dipakai",editLabel:"Edit label",save:"Simpan",cancel:"Batal",removeLabel:"Hapus label",accountActions:"Tindakan akun",appearance:"Tampilan",theme:"Tema",language:"Bahasa",layout:"Tata letak",followVsCode:"Ikuti Tema Editor / IDE",light:"Terang",dark:"Gelap",system:"Sistem",automatic:"Otomatis",english:"English",indonesian:"Bahasa Indonesia",hideCurrent:"Sembunyikan akun saat ini",hideSaved:"Sembunyikan akun tersimpan",hideRuntime:"Sembunyikan status Antigravity",showQuotaAnalytics:"Tampilkan analisis kuota 7 hari",switchingAndAutomation:"Peralihan & Otomatisasi",quotaAndReminders:"Kuota & Pengingat",autoRefreshQuota:"Auto-refresh kuota",autoRefreshOff:"Nonaktif (Hanya manual)",every1Minute:"Setiap 1 menit",every5Minutes:"Setiap 5 menit (Disarankan)",every15Minutes:"Setiap 15 menit",every30Minutes:"Setiap 30 menit",every1Hour:"Setiap 1 jam",lowQuotaReminder:"Pemberitahuan kuota menipis",reminderThreshold:"Batas peringatan",percentRemaining:"% tersisa",smartQuotaFallback:"Peralihan Cepat saat Kuota Menipis",backupAndRestore:"Cadangan & Pemulihan",backupDesc:"Ekspor metadata akun tersimpan ke JSON atau pulihkan di perangkat lain.",exportAccounts:"Ekspor Akun",importAccounts:"Impor Akun",reconnectHub:"Sambungkan Ulang Hub",restartBackend:"Mulai Ulang Backend",processRecovery:"Pemulihan Proses",settingsHint:"Perubahan baru diterapkan setelah Simpan.",googleExtension:"Ekstensi Google",officialExtension:"Ekstensi resmi Antigravity",agyBackend:"Backend AGY",localBackend:"Backend lokal Antigravity",hub:"Hub",localHub:"Hub Lokal",hubConnection:"Koneksi hub Antigravity",running:"Berjalan",stopped:"Berhenti",ready:"Siap",disconnected:"Tidak tersedia",version:"Versi",refreshing:"Menyegarkan status akun...",adding:"Membuka alur akun Google...",saving:"Menyimpan akun saat ini...",reauthenticating:"Melakukan autentikasi ulang...",signingOut:"Keluar dari akun...",switching:"Mengganti akun...",updatingLabel:"Memperbarui label akun...",savingSettings:"Menyimpan pengaturan...",stateUpdated:"Status akun diperbarui.",labelUpdated:"Label akun diperbarui.",settingsSaved:"Pengaturan disimpan.",collapse:"Ciutkan bagian",expand:"Buka bagian",currentAccountLabel:"Akun saat ini",developedBy:"Dikembangkan oleh",about:"Tentang",developer:"Developer",website:"Situs",removeSavedAccount:"Hapus akun tersimpan",removeSavedQuestion:"Hapus akun tersimpan?",removeSavedExplanation:"Ini hanya menghapus metadata lokal Account Switcher. Tindakan ini tidak mengeluarkan akun, menghapus akun Google, atau menghapus kredensial Google.",remove:"Hapus",accountRemoved:"Akun tersimpan dihapus.",usage:"Penggunaan",weeklyLimit:"Batas mingguan",fiveHourLimit:"Batas 5 jam",weeklyShort:"Mingguan",fiveHourShort:"5j",updated:"Diperbarui",models:"model",remaining:"tersisa",resetsIn:"Reset dalam",resetDue:"Waktunya reset",quotaRestored:"Dipulihkan",lastUpdated:"Terakhir diperbarui",quotaSnapshot:"Snapshot kuota",showAllModels:"Tampilkan semua model",showLess:"Tampilkan lebih sedikit",justNow:"baru saja",ago:"yang lalu",quotaUnavailable:"Penggunaan tidak tersedia",quotaUnavailableHint:"Antigravity tidak mengembalikan informasi kuota saat ini.",quotaHistory:"Analitik Kuota 7 Hari",searchAccountsPlaceholder:"Cari nama, email, atau grup...",highestQuota:"Kuota Tertinggi",earliestReset:"Reset Terdekat",nameAZ:"Nama (A-Z)",noMatchingAccounts:"Tidak ada akun yang cocok dengan filter.",liveData:"Data langsung",quotaHistorySub:"Sisa terendah harian",exportAnalytics:"Ekspor Analitik",autoRoundRobin:"Auto-Round-Robin (Ganti saat kuota habis)",enableQuotaAudio:"Notifikasi Suara Lembut (Web Audio)",quotaMatrix:"Matriks Kuota",quotaMatrixTitle:"Matriks Kuota Multi-Akun",quotaMatrixSub:"Perbandingan sisa kuota semua akun secara real-time",switchNow:"Ganti",noSnapshotYet:"Belum ada data kuota",instantSwitch:"Switch Instan (Tanpa Browser)",instantSwitchHint:"Beralih akun seketika menggunakan token sesi tersimpan tanpa membuka browser.",smartQuotaFallbackHint:"Tampilkan prompt 1-klik untuk beralih ke akun berkuota lebih banyak sebelum habis.",autoRoundRobinHint:"Otomatis rotasi ke akun dengan kuota tertinggi saat terkena rate limit (tanpa klik).",enableQuotaAudioHint:"Bunyikan nada audio lembut saat kuota reset atau mencapai batas kritis.",lowQuotaReminderHint:"Tampilkan notifikasi peringatan saat sisa kuota akun berada di bawah batas.",hideRuntimeHint:"Sembunyikan status runtime Antigravity dari bilah bawah.",hideCurrentHint:"Sembunyikan panel akun yang sedang aktif dari tampilan utama.",hideSavedHint:"Sembunyikan daftar dan pengelola akun tersimpan.",showQuotaAnalyticsHint:"Tampilkan grafik analitik dan riwayat kuota 7 hari terakhir.",instantBadge:"Instan",vaultTitle:"Brankas Token",purgeVault:"Bersihkan Brankas Token...",vaultInfo:"Tersimpan di Brankas Token terenkripsi untuk pergantian 1-klik tanpa login browser",plan:"Paket",accountPlan:"Paket Akun",selectPlan:"Pilih Paket",advancedTitle:"Lanjutan",proxyMode:"Mode Proxy",proxyModeSystem:"Bawaan Sistem / VS Code",proxyModeManual:"Proxy Kustom Manual",proxyModeDirect:"Langsung (Tanpa Proxy)",proxyUrl:"URL Server Proxy",proxyUrlPlaceholder:"http://127.0.0.1:7890 atau socks5://...",proxyStrictSSL:"Verifikasi SSL Ketat",proxyStrictSSLHint:"Nonaktifkan hanya jika menggunakan sertifikat proxy lokal/internal."}};function E(){return l.preferences?.effectiveLanguage==="id"?"id":"en"}function a(e){return Q[E()]?.[e]??Q.en[e]??e}function t(e){return String(e??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}function g(e,i="ui-icon"){const n=`class="${t(i)}" viewBox="0 0 16 16" fill="none" aria-hidden="true"`;return{refresh:`
+"use strict";(()=>{const k=acquireVsCodeApi(),R=document.getElementById("app");if(!R)return;const $=k.getState()||{};let l={loading:!0,current:$.current||null,accounts:Array.isArray($.accounts)?$.accounts:[],runtime:$.runtime||null,usage:$.usage||null,usageSnapshots:$.usageSnapshots||{},usageError:null,error:null,preferences:{version:1,theme:"vscode",language:"auto",effectiveLanguage:"en",hideCurrent:!1,hideSaved:!1,hideRuntime:!1,showCurrent:!0,showSaved:!0,showRuntime:!0,showQuotaAnalytics:!1,autoRefreshIntervalMinutes:5,enableLowQuotaReminder:!0,lowQuotaThresholdPercent:20,smartQuotaFallback:!0,autoRoundRobin:!1,enableQuotaAudio:!0,enableInstantSwitch:!0,proxyMode:"system",proxyUrl:"",proxyStrictSSL:!0},vaultedEmails:[],meta:{version:"1.4.1",developer:"Boy Gilang Ramadhan",website:"https://boygr.com",iconUri:""}},s={search:typeof $.search=="string"?$.search:"",sortBy:$.sortCustomized&&typeof $.sortBy=="string"?$.sortBy:"recent",sortCustomized:!!$.sortCustomized,currentCollapsed:!!$.currentCollapsed,savedCollapsed:!!$.savedCollapsed,runtimeCollapsed:$.runtimeCollapsed!==!1,usageCollapsed:!!$.usageCollapsed,settingsOpen:!1,settingsDraft:null,editingEmail:null,editValue:"",editColorTag:"",editGroup:"",customGroupInputOpen:!1,customGroupInputValue:"",groupFilter:"all",removeCandidate:null,switchCandidate:null,runtimeModalOpen:!1,quotaMatrixOpen:!1,matrixSearch:"",matrixSort:"quota"},S=null,M=null,T=null;const Q={en:{appName:"Antigravity Account Switcher",accountManager:"Google account manager",settings:"Settings",currentAccount:"Current account",savedAccounts:"Saved accounts",antigravityStatus:"Antigravity status",refresh:"Refresh",connected:"Connected",active:"Active",switch:"Switch",reauth:"Re-auth",signout:"Sign out",addGoogleAccount:"Add Google Account",addGoogleAccountHint:"Sign in or switch account",saveCurrentAccount:"Save Current Account",unavailable:"Antigravity account unavailable",waiting:"Waiting for Antigravity...",checking:"Checking\u2026",loadingAccount:"Loading account\u2026",loadingSavedAccounts:"Loading saved accounts\u2026",updatingQuota:"Updating quota\u2026",checkingAccount:"Checking Antigravity account state\u2026",checkingExtension:"Checking extension status\u2026",checkingBackend:"Checking backend status\u2026",checkingHub:"Checking hub connection\u2026",noSaved:"No saved accounts",noSavedHint:"Save the current Antigravity account or add another Google account.",cannotRemoveActive:"Active account cannot be removed. Sign out first.",cannotRemoveActiveDetail:"This account is currently active in Antigravity. Sign out before removing it.",noActiveAccount:"No Account Connected",noActiveAccountHint:"Sign in with your Google account to start using Google Antigravity and monitor quotas.",signInGoogle:"Sign In with Google",connecting:"Connecting\u2026",connectingToAntigravity:"Connecting to Google Antigravity",connectingToAntigravityHint:"Establishing connection to Google servers. Your active account and quotas will load automatically.",waitingForConnection:"Waiting for Google Antigravity connection before switching accounts\u2026",antigravityOffline:"Antigravity Offline",antigravityOfflineHint:"Unable to connect to the Antigravity backend service.",antigravityNotInstalled:"Not Installed",antigravityNotInstalledHint:"Official Google Antigravity extension is not installed.",noMatches:"No matching accounts",noMatchesHint:"Try another label, display name, or email.",searchPlaceholder:"Search accounts",sortBy:"Sort by",sortQuota:"Highest quota",sortName:"Name (A-Z)",sortRecent:"Recently used",clearSearch:"Clear search",clearFilter:"Clear filter",activeNow:"Active now",lastUsed:"Last used",editLabel:"Edit label",save:"Save",cancel:"Cancel",removeLabel:"Clear label",accountActions:"Account actions",appearance:"Appearance",theme:"Theme",language:"Language",layout:"Layout",followVsCode:"Follow Editor / IDE Theme",light:"Light",dark:"Dark",system:"System",automatic:"Auto",english:"English",indonesian:"Bahasa Indonesia",hideCurrent:"Hide current account",hideSaved:"Hide saved accounts",hideRuntime:"Hide Antigravity status",showQuotaAnalytics:"Show 7-day quota analytics",switchingAndAutomation:"Switching & Automation",quotaAndReminders:"Quota & Reminders",autoRefreshQuota:"Auto-refresh quota",autoRefreshOff:"Off (Manual only)",every1Minute:"Every 1 minute",every5Minutes:"Every 5 minutes (Recommended)",every15Minutes:"Every 15 minutes",every30Minutes:"Every 30 minutes",every1Hour:"Every 1 hour",lowQuotaReminder:"Low quota notification",reminderThreshold:"Warning threshold",percentRemaining:"% remaining",smartQuotaFallback:"Smart Quota Fallback (1-click switch)",backupAndRestore:"Backup & Restore",backupDesc:"Export saved accounts metadata to JSON or restore them on another machine.",exportAccounts:"Export Accounts",importAccounts:"Import Accounts",reconnectHub:"Reconnect Hub",restartBackend:"Restart Backend",processRecovery:"Process Recovery",settingsHint:"Changes apply only after Save.",googleExtension:"Google Extension",officialExtension:"Official Antigravity extension",agyBackend:"AGY Backend",localBackend:"Local Antigravity backend",hub:"Hub",localHub:"Local Hub",hubConnection:"Antigravity hub connection",running:"Running",stopped:"Stopped",ready:"Ready",disconnected:"Unavailable",version:"Version",refreshing:"Refreshing account state...",adding:"Opening Google account flow...",saving:"Saving current account...",reauthenticating:"Re-authenticating...",signingOut:"Signing out...",switching:"Switching account...",updatingLabel:"Updating account label...",savingSettings:"Saving settings...",stateUpdated:"Account state updated.",labelUpdated:"Account label updated.",settingsSaved:"Settings saved.",collapse:"Collapse section",expand:"Expand section",currentAccountLabel:"Current account",developedBy:"Developed by",about:"About",developer:"Developer",website:"Website",removeSavedAccount:"Remove saved account",switchAccountQuestion:"Switch active account?",switchAccountExplanation:"Antigravity will switch its active session to this account. Ongoing operations may refresh.",confirmSwitch:"Switch Account",removeSavedQuestion:"Remove saved account?",removeSavedExplanation:"This only removes local Account Switcher metadata. It does not sign you out, delete your Google account, or remove Google credentials.",remove:"Remove",accountRemoved:"Saved account removed.",usage:"Usage",weeklyLimit:"Weekly limit",fiveHourLimit:"5-hour limit",weeklyShort:"Weekly",fiveHourShort:"5h",updated:"Updated",models:"models",remaining:"remaining",resetsIn:"Resets in",resetDue:"Reset due",quotaRestored:"Restored",lastUpdated:"Last updated",quotaSnapshot:"Quota snapshot",showAllModels:"Show all models",showLess:"Show less",justNow:"just now",ago:"ago",quotaUnavailable:"Usage unavailable",quotaUnavailableHint:"Antigravity did not return current quota information.",quotaHistory:"7-Day Quota Analytics",searchAccountsPlaceholder:"Filter by name, email, or group...",highestQuota:"Highest Quota",earliestReset:"Earliest Reset",nameAZ:"Name (A-Z)",noMatchingAccounts:"No accounts match your filter.",liveData:"Live data",quotaHistorySub:"Daily lowest remaining",exportAnalytics:"Export Analytics",autoRoundRobin:"Auto-Round-Robin (Switch on rate limit)",enableQuotaAudio:"Subtle Audio Alerts (Web Audio)",quotaMatrix:"Quota Matrix",quotaMatrixTitle:"Multi-Account Quota Matrix",quotaMatrixSub:"Real-time quota comparison across all accounts",switchNow:"Switch",noSnapshotYet:"No quota data yet",instantSwitch:"Instant Switch (No Browser)",instantSwitchHint:"Switch accounts seamlessly using saved session tokens without re-opening your browser.",smartQuotaFallbackHint:"Show a 1-click prompt to switch to an account with more quota before limits are reached.",autoRoundRobinHint:"Automatically rotate to the account with the highest quota when rate limits occur.",enableQuotaAudioHint:"Play gentle synthesized chimes on quota reset or critical alerts.",lowQuotaReminderHint:"Show a warning notification when remaining quota falls below threshold.",hideRuntimeHint:"Hide the Antigravity background status indicator from the bottom bar.",hideCurrentHint:"Hide the current active account panel from the main view.",hideSavedHint:"Hide the saved accounts list and manager.",showQuotaAnalyticsHint:"Display the 7-day lowest quota analytics bar chart.",instantBadge:"Instant",vaultTitle:"Token Vault",purgeVault:"Clear Token Vault...",vaultInfo:"Saved in encrypted Token Vault for 1-click seamless switching",plan:"Plan",accountPlan:"Account Plan",selectPlan:"Select Plan",advancedTitle:"Advanced",proxyMode:"Proxy Mode",proxyModeSystem:"System / VS Code Default",proxyModeManual:"Manual Custom Proxy",proxyModeDirect:"Direct (No Proxy)",proxyUrl:"Proxy Server URL",proxyUrlPlaceholder:"http://127.0.0.1:7890 or socks5://...",proxyStrictSSL:"Strict SSL Verification",proxyStrictSSLHint:"Disable only if using internal self-signed proxy certs."},id:{appName:"Antigravity Account Switcher",accountManager:"Pengelola akun Google",settings:"Pengaturan",currentAccount:"Akun saat ini",savedAccounts:"Akun tersimpan",antigravityStatus:"Status Antigravity",refresh:"Segarkan",connected:"Terhubung",active:"Aktif",switch:"Ganti",reauth:"Autentikasi ulang",signout:"Keluar",addGoogleAccount:"Tambah Akun Google",addGoogleAccountHint:"Masuk atau ganti akun",saveCurrentAccount:"Simpan Akun Saat Ini",unavailable:"Akun Antigravity tidak tersedia",waiting:"Menunggu Antigravity...",checking:"Memeriksa\u2026",loadingAccount:"Memuat akun\u2026",loadingSavedAccounts:"Memuat akun tersimpan\u2026",updatingQuota:"Memperbarui kuota\u2026",checkingAccount:"Memeriksa status akun Antigravity\u2026",checkingExtension:"Memeriksa status ekstensi\u2026",checkingBackend:"Memeriksa status backend\u2026",checkingHub:"Memeriksa koneksi hub\u2026",noSaved:"Belum ada akun tersimpan",noSavedHint:"Simpan akun Antigravity saat ini atau tambahkan akun Google lain.",cannotRemoveActive:"Akun aktif tidak dapat dihapus. Keluar (Sign out) terlebih dahulu.",cannotRemoveActiveDetail:"Akun ini sedang aktif di Antigravity. Keluar (Sign out) terlebih dahulu sebelum menghapusnya.",noActiveAccount:"Tidak Ada Akun Terhubung",noActiveAccountHint:"Masuk dengan akun Google Anda untuk mulai menggunakan Google Antigravity dan memantau kuota.",signInGoogle:"Masuk dengan Google",connecting:"Menghubungkan\u2026",connectingToAntigravity:"Menghubungkan ke Google Antigravity",connectingToAntigravityHint:"Sedang menyambungkan ke server Google. Akun aktif dan kuota Anda akan dimuat secara otomatis.",waitingForConnection:"Menunggu koneksi Google Antigravity siap sebelum dapat berpindah akun\u2026",antigravityOffline:"Antigravity Offline",antigravityOfflineHint:"Tidak dapat terhubung ke layanan backend Antigravity.",antigravityNotInstalled:"Belum Terpasang",antigravityNotInstalledHint:"Ekstensi resmi Google Antigravity belum terpasang.",noMatches:"Tidak ada akun yang cocok",noMatchesHint:"Coba label, nama, atau email lainnya.",searchPlaceholder:"Cari akun",sortBy:"Urutkan",sortQuota:"Sisa kuota",sortName:"Nama (A-Z)",sortRecent:"Terakhir dipakai",clearSearch:"Hapus pencarian",clearFilter:"Hapus filter",activeNow:"Sedang aktif",lastUsed:"Terakhir dipakai",editLabel:"Edit label",save:"Simpan",cancel:"Batal",removeLabel:"Hapus label",accountActions:"Tindakan akun",appearance:"Tampilan",theme:"Tema",language:"Bahasa",layout:"Tata letak",followVsCode:"Ikuti Tema Editor / IDE",light:"Terang",dark:"Gelap",system:"Sistem",automatic:"Otomatis",english:"English",indonesian:"Bahasa Indonesia",hideCurrent:"Sembunyikan akun saat ini",hideSaved:"Sembunyikan akun tersimpan",hideRuntime:"Sembunyikan status Antigravity",showQuotaAnalytics:"Tampilkan analisis kuota 7 hari",switchingAndAutomation:"Peralihan & Otomatisasi",quotaAndReminders:"Kuota & Pengingat",autoRefreshQuota:"Auto-refresh kuota",autoRefreshOff:"Nonaktif (Hanya manual)",every1Minute:"Setiap 1 menit",every5Minutes:"Setiap 5 menit (Disarankan)",every15Minutes:"Setiap 15 menit",every30Minutes:"Setiap 30 menit",every1Hour:"Setiap 1 jam",lowQuotaReminder:"Pemberitahuan kuota menipis",reminderThreshold:"Batas peringatan",percentRemaining:"% tersisa",smartQuotaFallback:"Peralihan Cepat saat Kuota Menipis",backupAndRestore:"Cadangan & Pemulihan",backupDesc:"Ekspor metadata akun tersimpan ke JSON atau pulihkan di perangkat lain.",exportAccounts:"Ekspor Akun",importAccounts:"Impor Akun",reconnectHub:"Sambungkan Ulang Hub",restartBackend:"Mulai Ulang Backend",processRecovery:"Pemulihan Proses",settingsHint:"Perubahan baru diterapkan setelah Simpan.",googleExtension:"Ekstensi Google",officialExtension:"Ekstensi resmi Antigravity",agyBackend:"Backend AGY",localBackend:"Backend lokal Antigravity",hub:"Hub",localHub:"Hub Lokal",hubConnection:"Koneksi hub Antigravity",running:"Berjalan",stopped:"Berhenti",ready:"Siap",disconnected:"Tidak tersedia",version:"Versi",refreshing:"Menyegarkan status akun...",adding:"Membuka alur akun Google...",saving:"Menyimpan akun saat ini...",reauthenticating:"Melakukan autentikasi ulang...",signingOut:"Keluar dari akun...",switching:"Mengganti akun...",updatingLabel:"Memperbarui label akun...",savingSettings:"Menyimpan pengaturan...",stateUpdated:"Status akun diperbarui.",labelUpdated:"Label akun diperbarui.",settingsSaved:"Pengaturan disimpan.",collapse:"Ciutkan bagian",expand:"Buka bagian",currentAccountLabel:"Akun saat ini",developedBy:"Dikembangkan oleh",about:"Tentang",developer:"Developer",website:"Situs",removeSavedAccount:"Hapus akun tersimpan",switchAccountQuestion:"Ganti akun aktif?",switchAccountExplanation:"Antigravity akan mengganti sesi aktif ke akun ini. Operasi yang sedang berjalan mungkin akan disegarkan.",confirmSwitch:"Ganti Akun",removeSavedQuestion:"Hapus akun tersimpan?",removeSavedExplanation:"Ini hanya menghapus metadata lokal Account Switcher. Tindakan ini tidak mengeluarkan akun, menghapus akun Google, atau menghapus kredensial Google.",remove:"Hapus",accountRemoved:"Akun tersimpan dihapus.",usage:"Penggunaan",weeklyLimit:"Batas mingguan",fiveHourLimit:"Batas 5 jam",weeklyShort:"Mingguan",fiveHourShort:"5j",updated:"Diperbarui",models:"model",remaining:"tersisa",resetsIn:"Reset dalam",resetDue:"Waktunya reset",quotaRestored:"Dipulihkan",lastUpdated:"Terakhir diperbarui",quotaSnapshot:"Snapshot kuota",showAllModels:"Tampilkan semua model",showLess:"Tampilkan lebih sedikit",justNow:"baru saja",ago:"yang lalu",quotaUnavailable:"Penggunaan tidak tersedia",quotaUnavailableHint:"Antigravity tidak mengembalikan informasi kuota saat ini.",quotaHistory:"Analitik Kuota 7 Hari",searchAccountsPlaceholder:"Cari nama, email, atau grup...",highestQuota:"Kuota Tertinggi",earliestReset:"Reset Terdekat",nameAZ:"Nama (A-Z)",noMatchingAccounts:"Tidak ada akun yang cocok dengan filter.",liveData:"Data langsung",quotaHistorySub:"Sisa terendah harian",exportAnalytics:"Ekspor Analitik",autoRoundRobin:"Auto-Round-Robin (Ganti saat kuota habis)",enableQuotaAudio:"Notifikasi Suara Lembut (Web Audio)",quotaMatrix:"Matriks Kuota",quotaMatrixTitle:"Matriks Kuota Multi-Akun",quotaMatrixSub:"Perbandingan sisa kuota semua akun secara real-time",switchNow:"Ganti",noSnapshotYet:"Belum ada data kuota",instantSwitch:"Switch Instan (Tanpa Browser)",instantSwitchHint:"Beralih akun seketika menggunakan token sesi tersimpan tanpa membuka browser.",smartQuotaFallbackHint:"Tampilkan prompt 1-klik untuk beralih ke akun berkuota lebih banyak sebelum habis.",autoRoundRobinHint:"Otomatis rotasi ke akun dengan kuota tertinggi saat terkena rate limit (tanpa klik).",enableQuotaAudioHint:"Bunyikan nada audio lembut saat kuota reset atau mencapai batas kritis.",lowQuotaReminderHint:"Tampilkan notifikasi peringatan saat sisa kuota akun berada di bawah batas.",hideRuntimeHint:"Sembunyikan status runtime Antigravity dari bilah bawah.",hideCurrentHint:"Sembunyikan panel akun yang sedang aktif dari tampilan utama.",hideSavedHint:"Sembunyikan daftar dan pengelola akun tersimpan.",showQuotaAnalyticsHint:"Tampilkan grafik analitik dan riwayat kuota 7 hari terakhir.",instantBadge:"Instan",vaultTitle:"Brankas Token",purgeVault:"Bersihkan Brankas Token...",vaultInfo:"Tersimpan di Brankas Token terenkripsi untuk pergantian 1-klik tanpa login browser",plan:"Paket",accountPlan:"Paket Akun",selectPlan:"Pilih Paket",advancedTitle:"Lanjutan",proxyMode:"Mode Proxy",proxyModeSystem:"Bawaan Sistem / VS Code",proxyModeManual:"Proxy Kustom Manual",proxyModeDirect:"Langsung (Tanpa Proxy)",proxyUrl:"URL Server Proxy",proxyUrlPlaceholder:"http://127.0.0.1:7890 atau socks5://...",proxyStrictSSL:"Verifikasi SSL Ketat",proxyStrictSSLHint:"Nonaktifkan hanya jika menggunakan sertifikat proxy lokal/internal."}};function E(){return l.preferences?.effectiveLanguage==="id"?"id":"en"}function a(e){return Q[E()]?.[e]??Q.en[e]??e}function t(e){return String(e??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}function v(e,i="ui-icon"){const n=`class="${t(i)}" viewBox="0 0 16 16" fill="none" aria-hidden="true"`;return{refresh:`
                 <svg ${n}>
                     <path
                         d="M13 4.5V1.8M13 1.8h-2.7M13 1.8A6 6 0 1 0 13.65 8"
@@ -143,7 +143,7 @@
                 <svg ${n}>
                     <path d="M8 2.5l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9-3.6 1.9.7-4-2.9-2.8 4-.6z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
                 </svg>
-            `}[e]||""}function h(e){return String(e??"").trim().toLowerCase()}function I(e){if(l.preferences?.enableQuotaAudio!==!1)try{const i=window.AudioContext||window.webkitAudioContext;if(!i)return;const n=new i;e==="restored"?[523.25,659.25,783.99,1046.5].forEach((d,u)=>{const c=n.createOscillator(),r=n.createGain();c.type="sine",c.frequency.setValueAtTime(d,n.currentTime+u*.07),r.gain.setValueAtTime(.06,n.currentTime+u*.07),r.gain.exponentialRampToValueAtTime(1e-4,n.currentTime+u*.07+.55),c.connect(r),r.connect(n.destination),c.start(n.currentTime+u*.07),c.stop(n.currentTime+u*.07+.55)}):e==="warning"&&[440,369.99].forEach((d,u)=>{const c=n.createOscillator(),r=n.createGain();c.type="sine",c.frequency.setValueAtTime(d,n.currentTime+u*.12),r.gain.setValueAtTime(.05,n.currentTime+u*.12),r.gain.exponentialRampToValueAtTime(1e-4,n.currentTime+u*.12+.4),c.connect(r),r.connect(n.destination),c.start(n.currentTime+u*.12),c.stop(n.currentTime+u*.12+.4)})}catch{}}function B(){k.setState({search:o.search,sortBy:o.sortBy,sortCustomized:o.sortCustomized,currentCollapsed:o.currentCollapsed,savedCollapsed:o.savedCollapsed,runtimeCollapsed:o.runtimeCollapsed,usageCollapsed:o.usageCollapsed,accounts:l.accounts,current:l.current,runtime:l.runtime,usage:l.usage,usageSnapshots:l.usageSnapshots})}function q(e){S=e,v()}function Se(){S=null}function H(e,i="info"){M={message:e,kind:i},T&&clearTimeout(T),T=setTimeout(()=>{M=null,T=null,v()},2600),v()}function xe(){return S?{refresh:a("refreshing"),add:a("adding"),save:a("saving"),reauth:a("reauthenticating"),signout:a("signingOut"),switch:a("switching"),label:a("updatingLabel"),settings:a("savingSettings"),remove:a("removeSavedAccount")}[S.type]||"Working...":""}function f(){return!!S}function Me(e,i){const n=String(e||"").trim()||String(i||"").split("@")[0],s=n.split(/\s+/).filter(Boolean);return s.length>=2?(s[0][0]+s[s.length-1][0]).toUpperCase():n.slice(0,2).toUpperCase()||"A"}function X(){if(!l.current)return null;const e=h(l.current.email);return l.accounts.find(i=>h(i.email)===e)||null}function U(e){const i=h(e);return l.accounts.find(n=>h(n.email)===i)}function V(e){return e.label||e.displayName||e.email}function P(e){const i=h(e.email),n=l.usageSnapshots?.[i];if(!n||!Array.isArray(n.buckets)||n.buckets.length===0)return;let s;for(const d of n.buckets)typeof d.remainingFraction=="number"&&!d.disabled&&(s===void 0||d.remainingFraction<s)&&(s=d.remainingFraction);return s!==void 0?Math.round(s*100):void 0}function j(){const e=o.search.trim().toLowerCase();let i=e?l.accounts.filter(s=>[s.label,s.displayName,s.email,s.group].filter(Boolean).join(" ").toLowerCase().includes(e)):l.accounts.slice();o.groupFilter&&o.groupFilter!=="all"&&(i=i.filter(s=>s.group===o.groupFilter));const n=h(l.current?.email);return i.sort((s,d)=>{const u=h(s.email)===n,c=h(d.email)===n;if(u!==c)return u?-1:1;const r=o.sortBy||"recent";if(r==="quota"){const p=P(s),m=P(d);if(p!==void 0&&m!==void 0){if(m!==p)return m-p}else{if(p!==void 0)return-1;if(m!==void 0)return 1}}else if(r==="recent"){const p=s.lastSeenAt?new Date(s.lastSeenAt).getTime():0,m=d.lastSeenAt?new Date(d.lastSeenAt).getTime():0;if(m!==p)return m-p}return(s.label||s.displayName||s.email).localeCompare(d.label||d.displayName||d.email)}),i}function ee(){const e=document.documentElement,i=l.preferences?.theme||"vscode";if(e.removeAttribute("data-ag-theme"),i==="light"||i==="dark"){e.setAttribute("data-ag-theme",i);return}if(i==="system"){const n=window.matchMedia("(prefers-color-scheme: dark)").matches;e.setAttribute("data-ag-theme",n?"dark":"light")}}function Te(){return S?`
+            `}[e]||""}function h(e){return String(e??"").trim().toLowerCase()}function I(e){if(l.preferences?.enableQuotaAudio!==!1)try{const i=window.AudioContext||window.webkitAudioContext;if(!i)return;const n=new i;e==="restored"?[523.25,659.25,783.99,1046.5].forEach((d,u)=>{const c=n.createOscillator(),r=n.createGain();c.type="sine",c.frequency.setValueAtTime(d,n.currentTime+u*.07),r.gain.setValueAtTime(.06,n.currentTime+u*.07),r.gain.exponentialRampToValueAtTime(1e-4,n.currentTime+u*.07+.55),c.connect(r),r.connect(n.destination),c.start(n.currentTime+u*.07),c.stop(n.currentTime+u*.07+.55)}):e==="warning"&&[440,369.99].forEach((d,u)=>{const c=n.createOscillator(),r=n.createGain();c.type="sine",c.frequency.setValueAtTime(d,n.currentTime+u*.12),r.gain.setValueAtTime(.05,n.currentTime+u*.12),r.gain.exponentialRampToValueAtTime(1e-4,n.currentTime+u*.12+.4),c.connect(r),r.connect(n.destination),c.start(n.currentTime+u*.12),c.stop(n.currentTime+u*.12+.4)})}catch{}}function B(){k.setState({search:s.search,sortBy:s.sortBy,sortCustomized:s.sortCustomized,currentCollapsed:s.currentCollapsed,savedCollapsed:s.savedCollapsed,runtimeCollapsed:s.runtimeCollapsed,usageCollapsed:s.usageCollapsed,accounts:l.accounts,current:l.current,runtime:l.runtime,usage:l.usage,usageSnapshots:l.usageSnapshots})}function q(e){S=e,g()}function Se(){S=null}function H(e,i="info"){M={message:e,kind:i},T&&clearTimeout(T),T=setTimeout(()=>{M=null,T=null,g()},2600),g()}function xe(){return S?{refresh:a("refreshing"),add:a("adding"),save:a("saving"),reauth:a("reauthenticating"),signout:a("signingOut"),switch:a("switching"),label:a("updatingLabel"),settings:a("savingSettings"),remove:a("removeSavedAccount")}[S.type]||"Working...":""}function f(){return!!S}function Me(e,i){const n=String(e||"").trim()||String(i||"").split("@")[0],o=n.split(/\s+/).filter(Boolean);return o.length>=2?(o[0][0]+o[o.length-1][0]).toUpperCase():n.slice(0,2).toUpperCase()||"A"}function X(){if(!l.current)return null;const e=h(l.current.email);return l.accounts.find(i=>h(i.email)===e)||null}function O(e){const i=h(e);return l.accounts.find(n=>h(n.email)===i)}function U(e){return e.label||e.displayName||e.email}function P(e){const i=h(e.email),n=l.usageSnapshots?.[i];if(!n||!Array.isArray(n.buckets)||n.buckets.length===0)return;let o;for(const d of n.buckets)typeof d.remainingFraction=="number"&&!d.disabled&&(o===void 0||d.remainingFraction<o)&&(o=d.remainingFraction);return o!==void 0?Math.round(o*100):void 0}function j(){const e=s.search.trim().toLowerCase();let i=e?l.accounts.filter(o=>[o.label,o.displayName,o.email,o.group].filter(Boolean).join(" ").toLowerCase().includes(e)):l.accounts.slice();s.groupFilter&&s.groupFilter!=="all"&&(i=i.filter(o=>o.group===s.groupFilter));const n=h(l.current?.email);return i.sort((o,d)=>{const u=h(o.email)===n,c=h(d.email)===n;if(u!==c)return u?-1:1;const r=s.sortBy||"recent";if(r==="quota"){const p=P(o),m=P(d);if(p!==void 0&&m!==void 0){if(m!==p)return m-p}else{if(p!==void 0)return-1;if(m!==void 0)return 1}}else if(r==="recent"){const p=o.lastSeenAt?new Date(o.lastSeenAt).getTime():0,m=d.lastSeenAt?new Date(d.lastSeenAt).getTime():0;if(m!==p)return m-p}return(o.label||o.displayName||o.email).localeCompare(d.label||d.displayName||d.email)}),i}function ee(){const e=document.documentElement,i=l.preferences?.theme||"vscode";if(e.removeAttribute("data-ag-theme"),i==="light"||i==="dark"){e.setAttribute("data-ag-theme",i);return}if(i==="system"){const n=window.matchMedia("(prefers-color-scheme: dark)").matches;e.setAttribute("data-ag-theme",n?"dark":"light")}}function Te(){return S?`
                 <div
                     class="toast-host"
                     aria-live="polite"
@@ -185,7 +185,7 @@
                     </span>
                 </div>
             </div>
-        `:""}function Ce(e,i,n,s=""){return`
+        `:""}function Ce(e,i,n,o=""){return`
             <div class="section-header">
                 <button
                     type="button"
@@ -198,7 +198,7 @@
                         class="chevron"
                         aria-hidden="true"
                     >
-                        ${g(n?"chevronRight":"chevronDown")}
+                        ${v(n?"chevronRight":"chevronDown")}
                     </span>
 
                     <span class="section-title">
@@ -207,10 +207,10 @@
                 </button>
 
                 <div class="section-tools">
-                    ${s}
+                    ${o}
                 </div>
             </div>
-        `}function _e(){return`
+        `}function Ye(){return`
             <div class="app">
 
 
@@ -234,7 +234,7 @@
                     <input
                         class="label-input"
                         type="text"
-                        value="${t(o.editValue)}"
+                        value="${t(s.editValue)}"
                         data-role="label-input"
                         data-email="${t(e.email)}"
                         maxlength="80"
@@ -249,7 +249,7 @@
                         title="${t(a("save"))}"
                         aria-label="${t(a("save"))}"
                     >
-                        ${g("check")}
+                        ${v("check")}
                     </button>
 
                     <button
@@ -260,7 +260,7 @@
                         title="${t(a("cancel"))}"
                         aria-label="${t(a("cancel"))}"
                     >
-                        ${g("close")}
+                        ${v("close")}
                     </button>
                 </div>
 
@@ -268,14 +268,14 @@
                     ${i.map(n=>`
                         <button
                             type="button"
-                            class="color-picker-dot color-${n} ${o.editColorTag===n?"selected":""}"
+                            class="color-picker-dot color-${n} ${s.editColorTag===n?"selected":""}"
                             data-action="select-color-tag"
                             data-color="${n}"
                             title="${n}"
                             aria-label="${n}"
                         ></button>
                     `).join("")}
-                    ${o.editColorTag?`
+                    ${s.editColorTag?`
                         <button
                             type="button"
                             class="color-clear-btn"
@@ -290,22 +290,22 @@
                 <div class="label-editor-groups">
                     <span class="label-editor-meta-title">Group:</span>
                     <div class="group-pills-row">
-                        ${(()=>{const n=["Personal","Work"],s=(l.accounts||[]).map(u=>(u.group||"").trim()).filter(Boolean),d=Array.from(new Set([...n,...s]));return o.editGroup&&!d.includes(o.editGroup)&&d.push(o.editGroup),d.map(u=>`
+                        ${(()=>{const n=["Personal","Work"],o=(l.accounts||[]).map(u=>(u.group||"").trim()).filter(Boolean),d=Array.from(new Set([...n,...o]));return s.editGroup&&!d.includes(s.editGroup)&&d.push(s.editGroup),d.map(u=>`
                                 <button
                                     type="button"
-                                    class="group-tag-btn ${o.editGroup===u?"selected":""}"
+                                    class="group-tag-btn ${s.editGroup===u?"selected":""}"
                                     data-action="select-edit-group"
                                     data-group="${t(u)}"
                                 >${t(u)}</button>
                             `).join("")})()}
-                        ${o.customGroupInputOpen?`
+                        ${s.customGroupInputOpen?`
                             <div class="custom-group-input-wrapper">
                                 <input
                                     type="text"
                                     class="custom-group-input"
                                     id="custom-group-input"
                                     placeholder="Group..."
-                                    value="${t(o.customGroupInputValue||"")}"
+                                    value="${t(s.customGroupInputValue||"")}"
                                     maxlength="24"
                                 />
                                 <button
@@ -331,7 +331,7 @@
                                 title="Tambah group baru"
                             >+ Custom</button>
                         `}
-                        ${o.editGroup?`
+                        ${s.editGroup?`
                             <button
                                 type="button"
                                 class="color-clear-btn"
@@ -344,13 +344,13 @@
                     </div>
                 </div>
             </div>
-        `}function Re(e){if(typeof e!="string")return"";const i=e.trim();if(i.startsWith("data:image/png;base64,")||i.startsWith("data:image/jpeg;base64,")||i.startsWith("data:image/webp;base64,")||i.startsWith("data:image/gif;base64,"))return i;try{const n=new URL(i),s=n.hostname.toLowerCase(),d=s==="googleusercontent.com"||s.endsWith(".googleusercontent.com")||s==="ggpht.com"||s.endsWith(".ggpht.com")||s==="gstatic.com"||s.endsWith(".gstatic.com")||s==="google.com"||s.endsWith(".google.com");return n.protocol!=="https:"||!d?"":n.toString()}catch{return""}}function W(e,i,n,s="",d=""){const u=Re(n),c=`
+        `}function Re(e){if(typeof e!="string")return"";const i=e.trim();if(i.startsWith("data:image/png;base64,")||i.startsWith("data:image/jpeg;base64,")||i.startsWith("data:image/webp;base64,")||i.startsWith("data:image/gif;base64,"))return i;try{const n=new URL(i),o=n.hostname.toLowerCase(),d=o==="googleusercontent.com"||o.endsWith(".googleusercontent.com")||o==="ggpht.com"||o.endsWith(".ggpht.com")||o==="gstatic.com"||o.endsWith(".gstatic.com")||o==="google.com"||o.endsWith(".google.com");return n.protocol!=="https:"||!d?"":n.toString()}catch{return""}}function W(e,i,n,o="",d=""){const u=Re(n),c=`
             <span class="avatar-fallback">
                 ${t(Me(e,i))}
             </span>
         `;return`
             <div
-                class="avatar ${t(s)} ${u?"has-image":""}"
+                class="avatar ${t(o)} ${u?"has-image":""}"
                 aria-hidden="true"
             >
                 ${c}
@@ -368,12 +368,12 @@
 
                 ${d}
             </div>
-        `}function qe(e){if(!e)return null;const i=typeof e.plan=="string"?e.plan.trim():"",n=typeof e.g1Tier=="string"?e.g1Tier.trim():"",s=i||n,d=e.isPro===!0;if(!s&&!d)return null;let u="",c="plan-free",r="";const p=s.toUpperCase();if(p.includes("ULTRA"))u="Google AI Ultra",c="plan-ultra",r="\u{1F31F}";else if(p.includes("PLUS"))u="Google AI Plus",c="plan-plus",r="\u2728";else if(p.includes("AI_PREMIUM")||p.includes("PREMIUM"))u="Google AI Plus",c="plan-plus",r="\u2728";else if(p.includes("PRO")||d)u="Google AI Pro",c="plan-pro",r="\u26A1";else if(p.includes("ENTERPRISE"))u="Google AI Enterprise",c="plan-pro",r="\u{1F3E2}";else if(p.includes("FREE")||p.includes("STANDARD"))u="Google AI Free",c="plan-free",r="\u2726";else if(s)u=s.replace(/^G1_TIER_/,"").replace(/_/g," "),c="plan-custom",r="\u2728";else return null;return{name:u,className:c,icon:r}}function K(e){try{const i=qe(e);return!i||!i.name?"":`
+        `}function qe(e){if(!e)return null;const i=typeof e.plan=="string"?e.plan.trim():"",n=typeof e.g1Tier=="string"?e.g1Tier.trim():"",o=i||n,d=e.isPro===!0;if(!o&&!d)return null;let u="",c="plan-free",r="";const p=o.toUpperCase();if(p.includes("ULTRA"))u="Google AI Ultra",c="plan-ultra",r="\u{1F31F}";else if(p.includes("PLUS"))u="Google AI Plus",c="plan-plus",r="\u2728";else if(p.includes("AI_PREMIUM")||p.includes("PREMIUM"))u="Google AI Plus",c="plan-plus",r="\u2728";else if(p.includes("PRO")||d)u="Google AI Pro",c="plan-pro",r="\u26A1";else if(p.includes("ENTERPRISE"))u="Google AI Enterprise",c="plan-pro",r="\u{1F3E2}";else if(p.includes("FREE")||p.includes("STANDARD"))u="Google AI Free",c="plan-free",r="\u2726";else if(o)u=o.replace(/^G1_TIER_/,"").replace(/_/g," "),c="plan-custom",r="\u2728";else return null;return{name:u,className:c,icon:r}}function K(e){try{const i=qe(e);return!i||!i.name?"":`
                 <span class="plan-pill ${t(i.className)}" title="${t(`Plan: ${i.name}`)}">
                     <span class="plan-icon" aria-hidden="true">${i.icon}</span>
                     <span class="plan-text">${t(i.name)}</span>
                 </span>
-            `}catch{return""}}function ae(e){return typeof e!="number"||!Number.isFinite(e)?null:Math.max(0,Math.min(100,e*100))}function ne(e){const i=ae(e);if(i===null)return"\u2014";const n=Math.round(i*100)/100;return(Number.isInteger(n)?String(n):n.toFixed(2))+"%"}function z(e){if(!e||typeof e.remainingFraction!="number"||!Number.isFinite(e.remainingFraction))return null;if(e.resetTime){const i=new Date(e.resetTime).getTime();if(Number.isFinite(i)&&i<=Date.now())return 1}return e.remainingFraction}function ie(e){const i=Math.max(0,Math.floor(e/6e4));if(i<1)return"<1m";const n=Math.floor(i/1440),s=Math.floor(i%1440/60),d=i%60,u=[];return n>0&&u.push(`${n}d`),s>0&&u.push(`${s}h`),n===0&&d>0&&u.push(`${d}m`),u.slice(0,2).join(" ")||"<1m"}function D(e){if(!e)return"";const i=new Date(e).getTime();if(!Number.isFinite(i))return"";const n=i-Date.now();if(n<=0){const s=new Date(e),d=String(s.getHours()).padStart(2,"0"),u=String(s.getMinutes()).padStart(2,"0"),r=s.toDateString()===new Date().toDateString()?`${d}:${u}`:`${s.getDate()}/${s.getMonth()+1} ${d}:${u}`;return`${a("quotaRestored")||a("resetDue")} (${r})`}return`${a("resetsIn")} `+ie(n)}function N(e){if(!e)return"";const i=new Date(e).getTime();if(!Number.isFinite(i))return"";const n=Math.max(0,Date.now()-i);return n<6e4?a("justNow"):`${ie(n)} `+a("ago")}function He(e){const i=String(e?.window||"").trim().toLowerCase();return i==="weekly"?a("weeklyLimit"):i==="5h"?a("fiveHourLimit"):e?.displayName||e?.window||"Quota"}function Le(e){const i={weekly:0,"5h":1};return[...Array.isArray(e)?e:[]].sort((n,s)=>{const d=String(n?.window||"").toLowerCase(),u=String(s?.window||"").toLowerCase();return(i[d]??99)-(i[u]??99)})}function Ee(e){const i=z(e),n=ae(i),s=ne(i),d=D(e.resetTime),u=He(e),c=t(u).replace(/\s+/,"<br>");return`
+            `}catch{return""}}function ae(e){return typeof e!="number"||!Number.isFinite(e)?null:Math.max(0,Math.min(100,e*100))}function ne(e){const i=ae(e);if(i===null)return"\u2014";const n=Math.round(i*100)/100;return(Number.isInteger(n)?String(n):n.toFixed(2))+"%"}function z(e){if(!e||typeof e.remainingFraction!="number"||!Number.isFinite(e.remainingFraction))return null;if(e.resetTime){const i=new Date(e.resetTime).getTime();if(Number.isFinite(i)&&i<=Date.now())return 1}return e.remainingFraction}function ie(e){const i=Math.max(0,Math.floor(e/6e4));if(i<1)return"<1m";const n=Math.floor(i/1440),o=Math.floor(i%1440/60),d=i%60,u=[];return n>0&&u.push(`${n}d`),o>0&&u.push(`${o}h`),n===0&&d>0&&u.push(`${d}m`),u.slice(0,2).join(" ")||"<1m"}function D(e){if(!e)return"";const i=new Date(e).getTime();if(!Number.isFinite(i))return"";const n=i-Date.now();if(n<=0){const o=new Date(e),d=String(o.getHours()).padStart(2,"0"),u=String(o.getMinutes()).padStart(2,"0"),r=o.toDateString()===new Date().toDateString()?`${d}:${u}`:`${o.getDate()}/${o.getMonth()+1} ${d}:${u}`;return`${a("quotaRestored")||a("resetDue")} (${r})`}return`${a("resetsIn")} `+ie(n)}function N(e){if(!e)return"";const i=new Date(e).getTime();if(!Number.isFinite(i))return"";const n=Math.max(0,Date.now()-i);return n<6e4?a("justNow"):`${ie(n)} `+a("ago")}function He(e){const i=String(e?.window||"").trim().toLowerCase();return i==="weekly"?a("weeklyLimit"):i==="5h"?a("fiveHourLimit"):e?.displayName||e?.window||"Quota"}function Le(e){const i={weekly:0,"5h":1};return[...Array.isArray(e)?e:[]].sort((n,o)=>{const d=String(n?.window||"").toLowerCase(),u=String(o?.window||"").toLowerCase();return(i[d]??99)-(i[u]??99)})}function Ee(e){const i=z(e),n=ae(i),o=ne(i),d=D(e.resetTime),u=He(e),c=t(u).replace(/\s+/,"<br>");return`
             <div
                 class="quota-bucket ${e.disabled?"disabled":""}"
                 data-window="${t(e.window||"")}"
@@ -387,7 +387,7 @@
                     </span>
 
                     <strong class="quota-percent">
-                        ${t(s)}
+                        ${t(o)}
                     </strong>
                 </div>
 
@@ -396,7 +396,7 @@
                     max="100"
                     value="${n===null?0:n}"
                     aria-label="${t(u)}"
-                    aria-valuetext="${t(`${s} ${a("remaining")}`)}"
+                    aria-valuetext="${t(`${o} ${a("remaining")}`)}"
                 ></progress>
 
                 <div class="quota-bucket-meta">
@@ -410,7 +410,7 @@
                             `:""}
                 </div>
             </div>
-        `}function se(e){const i=String(e?.displayName||"").trim(),n=i.toLowerCase();return n==="gemini models"||n==="gemini"?"Gemini":n==="claude and gpt models"||n==="claude and gpt"?"Claude and GPT":i||"Quota"}function Ye(e){const i=Le(e.buckets),n=se(e),s=String(e?.description||"").trim();return`
+        `}function se(e){const i=String(e?.displayName||"").trim(),n=i.toLowerCase();return n==="gemini models"||n==="gemini"?"Gemini":n==="claude and gpt models"||n==="claude and gpt"?"Claude and GPT":i||"Quota"}function Je(e){const i=Le(e.buckets),n=se(e),o=String(e?.description||"").trim();return`
             <div class="quota-group">
                 <div class="quota-group-heading">
                     <span
@@ -420,12 +420,12 @@
                         ${t(n)}
                     </span>
 
-                    ${s?`
+                    ${o?`
                                 <button
                                     type="button"
                                     class="quota-info-button"
-                                    title="${t(s)}"
-                                    aria-label="${t(`${n}: ${s}`)}"
+                                    title="${t(o)}"
+                                    aria-label="${t(`${n}: ${o}`)}"
                                 >
                                     i
                                 </button>
@@ -436,7 +436,7 @@
                     ${i.map(Ee).join("")}
                 </div>
             </div>
-        `}function Ie(){const e=l.usage,i=Array.isArray(e?.groups)?e.groups:[],n=e?.fetchedAt?N(e.fetchedAt):"",s=i.length>0?de(e):`
+        `}function Ie(){const e=l.usage,i=Array.isArray(e?.groups)?e.groups:[],n=e?.fetchedAt?N(e.fetchedAt):"",o=i.length>0?de(e):`
                 <div class="usage-empty secondary-text">
                     ${t(l.usageError||a("quotaUnavailable"))}
                 </div>
@@ -459,10 +459,10 @@
                 </div>
 
                 <div class="current-usage-body saved-account-quota-area">
-                    ${s}
+                    ${o}
                 </div>
             </div>
-        `}function Be(){const e=[],i=new Date;for(let n=6;n>=0;n--){const s=new Date(i);s.setDate(s.getDate()-n);const d=s.toISOString().split("T")[0],u=s.toLocaleDateString(E()==="id"?"id-ID":"en-US",{weekday:"short"});e.push({date:d,label:u})}return e}function Ge(e){if(!e)return"";const i=l.quotaHistory||{},n=h(e),s=i[n]||[],u=Be().map(c=>{const r=s.find(A=>A.date===c.date),p=r&&typeof r.lowestRemainingPercent=="number",m=p?r.lowestRemainingPercent:null;let y="history-empty";p&&(y=m<=15?"history-critical":m<=35?"history-warn":"history-healthy");const b=p?`${Math.max(12,m)}%`:"4px",x=p?`${c.label} (${c.date}): ${m}% ${a("remaining")}`:`${c.label} (${c.date}): -`;return`
+        `}function Be(){const e=[],i=new Date;for(let n=6;n>=0;n--){const o=new Date(i);o.setDate(o.getDate()-n);const d=o.toISOString().split("T")[0],u=o.toLocaleDateString(E()==="id"?"id-ID":"en-US",{weekday:"short"});e.push({date:d,label:u})}return e}function Ge(e){if(!e)return"";const i=l.quotaHistory||{},n=h(e),o=i[n]||[],u=Be().map(c=>{const r=o.find(A=>A.date===c.date),p=r&&typeof r.lowestRemainingPercent=="number",m=p?r.lowestRemainingPercent:null;let y="history-empty";p&&(y=m<=15?"history-critical":m<=35?"history-warn":"history-healthy");const b=p?`${Math.max(12,m)}%`:"4px",x=p?`${c.label} (${c.date}): ${m}% ${a("remaining")}`:`${c.label} (${c.date}): -`;return`
                 <div class="history-bar-col" title="${t(x)}">
                     <div class="history-bar-track">
                         <div class="history-bar-fill ${y}" style="height: ${b};"></div>
@@ -478,7 +478,7 @@
                         <span class="quota-history-sub secondary-text">${t(a("quotaHistorySub"))}</span>
                     </div>
                     <button type="button" class="export-analytics-btn" data-action="export-quota-analytics" title="${t(a("exportAnalytics"))}">
-                        ${g("export","export-btn-icon")}
+                        ${v("export","export-btn-icon")}
                         <span>${t(a("exportAnalytics"))}</span>
                     </button>
                 </div>
@@ -529,7 +529,7 @@
                                     data-action="refresh"
                                     ${f()?"disabled":""}
                                 >
-                                    ${g("refresh")}
+                                    ${v("refresh")}
                                     <span>${t(a("refresh"))}</span>
                                 </button>
                             </div>
@@ -566,7 +566,7 @@
                                     data-action="refresh"
                                     ${f()?"disabled":""}
                                 >
-                                    ${g("refresh")}
+                                    ${v("refresh")}
                                     <span>${t(a("refresh"))}</span>
                                 </button>
                             </div>
@@ -603,7 +603,7 @@
                                     data-action="restart-backend"
                                     ${f()?"disabled":""}
                                 >
-                                    ${g("refresh")}
+                                    ${v("refresh")}
                                     <span>${t(a("restartBackend"))}</span>
                                 </button>
 
@@ -613,7 +613,7 @@
                                     data-action="refresh"
                                     ${f()?"disabled":""}
                                 >
-                                    ${g("refresh")}
+                                    ${v("refresh")}
                                     <span>${t(a("refresh"))}</span>
                                 </button>
                             </div>
@@ -650,7 +650,7 @@
                                 data-action="add"
                                 ${f()?"disabled":""}
                             >
-                                ${g("plus")}
+                                ${v("plus")}
                                 <span>${t(a("signInGoogle"))}</span>
                             </button>
 
@@ -660,13 +660,13 @@
                                 data-action="refresh"
                                 ${f()?"disabled":""}
                             >
-                                ${g("refresh")}
+                                ${v("refresh")}
                                 <span>${t(a("refresh"))}</span>
                             </button>
                         </div>
                     </div>
                 </section>
-            `}const n=X(),s=l.current.displayName||n?.displayName||l.current.email,d=n&&h(o.editingEmail)===h(n.email),u=n?.label||a("currentAccountLabel"),c=`
+            `}const n=X(),o=l.current.displayName||n?.displayName||l.current.email,d=n&&h(s.editingEmail)===h(n.email),u=n?.label||a("currentAccountLabel"),c=`
             <span class="connection-state inline ${e?"checking":""}">
                 <span class="status-dot"></span>
 
@@ -681,7 +681,7 @@
                     aria-label="${t(a("currentAccount"))}"
                 >
                     <div class="identity-row current-identity-row">
-                        ${W(s,l.current.email,l.current.profilePictureUrl||n?.profilePictureUrl,n?.colorTag?`current-avatar tag-${t(n.colorTag)}`:"current-avatar")}
+                        ${W(o,l.current.email,l.current.profilePictureUrl||n?.profilePictureUrl,n?.colorTag?`current-avatar tag-${t(n.colorTag)}`:"current-avatar")}
 
 
                         <div class="identity">
@@ -693,9 +693,9 @@
                                         <div class="saved-title-row current-title-row">
                                             <div
                                                 class="identity-name current-name"
-                                                title="${t(n?.label&&n.label.trim()&&n.label.trim()!==s?`${n.label.trim()} (${s})`:s)}"
+                                                title="${t(n?.label&&n.label.trim()&&n.label.trim()!==o?`${n.label.trim()} (${o})`:o)}"
                                             >
-                                                ${n?.colorTag?`<span class="color-tag-dot tag-${t(n.colorTag)}" title="${t(n.colorTag)}"></span>`:""}${t(n?.label&&n.label.trim()?n.label.trim():s)}
+                                                ${n?.colorTag?`<span class="color-tag-dot tag-${t(n.colorTag)}" title="${t(n.colorTag)}"></span>`:""}${t(n?.label&&n.label.trim()?n.label.trim():o)}
                                             </div>
 
                                             <div class="saved-title-actions">
@@ -709,7 +709,7 @@
                                                                 aria-label="${t(a("editLabel"))}"
                                                                 ${f()?"disabled":""}
                                                             >
-                                                                ${g("edit")}
+                                                                ${v("edit")}
                                                             </button>
                                                         `:""}
                                             </div>
@@ -767,7 +767,7 @@
                     ${l.preferences?.showQuotaAnalytics?Ge(l.current.email):""}
                 </div>
             </section>
-        `}function re(e,i){return(Array.isArray(e?.groups)?e.groups:[]).find(s=>i(String(s.displayName||"").toLowerCase()))}function le(e,i){return(Array.isArray(e?.buckets)?e.buckets:[]).find(n=>String(n.window||"").toLowerCase()===i)}function ce(e){return ne(z(e))}function ue(e,i){if(!i)return"";const n=le(i,"weekly"),s=le(i,"5h"),d=D(n?.resetTime),u=D(s?.resetTime),c=(r,p,m,y)=>`
+        `}function re(e,i){return(Array.isArray(e?.groups)?e.groups:[]).find(o=>i(String(o.displayName||"").toLowerCase()))}function ce(e,i){return(Array.isArray(e?.buckets)?e.buckets:[]).find(n=>String(n.window||"").toLowerCase()===i)}function le(e){return ne(z(e))}function ue(e,i){if(!i)return"";const n=ce(i,"weekly"),o=ce(i,"5h"),d=D(n?.resetTime),u=D(o?.resetTime),c=(r,p,m,y)=>`
                 <div class="saved-quota-pair">
                     <div class="saved-usage-metric">
                         <span class="saved-usage-metric-label">
@@ -777,9 +777,9 @@
                         <span
                             class="saved-usage-metric-value"
                             ${p?.resetTime?`data-reset-time="${t(p.resetTime)}"`:""}
-                            ${typeof p?.remainingFraction=="number"?`data-initial-percent="${t(ce(p))}"`:""}
+                            ${typeof p?.remainingFraction=="number"?`data-initial-percent="${t(le(p))}"`:""}
                         >
-                            ${t(ce(p))}
+                            ${t(le(p))}
                         </span>
                     </div>
 
@@ -802,16 +802,16 @@
                 <div class="saved-usage-metrics">
                     ${c(a("weeklyShort"),n,d,"saved-weekly-reset")}
 
-                    ${c(a("fiveHourShort"),s,u,"saved-five-hour-reset")}
+                    ${c(a("fiveHourShort"),o,u,"saved-five-hour-reset")}
                 </div>
             </div>
-        `}function de(e){if(!e)return"";const i=re(e,s=>s.includes("gemini")),n=re(e,s=>s.includes("claude")||s.includes("gpt"));return!i&&!n?"":`
+        `}function de(e){if(!e)return"";const i=re(e,o=>o.includes("gemini")),n=re(e,o=>o.includes("claude")||o.includes("gpt"));return!i&&!n?"":`
             <div class="saved-usage-summary">
                 ${ue("Gemini",i)}
 
                 ${ue("Claude + GPT",n)}
             </div>
-        `}function De(e){const i=h(l.current?.email),n=!!i&&h(e.email)===i,s=h(o.editingEmail)===h(e.email),d=!!(l.loading&&(!l.accounts||l.accounts.length===0)),u=l.usageSnapshots?.[h(e.email)],c=n&&l.usage||u,r=c?.fetchedAt?N(c.fetchedAt):"",p=n?a("activeNow")||"Active now":e.lastSeenAt?N(e.lastSeenAt):"",m=[];if(n?m.push(a("active")||"Active account"):e.lastSeenAt&&m.push(`${a("lastUsed")||"Last used"}: ${new Date(e.lastSeenAt).toLocaleString()}`),r){const x=n?a("liveData")||"Live data":a("updated")||"Snapshot updated";m.push(`${x}: ${r}`)}const y=m.join(" \u2022 "),b=p?`
+        `}function De(e){const i=h(l.current?.email),n=!!i&&h(e.email)===i,o=h(s.editingEmail)===h(e.email),d=!!(l.loading&&(!l.accounts||l.accounts.length===0)),u=l.usageSnapshots?.[h(e.email)],c=n&&l.usage||u,r=c?.fetchedAt?N(c.fetchedAt):"",p=n?a("activeNow")||"Active now":e.lastSeenAt?N(e.lastSeenAt):"",m=[];if(n?m.push(a("active")||"Active account"):e.lastSeenAt&&m.push(`${a("lastUsed")||"Last used"}: ${new Date(e.lastSeenAt).toLocaleString()}`),r){const x=n?a("liveData")||"Live data":a("updated")||"Snapshot updated";m.push(`${x}: ${r}`)}const y=m.join(" \u2022 "),b=p?`
                 <span class="last-seen-pill ${n?"active":""}" title="${t(y)}">
                     <span class="last-seen-clock" aria-hidden="true">\u23F1</span>
                     <span>${t(p)}</span>
@@ -859,13 +859,13 @@
                             `}
                 </div>
                 <div class="identity saved-account-identity">
-                    ${s?te(e):`
+                    ${o?te(e):`
                                 <div class="saved-title-row">
                                     <div
                                         class="identity-name saved-label"
-                                        title="${t(V(e))}"
+                                        title="${t(U(e))}"
                                     >
-                                        ${e.colorTag?`<span class="color-tag-dot tag-${t(e.colorTag)}" title="${t(e.colorTag)}"></span>`:""}${t(V(e))}
+                                        ${e.colorTag?`<span class="color-tag-dot tag-${t(e.colorTag)}" title="${t(e.colorTag)}"></span>`:""}${t(U(e))}
                                     </div>
 
                                     <div class="saved-title-actions">
@@ -879,7 +879,7 @@
                                             aria-label="${t(a("editLabel"))}"
                                             ${f()?"disabled":""}
                                         >
-                                            ${g("edit")}
+                                            ${v("edit")}
                                         </button>
 
                                         <button
@@ -891,7 +891,7 @@
                                             aria-label="${t(a(n?"cannotRemoveActive":"removeSavedAccount"))}"
                                             ${n?'aria-disabled="true"':f()?"disabled":""}
                                         >
-                                            ${g("trash")}
+                                            ${v("trash")}
                                         </button>
                                     </div>
                                 </div>
@@ -936,7 +936,7 @@
         `}function pe(){if(l.loading&&!Array.isArray(l.accounts))return`
                 <div class="saved-loading-panel" role="status" aria-live="polite">
                     <div class="saved-loading-spinner-row">
-                        <span class="loading-spin-icon">${g("refresh")}</span>
+                        <span class="loading-spin-icon">${v("refresh")}</span>
                         <strong>${t(a("loadingSavedAccounts"))}</strong>
                     </div>
                     <div class="saved-skeleton-container">
@@ -952,7 +952,7 @@
             `;const e=j();return!l.accounts||l.accounts.length===0?`
                 <div class="empty-panel saved-empty-card">
                     <div class="empty-panel-icon">
-                        ${g("users")}
+                        ${v("users")}
                     </div>
 
                     <strong class="empty-panel-title">
@@ -971,7 +971,7 @@
                                         data-action="save"
                                         ${f()?"disabled":""}
                                     >
-                                        ${g("star")}
+                                        ${v("star")}
                                         <span>${t(a("saveCurrent"))}</span>
                                     </button>
                                 `:`
@@ -981,7 +981,7 @@
                                         data-action="add"
                                         ${f()?"disabled":""}
                                     >
-                                        ${g("plus")}
+                                        ${v("plus")}
                                         <span>${t(a("signInGoogle"))}</span>
                                     </button>
                                 `}
@@ -997,7 +997,7 @@
                         ${t(a("noMatchesHint"))}
                     </div>
 
-                    ${o.search.trim()||o.groupFilter!=="all"?`
+                    ${s.search.trim()||s.groupFilter!=="all"?`
                         <div style="margin-top: 10px;">
                             <button type="button" class="btn compact" data-action="clear-search">
                                 ${t(a("clearFilter")||"Clear filter")}
@@ -1005,16 +1005,16 @@
                         </div>
                     `:""}
                 </div>
-            `:e.map(De).join("")}function Ne(){if(l.preferences?.hideSaved===!0||l.preferences?.showSaved===!1)return"";const e=j().length,i=(l.accounts?.length||0)>3,n=!!l.loading&&(!l.accounts||l.accounts.length===0),s=!!l.loading&&(l.accounts?.length||0)>0,d=n?"\u2026":o.search.trim()?`${e}/${l.accounts.length}`:String(l.accounts.length),u=`
+            `:e.map(De).join("")}function Ne(){if(l.preferences?.hideSaved===!0||l.preferences?.showSaved===!1)return"";const e=j().length,i=(l.accounts?.length||0)>3,n=!!l.loading&&(!l.accounts||l.accounts.length===0),o=!!l.loading&&(l.accounts?.length||0)>0,d=n?"\u2026":s.search.trim()?`${e}/${l.accounts.length}`:String(l.accounts.length),u=`
             <div class="saved-header-actions">
-                ${s?`
+                ${o?`
                             <span
                                 class="refreshing-indicator"
                                 title="${t(a("updatingQuota"))}"
                                 aria-label="${t(a("updatingQuota"))}"
                             >
                                 <span class="loading-spin-icon">
-                                    ${g("refresh")}
+                                    ${v("refresh")}
                                 </span>
                             </span>
                         `:""}
@@ -1035,14 +1035,14 @@
                     aria-label="${t(a("addGoogleAccount"))}"
                     ${f()?"disabled":""}
                 >
-                    ${g("plus")}
+                    ${v("plus")}
                 </button>
             </div>
         `;return`
             <section class="section saved-section">
-                ${Ce(a("savedAccounts"),"toggle-saved",o.savedCollapsed,u)}
+                ${Ce(a("savedAccounts"),"toggle-saved",s.savedCollapsed,u)}
 
-                ${o.savedCollapsed?"":`
+                ${s.savedCollapsed?"":`
                             <div class="saved-body">
                                 <div class="saved-controls">
                                     ${(l.accounts?.length||0)>0?`
@@ -1052,14 +1052,14 @@
                                                             class="search-icon"
                                                             aria-hidden="true"
                                                         >
-                                                            ${g("search")}
+                                                            ${v("search")}
                                                         </span>
 
                                                         <input
                                                             id="account-search"
                                                             class="search-input"
                                                             type="search"
-                                                            value="${t(o.search)}"
+                                                            value="${t(s.search)}"
                                                             placeholder="${t(a("searchPlaceholder"))}"
                                                             autocomplete="off"
                                                             spellcheck="false"
@@ -1069,7 +1069,7 @@
                                                             type="button"
                                                             class="search-clear-btn"
                                                             data-action="clear-search"
-                                                            style="display: ${o.search?"inline-flex":"none"};"
+                                                            style="display: ${s.search?"inline-flex":"none"};"
                                                             title="${t(a("clearSearch")||"Clear search")}"
                                                             aria-label="${t(a("clearSearch")||"Clear search")}"
                                                         >
@@ -1085,17 +1085,17 @@
                                                             aria-label="${t(a("sortBy"))}"
                                                             title="${t(a("sortBy"))}"
                                                         >
-                                                            <option value="recent" ${o.sortBy==="recent"?"selected":""}>${t(a("sortRecent"))}</option>
-                                                            <option value="quota" ${o.sortBy==="quota"?"selected":""}>${t(a("sortQuota"))}</option>
-                                                            <option value="name" ${o.sortBy==="name"?"selected":""}>${t(a("sortName"))}</option>
+                                                            <option value="recent" ${s.sortBy==="recent"?"selected":""}>${t(a("sortRecent"))}</option>
+                                                            <option value="quota" ${s.sortBy==="quota"?"selected":""}>${t(a("sortQuota"))}</option>
+                                                            <option value="name" ${s.sortBy==="name"?"selected":""}>${t(a("sortName"))}</option>
                                                         </select>
                                                     </div>
                                                 </div>
 
                                                 ${(()=>{const c=Array.from(new Set((l.accounts||[]).map(r=>r.group).filter(Boolean)));return c.length===0?"":`
                                                         <div class="saved-group-filter-row">
-                                                            <button type="button" class="group-filter-chip ${o.groupFilter==="all"?"active":""}" data-action="set-group-filter" data-group="all">All (${l.accounts.length})</button>
-                                                            ${c.map(r=>{const p=l.accounts.filter(m=>m.group===r).length;return`<button type="button" class="group-filter-chip ${o.groupFilter===r?"active":""}" data-action="set-group-filter" data-group="${t(r)}">${t(r)} (${p})</button>`}).join("")}
+                                                            <button type="button" class="group-filter-chip ${s.groupFilter==="all"?"active":""}" data-action="set-group-filter" data-group="all">All (${l.accounts.length})</button>
+                                                            ${c.map(r=>{const p=l.accounts.filter(m=>m.group===r).length;return`<button type="button" class="group-filter-chip ${s.groupFilter===r?"active":""}" data-action="set-group-filter" data-group="${t(r)}">${t(r)} (${p})</button>`}).join("")}
                                                         </div>
                                                     `})()}
                                             `:""}
@@ -1122,7 +1122,7 @@
                             </div>
                         `}
             </section>
-        `}function Z(e,i,n,s,d){return`
+        `}function Z(e,i,n,o,d){return`
             <div class="runtime-row">
                 <div
                     class="runtime-symbol"
@@ -1142,13 +1142,13 @@
                 </div>
 
                 <div
-                    class="runtime-state ${t(s)}"
+                    class="runtime-state ${t(o)}"
                 >
                     <span class="status-dot"></span>
                     ${t(d)}
                 </div>
             </div>
-        `}function Ue(){if(l.preferences?.hideRuntime===!0||l.preferences?.showRuntime===!1)return"";const e=!!l.loading,i=l.runtime||{},n=i.extension||{},s=i.process||null,d=i.health||null,u=!!n.installed,c=!!s,r=!!d?.reachable,p=u&&c&&r,m=l.connectionState||(e?"connecting":p?"connected":"offline");let y="healthy",b=a("ready");return m==="connecting"||e?(y="connecting",b=a("connecting")):m==="not_installed"?(y="warning",b=a("antigravityNotInstalled")):m==="offline"?(y="warning",b=a("antigravityOffline")):m==="disconnected"||m==="connected"||p?(y="healthy",b=a("ready")):(y="warning",b=a("disconnected")),`
+        `}function Oe(){if(l.preferences?.hideRuntime===!0||l.preferences?.showRuntime===!1)return"";const e=!!l.loading,i=l.runtime||{},n=i.extension||{},o=i.process||null,d=i.health||null,u=!!n.installed,c=!!o,r=!!d?.reachable,p=u&&c&&r,m=l.connectionState||(e?"connecting":p?"connected":"offline");let y="healthy",b=a("ready");return m==="connecting"||e?(y="connecting",b=a("connecting")):m==="not_installed"?(y="warning",b=a("antigravityNotInstalled")):m==="offline"?(y="warning",b=a("antigravityOffline")):m==="disconnected"||m==="connected"||p?(y="healthy",b=a("ready")):(y="warning",b=a("disconnected")),`
             <div class="runtime-status-bar">
                 <button
                     type="button"
@@ -1168,11 +1168,11 @@
                     title="${t(a("quotaMatrixTitle"))}"
                     aria-label="${t(a("quotaMatrixTitle"))}"
                 >
-                    ${g("matrix","quota-matrix-icon")}
+                    ${v("matrix","quota-matrix-icon")}
                     <span>${t(a("quotaMatrix"))}</span>
                 </button>
             </div>
-        `}function Oe(){if(!o.runtimeModalOpen)return"";const e=!!l.loading,i=l.runtime||{},n=i.extension||{},s=i.process||null,d=i.health||null,u=!!n.installed,c=!!s,r=!!d?.reachable,p=u&&c&&r,m=e?"checking":p?"healthy":"warning",y=a(e?"checking":p?"ready":"disconnected");return`
+        `}function Ue(){if(!s.runtimeModalOpen)return"";const e=!!l.loading,i=l.runtime||{},n=i.extension||{},o=i.process||null,d=i.health||null,u=!!n.installed,c=!!o,r=!!d?.reachable,p=u&&c&&r,m=e?"checking":p?"healthy":"warning",y=a(e?"checking":p?"ready":"disconnected");return`
             <div
                 class="runtime-modal-backdrop"
                 data-action="runtime-modal-backdrop"
@@ -1196,7 +1196,7 @@
                             aria-label="${t(a("cancel")||"Close")}"
                             title="${t(a("cancel")||"Close")}"
                         >
-                            ${g("close")}
+                            ${v("close")}
                         </button>
                     </header>
 
@@ -1233,7 +1233,7 @@
                     </div>
                 </section>
             </div>
-        `}function me(e,i,n){const s=h(e.email),d=s===i&&l.usage?l.usage:n[s];if(!d?.buckets||!Array.isArray(d.buckets))return 1/0;let u=1/0;for(const c of d.buckets)if(c.resetTime&&!c.disabled){const r=new Date(c.resetTime).getTime();Number.isFinite(r)&&r>Date.now()&&r<u&&(u=r)}return u}function ge(){const e=l.accounts||[],i=l.usageSnapshots||{},n=h(l.current?.email||""),s=(o.matrixSearch||"").trim().toLowerCase();let d=s?e.filter(r=>[r.label,r.displayName,r.email,r.group].filter(Boolean).join(" ").toLowerCase().includes(s)):e.slice();const u=o.matrixSort||"quota",c=d.sort((r,p)=>{const m=h(r.email),y=h(p.email);if(m===n)return-1;if(y===n)return 1;if(u==="reset"){const b=me(r,n,i),x=me(p,n,i);if(b!==x)return b-x}else if(u==="quota"){const b=P(r),x=P(p),A=typeof b=="number"?b:-1,L=typeof x=="number"?x:-1;if(A!==L)return L-A}return(r.label||r.displayName||r.email).localeCompare(p.label||p.displayName||p.email)});return c.length===0?s?`
+        `}function me(e,i,n){const o=h(e.email),d=o===i&&l.usage?l.usage:n[o];if(!d?.buckets||!Array.isArray(d.buckets))return 1/0;let u=1/0;for(const c of d.buckets)if(c.resetTime&&!c.disabled){const r=new Date(c.resetTime).getTime();Number.isFinite(r)&&r>Date.now()&&r<u&&(u=r)}return u}function ge(){const e=l.accounts||[],i=l.usageSnapshots||{},n=h(l.current?.email||""),o=(s.matrixSearch||"").trim().toLowerCase();let d=o?e.filter(r=>[r.label,r.displayName,r.email,r.group].filter(Boolean).join(" ").toLowerCase().includes(o)):e.slice();const u=s.matrixSort||"quota",c=d.sort((r,p)=>{const m=h(r.email),y=h(p.email);if(m===n)return-1;if(y===n)return 1;if(u==="reset"){const b=me(r,n,i),x=me(p,n,i);if(b!==x)return b-x}else if(u==="quota"){const b=P(r),x=P(p),A=typeof b=="number"?b:-1,L=typeof x=="number"?x:-1;if(A!==L)return L-A}return(r.label||r.displayName||r.email).localeCompare(p.label||p.displayName||p.email)});return c.length===0?o?`
                         <div class="search-empty-state">
                             <span>${t(a("noMatchingAccounts"))}</span>
                             <button type="button" class="btn compact" data-action="clear-matrix-search">
@@ -1244,7 +1244,7 @@
                     <div class="matrix-empty secondary-text">
                         ${t(a("noSaved"))}
                     </div>
-                `:c.map(r=>{const p=h(r.email),m=!!(n&&p===n),y=m&&l.usage||i[p],b=r.displayName||r.label||r.email,x=r.label||(m?a("currentAccountLabel"):"");let A=null,L="",G=null,O="";if(y?.buckets&&Array.isArray(y.buckets))for(const w of y.buckets){const J=(w.displayName||w.bucketId||"").toLowerCase(),F=(w.window||w.description||"").toLowerCase(),Ze=J.includes("5-hour")||J.includes("5h")||F.includes("5 hour")||F.includes("5h"),$e=J.includes("week")||F.includes("week")||F.includes("7 day");if(typeof w.remainingFraction=="number"&&!w.disabled){const ke=z(w),we=typeof ke=="number"?Math.max(0,Math.min(100,Math.round(ke*100))):null,Ae=w.resetTime?D(w.resetTime):"";Ze||A===null&&!$e?(A=we,L=Ae):$e&&(G=we,O=Ae)}}if(A===null){const w=P(r);typeof w=="number"&&(A=w)}const ye=w=>typeof w!="number"?"tone-empty":w<=15?"tone-critical":w<=35?"tone-warn":"tone-healthy";return`
+                `:c.map(r=>{const p=h(r.email),m=!!(n&&p===n),y=m&&l.usage||i[p],b=r.displayName||r.label||r.email,x=r.label||(m?a("currentAccountLabel"):"");let A=null,L="",G=null,F="";if(y?.buckets&&Array.isArray(y.buckets))for(const w of y.buckets){const J=(w.displayName||w.bucketId||"").toLowerCase(),V=(w.window||w.description||"").toLowerCase(),_e=J.includes("5-hour")||J.includes("5h")||V.includes("5 hour")||V.includes("5h"),$e=J.includes("week")||V.includes("week")||V.includes("7 day");if(typeof w.remainingFraction=="number"&&!w.disabled){const ke=z(w),we=typeof ke=="number"?Math.max(0,Math.min(100,Math.round(ke*100))):null,Ae=w.resetTime?D(w.resetTime):"";_e||A===null&&!$e?(A=we,L=Ae):$e&&(G=we,F=Ae)}}if(A===null){const w=P(r);typeof w=="number"&&(A=w)}const ye=w=>typeof w!="number"?"tone-empty":w<=15?"tone-critical":w<=35?"tone-warn":"tone-healthy";return`
                     <div class="matrix-card ${m?"active-matrix-card":""}">
                         <!-- Tier 1: Header Row (Identity Left, Action Right) -->
                         <div class="matrix-card-header">
@@ -1304,11 +1304,11 @@
                                 <div class="matrix-quota-track">
                                     <div class="matrix-quota-fill ${ye(G)}" style="width: ${typeof G=="number"?G:0}%;"></div>
                                 </div>
-                                ${O?`<span class="matrix-reset-sub" title="${t(O)}">${t(O)}</span>`:""}
+                                ${F?`<span class="matrix-reset-sub" title="${t(F)}">${t(F)}</span>`:""}
                             </div>
                         </div>
                     </div>
-                `}).join("")}function Fe(){if(!o.quotaMatrixOpen)return"";const e=l.accounts||[],i=ge();return`
+                `}).join("")}function Fe(){if(!s.quotaMatrixOpen)return"";const e=l.accounts||[],i=ge();return`
             <div class="matrix-modal-backdrop" data-action="close-quota-matrix">
                 <section
                     class="matrix-modal-panel"
@@ -1318,7 +1318,7 @@
                 >
                     <header class="matrix-modal-header">
                         <div class="matrix-modal-title-group">
-                            <h2>${g("matrix","modal-header-icon")} ${t(a("quotaMatrixTitle"))}</h2>
+                            <h2>${v("matrix","modal-header-icon")} ${t(a("quotaMatrixTitle"))}</h2>
                             <span class="secondary-text">${t(a("quotaMatrixSub"))}</span>
                         </div>
                         <button
@@ -1328,7 +1328,7 @@
                             aria-label="${t(a("cancel")||"Close")}"
                             title="${t(a("cancel")||"Close")}"
                         >
-                            ${g("close")}
+                            ${v("close")}
                         </button>
                     </header>
 
@@ -1336,17 +1336,17 @@
                         ${e.length>1?`
                             <div class="matrix-filter-row">
                                 <div class="search-input-wrapper">
-                                    <span class="search-input-icon">${g("search")}</span>
+                                    <span class="search-input-icon">${v("search")}</span>
                                     <input
                                         id="matrix-search"
                                         class="accounts-search-input"
                                         type="search"
-                                        value="${t(o.matrixSearch||"")}"
+                                        value="${t(s.matrixSearch||"")}"
                                         placeholder="${t(a("searchAccountsPlaceholder"))}"
                                         autocomplete="off"
                                         spellcheck="false"
                                     >
-                                    ${o.matrixSearch?`
+                                    ${s.matrixSearch?`
                                         <button
                                             type="button"
                                             class="search-clear-btn"
@@ -1361,7 +1361,7 @@
                                     <span class="matrix-sort-label">${t(a("sortBy")||"Sort:")}</span>
                                     <button
                                         type="button"
-                                        class="matrix-sort-chip ${!o.matrixSort||o.matrixSort==="quota"?"active":""}"
+                                        class="matrix-sort-chip ${!s.matrixSort||s.matrixSort==="quota"?"active":""}"
                                         data-action="set-matrix-sort"
                                         data-sort="quota"
                                     >
@@ -1369,7 +1369,7 @@
                                     </button>
                                     <button
                                         type="button"
-                                        class="matrix-sort-chip ${o.matrixSort==="reset"?"active":""}"
+                                        class="matrix-sort-chip ${s.matrixSort==="reset"?"active":""}"
                                         data-action="set-matrix-sort"
                                         data-sort="reset"
                                     >
@@ -1377,7 +1377,7 @@
                                     </button>
                                     <button
                                         type="button"
-                                        class="matrix-sort-chip ${o.matrixSort==="name"?"active":""}"
+                                        class="matrix-sort-chip ${s.matrixSort==="name"?"active":""}"
                                         data-action="set-matrix-sort"
                                         data-sort="name"
                                     >
@@ -1404,7 +1404,7 @@
                     </footer>
                 </section>
             </div>
-        `}function Ve(){if(!o.settingsOpen||!o.settingsDraft)return"";const e=o.settingsDraft;return`
+        `}function Ve(){if(!s.settingsOpen||!s.settingsDraft)return"";const e=s.settingsDraft;return`
             <div
                 class="settings-backdrop"
                 data-action="settings-backdrop"
@@ -1677,7 +1677,7 @@
                                     class="btn block"
                                     data-action="clear-token-vault"
                                 >
-                                    ${g("key")} ${t(a("purgeVault"))}
+                                    ${v("key")} ${t(a("purgeVault"))}
                                 </button>
                             </div>
                         </div>
@@ -1804,7 +1804,7 @@
                     </footer>
                 </section>
             </div>
-        `}function C(e,i,n,s){return`
+        `}function C(e,i,n,o){return`
             <div class="check-setting-wrap">
                 <label class="check-row">
                     <input
@@ -1817,9 +1817,9 @@
                         ${t(i)}
                     </span>
                 </label>
-                ${s?`<div class="field-hint">${t(s)}</div>`:""}
+                ${o?`<div class="field-hint">${t(o)}</div>`:""}
             </div>
-        `}function je(){const e=l.meta||{},i=e.developer||"Boy Gilang Ramadhan",n=e.website||"https://boygr.com",s=e.version||"0.5.1";return`
+        `}function je(){const e=l.meta||{},i=e.developer||"Boy Gilang Ramadhan",n=e.website||"https://boygr.com",o=e.version||"0.5.1";return`
             <footer class="developer-footer">
                 <div class="developer-footer-copy">
                     <span class="footer-prefix">${t(a("developedBy"))}</span>
@@ -1834,10 +1834,10 @@
                 </div>
 
                 <span class="footer-version">
-                    v${t(s)}
+                    v${t(o)}
                 </span>
             </footer>
-        `}function We(){const e=o.removeCandidate;return e?`
+        `}function We(){const e=s.removeCandidate;return e?`
             <div
                 class="dialog-backdrop"
                 data-action="cancel-remove"
@@ -1863,7 +1863,7 @@
                             </h2>
 
                             <div class="confirm-account-name">
-                                ${t(V(e))}
+                                ${t(U(e))}
                             </div>
 
                             <div class="confirm-account-email">
@@ -1898,14 +1898,75 @@
                     </footer>
                 </section>
             </div>
-        `:""}function v(){ee(),document.documentElement.lang=E(),R.innerHTML=`
+        `:""}function Ke(){const e=s.switchCandidate;return e?`
+            <div
+                class="dialog-backdrop"
+                data-action="cancel-switch"
+            >
+                <section
+                    class="confirm-dialog switch-dialog"
+                    role="alertdialog"
+                    aria-modal="true"
+                    aria-labelledby="switch-dialog-title"
+                    aria-describedby="switch-dialog-description"
+                >
+                    <header class="confirm-dialog-header">
+                        <div
+                            class="switch-symbol"
+                            aria-hidden="true"
+                        >
+                            \u21C4
+                        </div>
+
+                        <div>
+                            <h2 id="switch-dialog-title">
+                                ${t(a("switchAccountQuestion"))}
+                            </h2>
+
+                            <div class="confirm-account-name">
+                                ${t(U(e))}
+                            </div>
+
+                            <div class="confirm-account-email">
+                                ${t(e.email)}
+                            </div>
+                        </div>
+                    </header>
+
+                    <p
+                        id="switch-dialog-description"
+                        class="confirm-description"
+                    >
+                        ${t(a("switchAccountExplanation"))}
+                    </p>
+
+                    <footer class="confirm-dialog-actions">
+                        <button
+                            type="button"
+                            class="btn"
+                            data-action="cancel-switch"
+                        >
+                            ${t(a("cancel"))}
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn primary-btn"
+                            data-action="confirm-switch"
+                        >
+                            ${t(a("confirmSwitch"))}
+                        </button>
+                    </footer>
+                </section>
+            </div>
+        `:""}function g(){ee(),document.documentElement.lang=E(),R.innerHTML=`
             <div
                 class="app"
                 aria-busy="${l.loading||f()?"true":"false"}"
             >
                 <div class="content-shell">
                     ${Te()}
-                    ${Ue()}
+                    ${Oe()}
                     ${Pe()}
                     ${Ne()}
                 </div>
@@ -1915,6 +1976,7 @@
 
             ${Ve()}
             ${We()}
-            ${Oe()}
+            ${Ke()}
+            ${Ue()}
             ${Fe()}
-        `,Qe(),oe(),o.editingEmail&&window.requestAnimationFrame(()=>{const e=document.querySelector('[data-role="label-input"]');e&&(e.focus(),e.setSelectionRange(e.value.length,e.value.length))})}function ve(){const e=document.getElementById("saved-account-list");e&&(e.innerHTML=pe());const i=document.getElementById("account-count");if(i){const n=j().length;i.textContent=o.search.trim()?`${n}/${l.accounts.length}`:String(l.accounts.length)}}function _(){const e=document.getElementById("matrix-account-list");e&&(e.innerHTML=ge())}function Ke(e){const i=U(e);i&&(o.editingEmail=i.email,o.editValue=i.label||"",o.editColorTag=i.colorTag||"",o.editGroup=i.group||"",o.customGroupInputOpen=!1,o.customGroupInputValue="",v())}function he(){o.editingEmail=null,o.editValue="",o.editColorTag="",o.editGroup="",o.customGroupInputOpen=!1,o.customGroupInputValue="",v()}function fe(e){const i=U(e);i&&(q({type:"label",email:i.email}),k.postMessage({type:"updateLabel",email:i.email,label:o.editValue,colorTag:o.editColorTag,group:o.editGroup}))}function be(){const e=l.preferences||{};o.settingsDraft={theme:e.theme||"vscode",language:e.language||"auto",hideCurrent:e.hideCurrent===!0||e.showCurrent===!1,hideSaved:e.hideSaved===!0||e.showSaved===!1,hideRuntime:e.hideRuntime===!0||e.showRuntime===!1,showQuotaAnalytics:e.showQuotaAnalytics===!0,autoRefreshIntervalMinutes:typeof e.autoRefreshIntervalMinutes=="number"?e.autoRefreshIntervalMinutes:5,enableLowQuotaReminder:e.enableLowQuotaReminder!==!1,lowQuotaThresholdPercent:typeof e.lowQuotaThresholdPercent=="number"?e.lowQuotaThresholdPercent:20,smartQuotaFallback:e.smartQuotaFallback!==!1,autoRoundRobin:e.autoRoundRobin===!0,enableQuotaAudio:e.enableQuotaAudio!==!1,enableInstantSwitch:e.enableInstantSwitch!==!1,proxyMode:e.proxyMode||"system",proxyUrl:e.proxyUrl||"",proxyStrictSSL:e.proxyStrictSSL!==!1},o.settingsOpen=!0,v()}function Y(){o.settingsOpen=!1,o.settingsDraft=null,v()}function ze(){o.settingsDraft&&(q({type:"settings"}),k.postMessage({type:"saveSettings",preferences:{...o.settingsDraft,showCurrent:!o.settingsDraft.hideCurrent,showSaved:!o.settingsDraft.hideSaved,showRuntime:!o.settingsDraft.hideRuntime}}))}R.addEventListener("input",e=>{const i=e.target;if(i instanceof HTMLInputElement&&i.id==="account-search"){o.search=i.value;const n=i.closest(".search-input-wrapper")?.querySelector(".search-clear-btn");n&&(n.style.display=o.search?"inline-flex":"none"),B(),ve();return}if(i instanceof HTMLInputElement&&i.id==="matrix-search"){o.matrixSearch=i.value;const n=i.closest(".search-input-wrapper")?.querySelector(".search-clear-btn");n&&(n.style.display=o.matrixSearch?"inline-flex":"none"),_();return}if(i instanceof HTMLInputElement&&i.dataset.role==="label-input"){o.editValue=i.value;return}if(i instanceof HTMLInputElement&&i.id==="custom-group-input"){o.customGroupInputValue=i.value;return}if(i instanceof HTMLInputElement&&i.dataset.setting==="proxyUrl"){o.settingsDraft&&(o.settingsDraft.proxyUrl=i.value);return}}),R.addEventListener("keydown",e=>{const i=e.target;if(i instanceof HTMLInputElement&&i.id==="custom-group-input")if(e.key==="Enter"){e.preventDefault();const n=i.value.trim();n&&(o.editGroup=n),o.customGroupInputOpen=!1,o.customGroupInputValue="",v()}else e.key==="Escape"&&(e.preventDefault(),o.customGroupInputOpen=!1,o.customGroupInputValue="",v())}),R.addEventListener("change",e=>{const i=e.target;if(i instanceof HTMLSelectElement&&i.dataset.action==="change-sort"){o.sortBy=i.value,o.sortCustomized=!0,B(),ve();return}if(!o.settingsDraft||!(i instanceof HTMLInputElement||i instanceof HTMLSelectElement))return;const n=i.dataset.setting;if(n){if(i instanceof HTMLInputElement&&i.type==="checkbox"){o.settingsDraft[n]=i.checked,n==="enableLowQuotaReminder"&&v();return}if(n==="autoRefreshIntervalMinutes"||n==="lowQuotaThresholdPercent"){o.settingsDraft[n]=Number.parseInt(i.value,10);return}if(n==="proxyMode"){o.settingsDraft.proxyMode=i.value,v();return}o.settingsDraft[n]=i.value}}),R.addEventListener("click",e=>{const i=e.target;if(!(i instanceof Element))return;const n=i.closest("[data-action]");if(!n)return;const s=n.dataset.action,d=n.dataset.email;if(s==="open-settings"){be();return}if(s==="cancel-settings"){Y();return}if(s==="settings-backdrop"&&i===n){Y();return}if(s==="save-settings"){f()||ze();return}if(s==="toggle-current"){o.currentCollapsed=!o.currentCollapsed,B(),v();return}if(s==="toggle-saved"){o.savedCollapsed=!o.savedCollapsed,B(),v();return}if(s==="clear-search"){o.search="",o.groupFilter="all";const c=document.getElementById("account-search");c&&(c.value="",c.focus());const r=document.querySelector(".search-clear-btn");r&&(r.style.display="none"),B(),v();return}if(s==="open-runtime-modal"){o.runtimeModalOpen=!0,v();return}if(s==="close-runtime-modal"||s==="runtime-modal-backdrop"&&i===n){o.runtimeModalOpen=!1,v();return}if(s==="open-quota-matrix"){o.quotaMatrixOpen=!0,v();return}if(s==="close-quota-matrix"){if(n.classList.contains("matrix-modal-backdrop")&&i!==n)return;o.quotaMatrixOpen=!1,o.matrixSearch="",v();return}if(s==="clear-matrix-search"){o.matrixSearch="";const c=document.getElementById("matrix-search");c&&(c.value="",c.focus());const r=n.closest(".search-input-wrapper")?.querySelector(".search-clear-btn")||document.querySelector(".matrix-filter-row .search-clear-btn");r&&(r.style.display="none"),_();return}if(s==="set-matrix-sort"){const c=n.dataset.sort||"quota";o.matrixSort=c,document.querySelectorAll(".matrix-sort-chip").forEach(p=>{p.classList.toggle("active",p.dataset.sort===c)}),_();return}if(s==="export-accounts"){k.postMessage({type:"exportAccounts"});return}if(s==="import-accounts"){k.postMessage({type:"importAccounts"});return}if(s==="clear-token-vault"){k.postMessage({type:"clearTokenVault"});return}if(s==="reconnect-hub"){o.runtimeModalOpen=!1,q({type:"refresh"}),k.postMessage({type:"reconnectHub"});return}if(s==="restart-backend"){o.runtimeModalOpen=!1,q({type:"refresh"}),k.postMessage({type:"restartBackend"});return}if(s==="select-color-tag"){const c=n.dataset.color||"";o.editColorTag=o.editColorTag===c?"":c,v();return}if(s==="select-edit-group"){const c=n.dataset.group||"";o.editGroup=o.editGroup===c?"":c,v();return}if(s==="open-custom-group"){o.customGroupInputOpen=!0,o.customGroupInputValue="",v(),setTimeout(()=>{const c=document.getElementById("custom-group-input");c&&c.focus()},20);return}if(s==="cancel-custom-group"){o.customGroupInputOpen=!1,o.customGroupInputValue="",v();return}if(s==="confirm-custom-group"){const c=document.getElementById("custom-group-input"),r=(c?c.value:o.customGroupInputValue||"").trim();r&&(o.editGroup=r),o.customGroupInputOpen=!1,o.customGroupInputValue="",v();return}if(s==="set-group-filter"){o.groupFilter=n.dataset.group||"all",v();return}if(s==="export-quota-analytics"){k.postMessage({type:"exportQuotaAnalytics"});return}if(s==="edit-label"){f()||Ke(d);return}if(s==="cancel-label"){he();return}if(s==="save-label"){f()||fe(d);return}if(s==="active-locked-remove"){H(a("cannotRemoveActive"),"warning");return}if(s==="remove-account"){const c=U(d);if(c&&!f()){const r=h(l.current?.email);if(r&&h(c.email)===r){H(a("cannotRemoveActive"),"warning");return}o.removeCandidate=c,v()}return}if(s==="cancel-remove"){o.removeCandidate=null,v();return}if(s==="confirm-remove"){const c=o.removeCandidate;if(c&&!f()){const r=h(l.current?.email);if(r&&h(c.email)===r){o.removeCandidate=null,v(),H(a("cannotRemoveActive"),"warning");return}q({type:"remove",email:c.email}),k.postMessage({type:"removeAccount",email:c.email})}return}if(f())return;if(s==="switch"){const c=U(d);c&&(o.quotaMatrixOpen=!1,q({type:"switch",email:c.email}),k.postMessage({type:"switchAccount",account:c}));return}const u={add:"addAccount",save:"saveCurrent",refresh:"refresh",reauth:"reauth",signout:"signout","restart-backend":"restartBackend"};u[s]&&(q({type:{add:"add",save:"save",refresh:"refresh",reauth:"reauth",signout:"signout","restart-backend":"refresh"}[s]}),k.postMessage({type:u[s]}))}),window.addEventListener("keydown",e=>{if(e.key==="Escape"){if(o.quotaMatrixOpen){o.quotaMatrixOpen=!1,v();return}if(o.runtimeModalOpen){o.runtimeModalOpen=!1,v();return}if(o.settingsOpen){Y();return}if(o.editingEmail&&!S){he();return}M&&!S&&(M=null,T&&(clearTimeout(T),T=null),v());return}if(e.key==="Enter"&&o.editingEmail&&!S){const i=document.activeElement;i instanceof HTMLInputElement&&i.dataset.role==="label-input"&&(e.preventDefault(),fe(o.editingEmail))}}),R.addEventListener("click",e=>{const i=e.target;if(!(i instanceof Element))return;const n=i.closest("[data-external-url]");if(!n)return;e.preventDefault();const s=n.dataset.externalUrl;s&&k.postMessage({type:"openExternal",url:s})}),window.addEventListener("message",e=>{const i=e.data;if(!i)return;if(i.type==="openSettings"){be();return}if(i.type==="openQuotaMatrix"){o.quotaMatrixOpen=!0,v();return}if(i.type==="playChime"){I(i.chime);return}if(i.type!=="state")return;const n=S;if(l=i.state,B(),Se(),n?.type==="remove"){o.removeCandidate=null,H(a("accountRemoved"),"success");return}if(n?.type==="label"){o.editingEmail=null,o.editValue="",H(a("labelUpdated"),"success");return}if(n?.type==="settings"){o.settingsOpen=!1,o.settingsDraft=null,H(a("settingsSaved"),"success");return}if(n&&n.type!=="refresh"){H(a("stateUpdated"),"success");return}v()}),window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{l.preferences?.theme==="system"&&ee()}),window.setInterval(()=>{oe()},3e4),v(),k.postMessage({type:"ready"})})();function enhanceSavedQuotaMetrics(k=document){const R=k.querySelectorAll(".saved-account-quota-area");for(const $ of R){const l=$.querySelectorAll([".saved-family-metric",".saved-usage-metric",".saved-quota-metric",".saved-metric-row",".saved-usage-row"].join(","));for(const o of l){const S=o.querySelector(".saved-quota-main"),M=o.querySelector(".saved-quota-value");if(!S||!M)continue;const T=M.textContent?.trim()??"",Q=T.match(/(-?\d+(?:\.\d+)?)\s*%/);if(!Q)continue;const E=Number(Q[1]);if(!Number.isFinite(E))continue;const a=Math.max(0,Math.min(100,E));let t=o.querySelector(":scope > .saved-quota-progress");if(!t){t=document.createElement("div"),t.className="saved-quota-progress",t.setAttribute("aria-hidden","true");const I=document.createElement("span");I.className="saved-quota-progress-fill",t.append(I),S.insertAdjacentElement("afterend",t)}t.style.setProperty("--saved-quota-percent",`${a}%`);let g=o.querySelector(":scope > .saved-quota-remaining");g||(g=document.createElement("div"),g.className="saved-quota-remaining",t.insertAdjacentElement("afterend",g)),g.textContent=`${T} remaining`;const h=o.querySelector([".saved-quota-reset",".saved-usage-reset",".saved-metric-reset"].join(","));if(h){const I=h.textContent?.trim()??"";h.textContent=I.replace(/^Resets\s+in\s+/i,"Reset ").replace(/^Reset\s+in\s+/i,"Reset ")}}}}let savedQuotaEnhancementQueued=!1;function queueSavedQuotaEnhancement(){savedQuotaEnhancementQueued||(savedQuotaEnhancementQueued=!0,queueMicrotask(()=>{savedQuotaEnhancementQueued=!1,enhanceSavedQuotaMetrics(document)}))}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",()=>{enhanceSavedQuotaMetrics(document)},{once:!0}):enhanceSavedQuotaMetrics(document);const savedQuotaObserver=new MutationObserver(()=>{queueSavedQuotaEnhancement()});savedQuotaObserver.observe(document.documentElement,{childList:!0,subtree:!0});
+        `,Qe(),oe(),s.editingEmail&&window.requestAnimationFrame(()=>{const e=document.querySelector('[data-role="label-input"]');e&&(e.focus(),e.setSelectionRange(e.value.length,e.value.length))})}function ve(){const e=document.getElementById("saved-account-list");e&&(e.innerHTML=pe());const i=document.getElementById("account-count");if(i){const n=j().length;i.textContent=s.search.trim()?`${n}/${l.accounts.length}`:String(l.accounts.length)}}function _(){const e=document.getElementById("matrix-account-list");e&&(e.innerHTML=ge())}function ze(e){const i=O(e);i&&(s.editingEmail=i.email,s.editValue=i.label||"",s.editColorTag=i.colorTag||"",s.editGroup=i.group||"",s.customGroupInputOpen=!1,s.customGroupInputValue="",g())}function he(){s.editingEmail=null,s.editValue="",s.editColorTag="",s.editGroup="",s.customGroupInputOpen=!1,s.customGroupInputValue="",g()}function fe(e){const i=O(e);i&&(q({type:"label",email:i.email}),k.postMessage({type:"updateLabel",email:i.email,label:s.editValue,colorTag:s.editColorTag,group:s.editGroup}))}function be(){const e=l.preferences||{};s.settingsDraft={theme:e.theme||"vscode",language:e.language||"auto",hideCurrent:e.hideCurrent===!0||e.showCurrent===!1,hideSaved:e.hideSaved===!0||e.showSaved===!1,hideRuntime:e.hideRuntime===!0||e.showRuntime===!1,showQuotaAnalytics:e.showQuotaAnalytics===!0,autoRefreshIntervalMinutes:typeof e.autoRefreshIntervalMinutes=="number"?e.autoRefreshIntervalMinutes:5,enableLowQuotaReminder:e.enableLowQuotaReminder!==!1,lowQuotaThresholdPercent:typeof e.lowQuotaThresholdPercent=="number"?e.lowQuotaThresholdPercent:20,smartQuotaFallback:e.smartQuotaFallback!==!1,autoRoundRobin:e.autoRoundRobin===!0,enableQuotaAudio:e.enableQuotaAudio!==!1,enableInstantSwitch:e.enableInstantSwitch!==!1,proxyMode:e.proxyMode||"system",proxyUrl:e.proxyUrl||"",proxyStrictSSL:e.proxyStrictSSL!==!1},s.settingsOpen=!0,g()}function Y(){s.settingsOpen=!1,s.settingsDraft=null,g()}function Ze(){s.settingsDraft&&(q({type:"settings"}),k.postMessage({type:"saveSettings",preferences:{...s.settingsDraft,showCurrent:!s.settingsDraft.hideCurrent,showSaved:!s.settingsDraft.hideSaved,showRuntime:!s.settingsDraft.hideRuntime}}))}R.addEventListener("input",e=>{const i=e.target;if(i instanceof HTMLInputElement&&i.id==="account-search"){s.search=i.value;const n=i.closest(".search-input-wrapper")?.querySelector(".search-clear-btn");n&&(n.style.display=s.search?"inline-flex":"none"),B(),ve();return}if(i instanceof HTMLInputElement&&i.id==="matrix-search"){s.matrixSearch=i.value;const n=i.closest(".search-input-wrapper")?.querySelector(".search-clear-btn");n&&(n.style.display=s.matrixSearch?"inline-flex":"none"),_();return}if(i instanceof HTMLInputElement&&i.dataset.role==="label-input"){s.editValue=i.value;return}if(i instanceof HTMLInputElement&&i.id==="custom-group-input"){s.customGroupInputValue=i.value;return}if(i instanceof HTMLInputElement&&i.dataset.setting==="proxyUrl"){s.settingsDraft&&(s.settingsDraft.proxyUrl=i.value);return}}),R.addEventListener("keydown",e=>{const i=e.target;if(i instanceof HTMLInputElement&&i.id==="custom-group-input")if(e.key==="Enter"){e.preventDefault();const n=i.value.trim();n&&(s.editGroup=n),s.customGroupInputOpen=!1,s.customGroupInputValue="",g()}else e.key==="Escape"&&(e.preventDefault(),s.customGroupInputOpen=!1,s.customGroupInputValue="",g())}),R.addEventListener("change",e=>{const i=e.target;if(i instanceof HTMLSelectElement&&i.dataset.action==="change-sort"){s.sortBy=i.value,s.sortCustomized=!0,B(),ve();return}if(!s.settingsDraft||!(i instanceof HTMLInputElement||i instanceof HTMLSelectElement))return;const n=i.dataset.setting;if(n){if(i instanceof HTMLInputElement&&i.type==="checkbox"){s.settingsDraft[n]=i.checked,n==="enableLowQuotaReminder"&&g();return}if(n==="autoRefreshIntervalMinutes"||n==="lowQuotaThresholdPercent"){s.settingsDraft[n]=Number.parseInt(i.value,10);return}if(n==="proxyMode"){s.settingsDraft.proxyMode=i.value,g();return}s.settingsDraft[n]=i.value}}),R.addEventListener("click",e=>{const i=e.target;if(!(i instanceof Element))return;const n=i.closest("[data-action]");if(!n)return;const o=n.dataset.action,d=n.dataset.email;if(o==="open-settings"){be();return}if(o==="cancel-settings"){Y();return}if(o==="settings-backdrop"&&i===n){Y();return}if(o==="save-settings"){f()||Ze();return}if(o==="toggle-current"){s.currentCollapsed=!s.currentCollapsed,B(),g();return}if(o==="toggle-saved"){s.savedCollapsed=!s.savedCollapsed,B(),g();return}if(o==="clear-search"){s.search="",s.groupFilter="all";const c=document.getElementById("account-search");c&&(c.value="",c.focus());const r=document.querySelector(".search-clear-btn");r&&(r.style.display="none"),B(),g();return}if(o==="open-runtime-modal"){s.runtimeModalOpen=!0,g();return}if(o==="close-runtime-modal"||o==="runtime-modal-backdrop"&&i===n){s.runtimeModalOpen=!1,g();return}if(o==="open-quota-matrix"){s.quotaMatrixOpen=!0,g();return}if(o==="close-quota-matrix"){if(n.classList.contains("matrix-modal-backdrop")&&i!==n)return;s.quotaMatrixOpen=!1,s.matrixSearch="",g();return}if(o==="clear-matrix-search"){s.matrixSearch="";const c=document.getElementById("matrix-search");c&&(c.value="",c.focus());const r=n.closest(".search-input-wrapper")?.querySelector(".search-clear-btn")||document.querySelector(".matrix-filter-row .search-clear-btn");r&&(r.style.display="none"),_();return}if(o==="set-matrix-sort"){const c=n.dataset.sort||"quota";s.matrixSort=c,document.querySelectorAll(".matrix-sort-chip").forEach(p=>{p.classList.toggle("active",p.dataset.sort===c)}),_();return}if(o==="export-accounts"){k.postMessage({type:"exportAccounts"});return}if(o==="import-accounts"){k.postMessage({type:"importAccounts"});return}if(o==="clear-token-vault"){k.postMessage({type:"clearTokenVault"});return}if(o==="reconnect-hub"){s.runtimeModalOpen=!1,q({type:"refresh"}),k.postMessage({type:"reconnectHub"});return}if(o==="restart-backend"){s.runtimeModalOpen=!1,q({type:"refresh"}),k.postMessage({type:"restartBackend"});return}if(o==="select-color-tag"){const c=n.dataset.color||"";s.editColorTag=s.editColorTag===c?"":c,g();return}if(o==="select-edit-group"){const c=n.dataset.group||"";s.editGroup=s.editGroup===c?"":c,g();return}if(o==="open-custom-group"){s.customGroupInputOpen=!0,s.customGroupInputValue="",g(),setTimeout(()=>{const c=document.getElementById("custom-group-input");c&&c.focus()},20);return}if(o==="cancel-custom-group"){s.customGroupInputOpen=!1,s.customGroupInputValue="",g();return}if(o==="confirm-custom-group"){const c=document.getElementById("custom-group-input"),r=(c?c.value:s.customGroupInputValue||"").trim();r&&(s.editGroup=r),s.customGroupInputOpen=!1,s.customGroupInputValue="",g();return}if(o==="set-group-filter"){s.groupFilter=n.dataset.group||"all",g();return}if(o==="export-quota-analytics"){k.postMessage({type:"exportQuotaAnalytics"});return}if(o==="edit-label"){f()||ze(d);return}if(o==="cancel-label"){he();return}if(o==="save-label"){f()||fe(d);return}if(o==="active-locked-remove"){H(a("cannotRemoveActive"),"warning");return}if(o==="remove-account"){const c=O(d);if(c&&!f()){const r=h(l.current?.email);if(r&&h(c.email)===r){H(a("cannotRemoveActive"),"warning");return}s.removeCandidate=c,g()}return}if(o==="cancel-remove"){if(n.classList.contains("dialog-backdrop")&&i!==n)return;s.removeCandidate=null,g();return}if(o==="confirm-remove"){const c=s.removeCandidate;if(c&&!f()){const r=h(l.current?.email);if(r&&h(c.email)===r){s.removeCandidate=null,g(),H(a("cannotRemoveActive"),"warning");return}q({type:"remove",email:c.email}),k.postMessage({type:"removeAccount",email:c.email})}return}if(o==="switch"){const c=O(d);c&&!f()&&(s.switchCandidate=c,g());return}if(o==="cancel-switch"){if(n.classList.contains("dialog-backdrop")&&i!==n)return;s.switchCandidate=null,g();return}if(o==="confirm-switch"){const c=s.switchCandidate;s.switchCandidate=null,c&&!f()&&(s.quotaMatrixOpen=!1,q({type:"switch",email:c.email}),k.postMessage({type:"switchAccount",account:c})),g();return}if(f())return;const u={add:"addAccount",save:"saveCurrent",refresh:"refresh",reauth:"reauth",signout:"signout","restart-backend":"restartBackend"};u[o]&&(q({type:{add:"add",save:"save",refresh:"refresh",reauth:"reauth",signout:"signout","restart-backend":"refresh"}[o]}),k.postMessage({type:u[o]}))}),window.addEventListener("keydown",e=>{if(e.key==="Escape"){if(s.quotaMatrixOpen){s.quotaMatrixOpen=!1,g();return}if(s.runtimeModalOpen){s.runtimeModalOpen=!1,g();return}if(s.switchCandidate){s.switchCandidate=null,g();return}if(s.removeCandidate){s.removeCandidate=null,g();return}if(s.settingsOpen){Y();return}if(s.editingEmail&&!S){he();return}M&&!S&&(M=null,T&&(clearTimeout(T),T=null),g());return}if(e.key==="Enter"&&s.editingEmail&&!S){const i=document.activeElement;i instanceof HTMLInputElement&&i.dataset.role==="label-input"&&(e.preventDefault(),fe(s.editingEmail))}}),R.addEventListener("click",e=>{const i=e.target;if(!(i instanceof Element))return;const n=i.closest("[data-external-url]");if(!n)return;e.preventDefault();const o=n.dataset.externalUrl;o&&k.postMessage({type:"openExternal",url:o})}),window.addEventListener("message",e=>{const i=e.data;if(!i)return;if(i.type==="openSettings"){be();return}if(i.type==="openQuotaMatrix"){s.quotaMatrixOpen=!0,g();return}if(i.type==="playChime"){I(i.chime);return}if(i.type!=="state")return;const n=S;if(l=i.state,B(),Se(),n?.type==="remove"){s.removeCandidate=null,H(a("accountRemoved"),"success");return}if(n?.type==="label"){s.editingEmail=null,s.editValue="",H(a("labelUpdated"),"success");return}if(n?.type==="settings"){s.settingsOpen=!1,s.settingsDraft=null,H(a("settingsSaved"),"success");return}if(n&&n.type!=="refresh"){H(a("stateUpdated"),"success");return}g()}),window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{l.preferences?.theme==="system"&&ee()}),window.setInterval(()=>{oe()},3e4),g(),k.postMessage({type:"ready"})})();function enhanceSavedQuotaMetrics(k=document){const R=k.querySelectorAll(".saved-account-quota-area");for(const $ of R){const l=$.querySelectorAll([".saved-family-metric",".saved-usage-metric",".saved-quota-metric",".saved-metric-row",".saved-usage-row"].join(","));for(const s of l){const S=s.querySelector(".saved-quota-main"),M=s.querySelector(".saved-quota-value");if(!S||!M)continue;const T=M.textContent?.trim()??"",Q=T.match(/(-?\d+(?:\.\d+)?)\s*%/);if(!Q)continue;const E=Number(Q[1]);if(!Number.isFinite(E))continue;const a=Math.max(0,Math.min(100,E));let t=s.querySelector(":scope > .saved-quota-progress");if(!t){t=document.createElement("div"),t.className="saved-quota-progress",t.setAttribute("aria-hidden","true");const I=document.createElement("span");I.className="saved-quota-progress-fill",t.append(I),S.insertAdjacentElement("afterend",t)}t.style.setProperty("--saved-quota-percent",`${a}%`);let v=s.querySelector(":scope > .saved-quota-remaining");v||(v=document.createElement("div"),v.className="saved-quota-remaining",t.insertAdjacentElement("afterend",v)),v.textContent=`${T} remaining`;const h=s.querySelector([".saved-quota-reset",".saved-usage-reset",".saved-metric-reset"].join(","));if(h){const I=h.textContent?.trim()??"";h.textContent=I.replace(/^Resets\s+in\s+/i,"Reset ").replace(/^Reset\s+in\s+/i,"Reset ")}}}}let savedQuotaEnhancementQueued=!1;function queueSavedQuotaEnhancement(){savedQuotaEnhancementQueued||(savedQuotaEnhancementQueued=!0,queueMicrotask(()=>{savedQuotaEnhancementQueued=!1,enhanceSavedQuotaMetrics(document)}))}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",()=>{enhanceSavedQuotaMetrics(document)},{once:!0}):enhanceSavedQuotaMetrics(document);const savedQuotaObserver=new MutationObserver(()=>{queueSavedQuotaEnhancement()});savedQuotaObserver.observe(document.documentElement,{childList:!0,subtree:!0});

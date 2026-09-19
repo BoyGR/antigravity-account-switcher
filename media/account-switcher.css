@@ -1378,6 +1378,24 @@ a {
     font-weight: 700;
 }
 
+.switch-symbol {
+    display: grid;
+    place-items: center;
+    width: 23px;
+    height: 23px;
+    border:
+        1px solid
+        color-mix(
+            in srgb,
+            var(--ag-focus) 55%,
+            var(--ag-border)
+        );
+    border-radius: 50%;
+    color: var(--ag-focus);
+    font-size: 12px;
+    font-weight: 700;
+}
+
 .confirm-account-name {
     margin-top: 5px;
     overflow: hidden;
@@ -1693,7 +1711,8 @@ a {
         background: ButtonFace;
     }
 
-    .danger-symbol {
+    .danger-symbol,
+    .switch-symbol {
         border-color: CanvasText;
         color: CanvasText;
     }
