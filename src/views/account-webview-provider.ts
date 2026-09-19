@@ -687,7 +687,7 @@ export class AntigravityAccountWebviewProvider
                     ),
 
                 developer:
-                    "Boy Gilang Ramadhan",
+                    "Boy Gilang Ramadhan (BoyGR)",
 
                 website:
                     "https://boygr.com",

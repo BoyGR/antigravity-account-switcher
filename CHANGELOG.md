@@ -2,6 +2,19 @@
 
 All notable changes to the **Antigravity Account Switcher** extension will be documented in this file.
 
+## [1.4.6] - 2026-09-19
+
+### Added & Improved
+- **Settings Reset to Default**:
+  - Added a dedicated "Reset to Default" (`Atur Ulang ke Default`) action button in the Settings modal footer.
+  - Instantly resets all draft configuration preferences back to initial defaults with a visual confirmation notice prior to saving.
+  - Full bilingual localization support across English (EN) and Indonesian (ID).
+- **Developer Attribution & Direct Link**:
+  - Updated developer branding in the persistent sidebar footer and About view to `Boy Gilang Ramadhan (BoyGR)`.
+  - Configured full interactive hyperlink opening `https://boygr.com` directly via native VS Code environment handler.
+
+---
+
 ## [1.4.5] - 2026-09-19
 
 ### Added & Improved

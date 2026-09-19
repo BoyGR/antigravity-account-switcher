@@ -48,8 +48,8 @@
         vaultedEmails: [],
 
         meta: {
-            version: "1.4.1",
-            developer: "Boy Gilang Ramadhan",
+            version: "1.4.6",
+            developer: "Boy Gilang Ramadhan (BoyGR)",
             website: "https://boygr.com",
             iconUri: "",
         },
@@ -419,6 +419,12 @@
 
             settingsHint:
                 "Changes apply only after Save.",
+
+            resetToDefault:
+                "Reset to Default",
+
+            resetSettingsNotice:
+                "Settings reset to default values. Click Save to apply.",
 
             googleExtension:
                 "Google Extension",
@@ -994,6 +1000,12 @@
 
             settingsHint:
                 "Perubahan baru diterapkan setelah Simpan.",
+
+            resetToDefault:
+                "Atur Ulang ke Default",
+
+            resetSettingsNotice:
+                "Pengaturan dikembalikan ke nilai default. Klik Simpan untuk menerapkan.",
 
             googleExtension:
                 "Ekstensi Google",
@@ -5275,7 +5287,7 @@
                                 </span>
 
                                 <strong>
-                                    ${escapeHtml(state.meta?.developer || "Boy Gilang Ramadhan")}
+                                    ${escapeHtml(state.meta?.developer || "Boy Gilang Ramadhan (BoyGR)")}
                                 </strong>
                             </div>
 
@@ -5301,20 +5313,31 @@
                     <footer class="settings-footer">
                         <button
                             type="button"
-                            class="btn"
-                            data-action="cancel-settings"
+                            class="btn btn-reset"
+                            data-action="reset-settings"
+                            title="${escapeHtml(t("resetToDefault"))}"
                         >
-                            ${escapeHtml(t("cancel"))}
+                            ${escapeHtml(t("resetToDefault"))}
                         </button>
 
-                        <button
-                            type="button"
-                            class="btn primary"
-                            data-action="save-settings"
-                            ${isBusy() ? "disabled" : ""}
-                        >
-                            ${escapeHtml(t("save"))}
-                        </button>
+                        <div class="settings-footer-actions">
+                            <button
+                                type="button"
+                                class="btn"
+                                data-action="cancel-settings"
+                            >
+                                ${escapeHtml(t("cancel"))}
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn primary"
+                                data-action="save-settings"
+                                ${isBusy() ? "disabled" : ""}
+                            >
+                                ${escapeHtml(t("save"))}
+                            </button>
+                        </div>
                     </footer>
                 </section>
             </div>
@@ -5351,7 +5374,7 @@
 
         const developer =
             meta.developer ||
-            "Boy Gilang Ramadhan";
+            "Boy Gilang Ramadhan (BoyGR)";
 
         const website =
             meta.website ||
@@ -5765,6 +5788,30 @@
         render();
     }
 
+    function resetSettingsToDefault() {
+        ui.settingsDraft = {
+            theme: "vscode",
+            language: "auto",
+            hideCurrent: false,
+            hideSaved: false,
+            hideRuntime: false,
+            showQuotaAnalytics: false,
+            autoRefreshIntervalMinutes: 5,
+            enableLowQuotaReminder: true,
+            lowQuotaThresholdPercent: 20,
+            smartQuotaFallback: true,
+            autoRoundRobin: false,
+            enableQuotaAudio: true,
+            enableInstantSwitch: true,
+            proxyMode: "system",
+            proxyUrl: "",
+            proxyStrictSSL: true,
+        };
+
+        showFeedback(t("resetSettingsNotice"), "info");
+        render();
+    }
+
     function cancelSettings() {
         ui.settingsOpen =
             false;
@@ -6021,6 +6068,14 @@
                 rawTarget === target
             ) {
                 cancelSettings();
+                return;
+            }
+
+            if (
+                action ===
+                    "reset-settings"
+            ) {
+                resetSettingsToDefault();
                 return;
             }
 

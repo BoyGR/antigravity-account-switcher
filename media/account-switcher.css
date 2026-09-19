@@ -1273,12 +1273,31 @@ a {
 
 .settings-footer {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     gap: 6px;
     padding:
         9px
         11px;
     border-top: 1px solid var(--ag-border);
+}
+
+.settings-footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.settings-footer .btn-reset {
+    background: transparent;
+    color: var(--ag-muted);
+    border-color: var(--ag-border);
+}
+
+.settings-footer .btn-reset:hover {
+    color: var(--vscode-foreground);
+    background: var(--ag-hover);
+    border-color: var(--vscode-focusBorder, var(--ag-accent));
 }
 
 .about-group {
