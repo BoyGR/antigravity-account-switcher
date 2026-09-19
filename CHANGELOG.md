@@ -2,6 +2,16 @@
 
 All notable changes to the **Antigravity Account Switcher** extension will be documented in this file.
 
+## [1.4.7] - 2026-09-20
+
+### Improved
+- **About Section Icon Centering**:
+  - Applied proper flexbox-based centering (`display: flex; flex-direction: column; align-items: center`) to the `.about-group` container in Settings modal.
+  - Icon/logo now horizontally centered within the About section, consistent with the `antigravity-conversation-manager` project pattern.
+  - `.about-group > h3` and `.about-row` retain full-width alignment so labels and values remain correctly laid out.
+
+---
+
 ## [1.4.6] - 2026-09-19
 
 ### Added & Improved
