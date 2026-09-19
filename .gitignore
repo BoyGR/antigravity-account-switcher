@@ -10,8 +10,8 @@ release/
 .env
 .env.*
 
+dist/
 out/
-dist/**/*.map
 
 # Internal private workspace (docs, operational artifacts, private notes)
 .bgr/
