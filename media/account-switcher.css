@@ -5046,8 +5046,11 @@ main {
     box-shadow: 0 0 4px color-mix(in srgb, var(--ag-error) 45%, transparent);
 }
 
-.runtime-status-pill.checking .status-dot {
+.runtime-status-pill.checking .status-dot,
+.runtime-status-pill.connecting .status-dot {
     background-color: var(--ag-warning, #f59e0b);
+    animation: pulseGlow 1.6s ease-in-out infinite;
+    box-shadow: 0 0 4px color-mix(in srgb, var(--ag-warning, #f59e0b) 45%, transparent);
 }
 
 .runtime-status-pill-label {
@@ -5296,6 +5299,11 @@ body {
     background: var(--ag-hover);
     border-color: var(--ag-focus);
     color: var(--ag-focus);
+}
+
+.saved-rail-badge.switch-badge-btn.waiting-connection {
+    opacity: 0.65;
+    cursor: wait !important;
 }
 
 .saved-rail-badge .badge-icon {
@@ -6568,6 +6576,99 @@ body {
     align-items: center;
     gap: 8px;
 }
+
+/* Connecting State Panel & Pulse Animations */
+@keyframes pulseGlow {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.35;
+        transform: scale(0.85);
+    }
+}
+
+@keyframes connectingPulse {
+    0% {
+        transform: translateX(-100%);
+    }
+    50% {
+        transform: translateX(30%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.current-state-panel.connecting {
+    display: flex;
+    flex-direction: column;
+    padding: 14px 12px;
+    border: 1px solid var(--ag-border);
+    border-radius: 8px;
+    background: var(--ag-raised);
+    margin: 4px 0;
+}
+
+.connecting-header-row {
+    margin-bottom: 6px;
+}
+
+.connection-state.connecting .status-dot.pulsing {
+    background: var(--ag-warning, #f59e0b);
+    animation: pulseGlow 1.6s ease-in-out infinite;
+    box-shadow: 0 0 6px color-mix(in srgb, var(--ag-warning, #f59e0b) 50%, transparent);
+}
+
+.connection-state.inline.connecting {
+    color: var(--ag-warning, #f59e0b);
+    font-weight: 500;
+}
+
+.connecting-title {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--ag-fg);
+    margin-bottom: 4px;
+}
+
+.connecting-desc {
+    font-size: 10px;
+    line-height: 1.4;
+    color: var(--ag-muted);
+    margin-bottom: 10px;
+}
+
+.connecting-pulse-container {
+    width: 100%;
+    height: 4px;
+    background: var(--ag-border);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 12px;
+}
+
+.connecting-pulse-bar {
+    width: 45%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--ag-focus, #3b82f6), transparent);
+    border-radius: 2px;
+    animation: connectingPulse 1.8s ease-in-out infinite;
+}
+
+.connecting-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.connection-state.error-state .status-dot.error {
+    background: var(--ag-error, #ef4444);
+    box-shadow: 0 0 4px color-mix(in srgb, var(--ag-error, #ef4444) 45%, transparent);
+}
+
 
 
 

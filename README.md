@@ -14,7 +14,7 @@ An extension for Visual Studio Code, Google Antigravity Standalone IDE, Cursor, 
 
 ### Status
 
-- **Version**: `1.4.2`
+- **Version**: `1.4.3`
 
 - **Supported Platforms**: Windows (with Instant Token Swapping), macOS, Linux
 - **Supported IDEs**: Visual Studio Code, Google Antigravity Standalone IDE, Cursor, and other VS Code-compatible editors
@@ -235,7 +235,7 @@ Customize behavior via your IDE Settings (`settings.json`):
 
 ### From GitHub Releases / VSIX Package
 
-1. Download the latest `antigravity-account-switcher-1.4.2.vsix` from [GitHub Releases](https://github.com/BoyGR/antigravity-account-switcher/releases).
+1. Download the latest `antigravity-account-switcher-1.4.3.vsix` from [GitHub Releases](https://github.com/BoyGR/antigravity-account-switcher/releases).
 
 2. **Via Graphical Interface (VS Code, Antigravity IDE, or Cursor)**:
    - Open **Extensions** (`Ctrl+Shift+X` / `Cmd+Shift+X`).
@@ -246,15 +246,15 @@ Customize behavior via your IDE Settings (`settings.json`):
 3. **Via Terminal / Command Line**:
    - **Visual Studio Code**:
      ```powershell
-     code --install-extension antigravity-account-switcher-1.4.2.vsix
+     code --install-extension antigravity-account-switcher-1.4.3.vsix
      ```
    - **Google Antigravity Standalone IDE**:
      ```powershell
-     antigravity --install-extension antigravity-account-switcher-1.4.2.vsix
+     antigravity --install-extension antigravity-account-switcher-1.4.3.vsix
      ```
    - **Cursor**:
      ```powershell
-     cursor --install-extension antigravity-account-switcher-1.4.2.vsix
+     cursor --install-extension antigravity-account-switcher-1.4.3.vsix
      ```
 
 

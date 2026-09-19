@@ -191,9 +191,19 @@ interface AccountSwitcherSnapshot {
 
     isVaultSupported?: boolean;
 }
+
+export type AntigravityConnectionState =
+    | "connecting"
+    | "connected"
+    | "disconnected"
+    | "not_installed"
+    | "offline";
+
 interface AccountSwitcherViewState
     extends AccountSwitcherSnapshot {
     loading: boolean;
+
+    connectionState: AntigravityConnectionState;
 
     preferences: ResolvedAccountSwitcherPreferences;
 
@@ -242,6 +252,8 @@ export class AntigravityAccountWebviewProvider
     private retryTimer?: ReturnType<typeof setTimeout>;
 
     private retryIndex = 0;
+
+    private isProbing = false;
 
     private quotaMonitor?: QuotaMonitorService;
 
@@ -430,6 +442,7 @@ export class AntigravityAccountWebviewProvider
     async refresh(background = false): Promise<void> {
         this.resetRetry();
         this.quotaMonitor?.clearDeduplicationCache();
+        this.isProbing = true;
 
         if (!background) {
             await this.postState(true);
@@ -442,6 +455,9 @@ export class AntigravityAccountWebviewProvider
 
         if (!success && !background) {
             this.scheduleRetry();
+        } else {
+            this.isProbing = false;
+            await this.postState(false);
         }
     }
 
@@ -614,6 +630,38 @@ export class AntigravityAccountWebviewProvider
 
         return success;
     }
+    private resolveConnectionState(loading: boolean): AntigravityConnectionState {
+        if (this.snapshot.current) {
+            return "connected";
+        }
+
+        const extension = this.snapshot.runtime?.extension;
+        if (extension && !extension.installed) {
+            return "not_installed";
+        }
+
+        const process = this.snapshot.runtime?.process;
+        const reachable = this.snapshot.runtime?.health?.reachable;
+        const isRetrying =
+            Boolean(this.retryTimer) ||
+            (this.retryIndex > 0 && this.retryIndex < this.retryDelaysMs.length);
+
+        if (
+            loading ||
+            this.isProbing ||
+            isRetrying ||
+            (extension?.installed && !reachable && this.retryIndex < this.retryDelaysMs.length)
+        ) {
+            return "connecting";
+        }
+
+        if (reachable) {
+            return "disconnected";
+        }
+
+        return "offline";
+    }
+
     private async postState(
         loading: boolean,
     ): Promise<void> {
@@ -623,6 +671,7 @@ export class AntigravityAccountWebviewProvider
 
         const state: AccountSwitcherViewState = {
             loading,
+            connectionState: this.resolveConnectionState(loading),
             ...this.snapshot,
             accounts:
                 this.snapshot.accounts.length > 0
@@ -689,6 +738,8 @@ export class AntigravityAccountWebviewProvider
         );
     }
     private cancelRetry(): void {
+        this.isProbing = false;
+
         if (!this.retryTimer) {
             return;
         }
@@ -748,10 +799,16 @@ export class AntigravityAccountWebviewProvider
 
         if (success) {
             this.cancelRetry();
+            await this.postState(false);
             return;
         }
 
-        this.scheduleRetry();
+        if (hasMoreRetries) {
+            this.scheduleRetry();
+        } else {
+            this.isProbing = false;
+            await this.postState(false);
+        }
     }
 
     private async handleMessage(
@@ -759,6 +816,7 @@ export class AntigravityAccountWebviewProvider
     ): Promise<void> {
         switch (message.type) {
             case "ready":
+                this.isProbing = this.snapshot.current === undefined;
                 await this.postState(false);
                 void this.refresh(this.snapshot.current !== undefined);
                 return;

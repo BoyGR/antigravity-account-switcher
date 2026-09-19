@@ -237,6 +237,30 @@
             signInGoogle:
                 "Sign In with Google",
 
+            connecting:
+                "Connecting…",
+
+            connectingToAntigravity:
+                "Connecting to Google Antigravity",
+
+            connectingToAntigravityHint:
+                "Establishing connection to Google servers. Your active account and quotas will load automatically.",
+
+            waitingForConnection:
+                "Waiting for Google Antigravity connection before switching accounts…",
+
+            antigravityOffline:
+                "Antigravity Offline",
+
+            antigravityOfflineHint:
+                "Unable to connect to the Antigravity backend service.",
+
+            antigravityNotInstalled:
+                "Not Installed",
+
+            antigravityNotInstalledHint:
+                "Official Google Antigravity extension is not installed.",
+
             noMatches:
                 "No matching accounts",
 
@@ -778,6 +802,30 @@
 
             signInGoogle:
                 "Masuk dengan Google",
+
+            connecting:
+                "Menghubungkan…",
+
+            connectingToAntigravity:
+                "Menghubungkan ke Google Antigravity",
+
+            connectingToAntigravityHint:
+                "Sedang menyambungkan ke server Google. Akun aktif dan kuota Anda akan dimuat secara otomatis.",
+
+            waitingForConnection:
+                "Menunggu koneksi Google Antigravity siap sebelum dapat berpindah akun…",
+
+            antigravityOffline:
+                "Antigravity Offline",
+
+            antigravityOfflineHint:
+                "Tidak dapat terhubung ke layanan backend Antigravity.",
+
+            antigravityNotInstalled:
+                "Belum Terpasang",
+
+            antigravityNotInstalledHint:
+                "Ekstensi resmi Google Antigravity belum terpasang.",
 
             noMatches:
                 "Tidak ada akun yang cocok",
@@ -3050,23 +3098,141 @@
         `;
 
         if (!state.current) {
-            if (checking) {
+            const conn =
+                state.connectionState ||
+                (checking ? "connecting" : "disconnected");
+
+            if (conn === "connecting" || checking) {
                 return `
                     <section class="section current-section">
                         ${header}
 
                         <div
-                            class="current-state-panel checking"
+                            class="current-state-panel connecting"
                             role="status"
                             aria-live="polite"
                         >
-                            <div class="saved-loading-spinner-row" style="margin-bottom: 4px;">
-                                <span class="loading-spin-icon">${icon("refresh")}</span>
-                                <strong>${escapeHtml(t("loadingAccount"))}</strong>
+                            <div class="connecting-header-row">
+                                <span class="connection-state inline connecting">
+                                    <span class="status-dot pulsing"></span>
+                                    ${escapeHtml(t("connecting"))}
+                                </span>
                             </div>
 
-                            <div class="secondary-text">
-                                ${escapeHtml(t("checkingAccount"))}
+                            <strong class="connecting-title">
+                                ${escapeHtml(t("connectingToAntigravity"))}
+                            </strong>
+
+                            <div class="secondary-text connecting-desc">
+                                ${escapeHtml(t("connectingToAntigravityHint"))}
+                            </div>
+
+                            <div class="connecting-pulse-container" aria-hidden="true">
+                                <div class="connecting-pulse-bar"></div>
+                            </div>
+
+                            <div class="connecting-actions">
+                                <button
+                                    type="button"
+                                    class="btn secondary-btn compact"
+                                    data-action="refresh"
+                                    ${isBusy() ? "disabled" : ""}
+                                >
+                                    ${icon("refresh")}
+                                    <span>${escapeHtml(t("refresh"))}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+                `;
+            }
+
+            if (conn === "not_installed") {
+                return `
+                    <section class="section current-section">
+                        ${header}
+
+                        <div
+                            class="current-state-panel empty-disconnected not-installed"
+                            role="region"
+                            aria-label="${escapeHtml(t("antigravityNotInstalled"))}"
+                        >
+                            <div class="disconnected-header-row">
+                                <span class="connection-state inline disconnected">
+                                    <span class="status-dot"></span>
+                                    ${escapeHtml(t("antigravityNotInstalled"))}
+                                </span>
+                            </div>
+
+                            <strong class="disconnected-title">
+                                ${escapeHtml(t("antigravityNotInstalled"))}
+                            </strong>
+
+                            <div class="secondary-text disconnected-desc">
+                                ${escapeHtml(t("antigravityNotInstalledHint"))}
+                            </div>
+
+                            <div class="disconnected-actions">
+                                <button
+                                    type="button"
+                                    class="btn secondary-btn compact"
+                                    data-action="refresh"
+                                    ${isBusy() ? "disabled" : ""}
+                                >
+                                    ${icon("refresh")}
+                                    <span>${escapeHtml(t("refresh"))}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+                `;
+            }
+
+            if (conn === "offline") {
+                return `
+                    <section class="section current-section">
+                        ${header}
+
+                        <div
+                            class="current-state-panel empty-disconnected offline"
+                            role="region"
+                            aria-label="${escapeHtml(t("antigravityOffline"))}"
+                        >
+                            <div class="disconnected-header-row">
+                                <span class="connection-state inline disconnected error-state">
+                                    <span class="status-dot error"></span>
+                                    ${escapeHtml(t("antigravityOffline"))}
+                                </span>
+                            </div>
+
+                            <strong class="disconnected-title">
+                                ${escapeHtml(t("antigravityOffline"))}
+                            </strong>
+
+                            <div class="secondary-text disconnected-desc">
+                                ${escapeHtml(t("antigravityOfflineHint"))}
+                            </div>
+
+                            <div class="disconnected-actions">
+                                <button
+                                    type="button"
+                                    class="btn primary-btn empty-cta-btn"
+                                    data-action="restart-backend"
+                                    ${isBusy() ? "disabled" : ""}
+                                >
+                                    ${icon("refresh")}
+                                    <span>${escapeHtml(t("restartBackend"))}</span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn secondary-btn compact"
+                                    data-action="refresh"
+                                    ${isBusy() ? "disabled" : ""}
+                                >
+                                    ${icon("refresh")}
+                                    <span>${escapeHtml(t("refresh"))}</span>
+                                </button>
                             </div>
                         </div>
                     </section>
@@ -3529,6 +3695,9 @@
                 (!state.accounts || state.accounts.length === 0)
             );
 
+        const isConnecting =
+            state.connectionState === "connecting" || checking;
+
         const snapshot =
             state.usageSnapshots?.[
                 normalizeEmail(
@@ -3613,13 +3782,14 @@
                             : `
                                 <button
                                     type="button"
-                                    class="saved-rail-badge switch-badge-btn"
-                                    data-action="switch"
+                                    class="saved-rail-badge switch-badge-btn ${isConnecting ? "waiting-connection" : ""}"
+                                    data-action="${isConnecting ? "waiting-switch" : "switch"}"
                                     data-email="${escapeHtml(account.email)}"
-                                    title="${escapeHtml(t("switch"))}"
-                                    aria-label="${escapeHtml(t("switch"))}"
+                                    title="${escapeHtml(isConnecting ? t("waitingForConnection") : t("switch"))}"
+                                    aria-label="${escapeHtml(isConnecting ? t("waitingForConnection") : t("switch"))}"
                                     ${
                                         checking ||
+                                        isConnecting ||
                                         isBusy()
                                             ? "disabled"
                                             : ""
@@ -3629,7 +3799,7 @@
                                         class="badge-icon"
                                         aria-hidden="true"
                                     >
-                                        ⇄
+                                        ${isConnecting ? "⏳" : "⇄"}
                                     </span>
                                     <span>${escapeHtml(t("switch"))}</span>
                                 </button>
@@ -4082,23 +4252,32 @@
             processHealthy &&
             hubHealthy;
 
-        const summaryKind =
-            checking
-                ? "checking"
-                : (
-                    allHealthy
-                        ? "healthy"
-                        : "warning"
-                );
+        const conn =
+            state.connectionState ||
+            (checking ? "connecting" : (allHealthy ? "connected" : "offline"));
 
-        const summaryText =
-            checking
-                ? t("checking")
-                : (
-                    allHealthy
-                        ? t("ready")
-                        : t("disconnected")
-                );
+        let summaryKind = "healthy";
+        let summaryText = t("ready");
+
+        if (conn === "connecting" || checking) {
+            summaryKind = "connecting";
+            summaryText = t("connecting");
+        } else if (conn === "not_installed") {
+            summaryKind = "warning";
+            summaryText = t("antigravityNotInstalled");
+        } else if (conn === "offline") {
+            summaryKind = "warning";
+            summaryText = t("antigravityOffline");
+        } else if (conn === "disconnected") {
+            summaryKind = "healthy";
+            summaryText = t("ready");
+        } else if (conn === "connected" || allHealthy) {
+            summaryKind = "healthy";
+            summaryText = t("ready");
+        } else {
+            summaryKind = "warning";
+            summaryText = t("disconnected");
+        }
 
         return `
             <div class="runtime-status-bar">
@@ -6093,10 +6272,20 @@
                 return;
             }
 
+            if (action === "waiting-switch") {
+                showFeedback(t("waitingForConnection"), "info");
+                return;
+            }
+
             if (
                 action ===
                     "switch"
             ) {
+                if (state.connectionState === "connecting" || checking) {
+                    showFeedback(t("waitingForConnection"), "info");
+                    return;
+                }
+
                 const account =
                     findAccount(
                         email
@@ -6136,6 +6325,9 @@
 
                 signout:
                     "signout",
+
+                "restart-backend":
+                    "restartBackend",
             };
 
             if (
@@ -6156,6 +6348,9 @@
 
                     signout:
                         "signout",
+
+                    "restart-backend":
+                        "refresh",
                 };
 
                 setOperation({

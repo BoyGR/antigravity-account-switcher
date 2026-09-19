@@ -2,6 +2,17 @@
 
 All notable changes to the **Antigravity Account Switcher** extension will be documented in this file.
 
+## [1.4.3] - 2026-09-19
+
+### Added & Improved
+- **Friendly Connecting State UX & Connection Lifecycle**:
+  - Introduced an explicit `AntigravityConnectionState` (`connecting`, `connected`, `disconnected`, `not_installed`, `offline`) to accurately track the Antigravity extension startup and handshake lifecycle.
+  - **Runtime Status Bar**: Replaced premature `Unavailable` warning pills with an animated amber pulsing dot and `Connecting...` (`Menghubungkan...`) during startup, probe, and retry periods.
+  - **Current Account Card**: Replaced confusing `No Account Connected - Sign In with Google` panels with a dedicated **Connecting to Google Antigravity** state card featuring a smooth animated shimmer bar, informative hints, and a quick `Refresh` button while the backend language server establishes its session.
+  - **Safe Account Switching Protection**: Saved Accounts `Switch` buttons now display a temporary `Waiting` state (`⏳ Switch` with tooltip *"Waiting for Google Antigravity connection before switching accounts..."*) to prevent broken switches or race conditions during startup.
+  - **Distinct Offline & Missing Extension States**: Structured specific panels for `not_installed` and `offline` scenarios with direct `Restart Backend` and `Refresh` recovery triggers.
+  - Complete bilingual support across English (EN) and Indonesian (ID).
+
 ---
 
 ## [1.4.2] - 2026-09-17
