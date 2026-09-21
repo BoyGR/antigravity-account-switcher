@@ -163,7 +163,13 @@ export class QuotaMonitorService implements vscode.Disposable {
                 Math.min(100, Math.round(bucket.remainingFraction * 100)),
             );
 
-            const bucketIdentifier = bucket.displayName || bucket.bucketId || "Quota";
+            const baseBucketName = bucket.displayName || bucket.bucketId || "Quota";
+            const modelGroupPrefix =
+                bucket.groupDisplayName &&
+                !baseBucketName.toLowerCase().includes(bucket.groupDisplayName.toLowerCase())
+                    ? `[${bucket.groupDisplayName}] `
+                    : "";
+            const bucketIdentifier = `${modelGroupPrefix}${baseBucketName}`;
             const resetKey = bucket.resetTime || "ongoing";
             const dedupKey = `${email.toLowerCase()}:${bucketIdentifier}:${resetKey}`;
 
@@ -320,7 +326,7 @@ export class QuotaMonitorService implements vscode.Disposable {
                     );
                     const candidateName = bestCandidate.label || bestCandidate.email;
                     void vscode.window.showInformationMessage(
-                        `⚡ Auto-Round-Robin: Rotated Antigravity account to ${candidateName} (${bestCandidate.percent}% available).`,
+                        `Auto-Round-Robin: Rotated Antigravity account to ${candidateName} (${bestCandidate.percent}% available).`,
                     );
                     if (this.config.enableQuotaAudio !== false && this.onAudioChime) {
                         void this.onAudioChime("warning");
@@ -329,7 +335,7 @@ export class QuotaMonitorService implements vscode.Disposable {
                 }
             }
             const candidateName = bestCandidate.label || bestCandidate.email;
-            const alertMsg = `⚡ Antigravity Rate Limit: Quota is exhausted (0%) for ${email}! Switch to ${candidateName} (${bestCandidate.percent}% available)?`;
+            const alertMsg = `Antigravity Rate Limit: ${bucketIdentifier} (${windowLabel}) is exhausted (0%) for ${email}! Switch to ${candidateName} (${bestCandidate.percent}% available)?`;
             const switchBtn = `Switch Now (${candidateName})`;
 
             void vscode.window
@@ -357,7 +363,7 @@ export class QuotaMonitorService implements vscode.Disposable {
         } else {
             void vscode.window
                 .showErrorMessage(
-                    `⚡ Antigravity Rate Limit: ${bucketIdentifier} (${windowLabel}) is exhausted (0% remaining).`,
+                    `Antigravity Rate Limit: ${bucketIdentifier} (${windowLabel}) is exhausted (0% remaining).`,
                     "Add Google Account",
                     "Dismiss",
                 )

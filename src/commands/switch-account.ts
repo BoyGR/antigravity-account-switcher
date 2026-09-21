@@ -67,7 +67,7 @@ export function registerSwitchAccountCommand(
                                     : account.email,
                                 description: [
                                     isCurrent ? "(Active)" : undefined,
-                                    isVaulted ? "⚡ Instant" : undefined,
+                                    isVaulted ? "Instant" : undefined,
                                 ].filter(Boolean).join(" · ") || undefined,
                                 account: {
                                     email: account.email,
@@ -132,7 +132,7 @@ export function registerSwitchAccountCommand(
                         {
                             location: vscode.ProgressLocation.Notification,
                             title: canInstantSwitch
-                                ? `⚡ Switching to ${displayName} instantly...`
+                                ? `Switching to ${displayName} instantly...`
                                 : `Switching to ${displayName}...`,
                             cancellable: false,
                         },
@@ -161,7 +161,7 @@ export function registerSwitchAccountCommand(
                         );
                     } else if (result.swappedInstantly) {
                         vscode.window.showInformationMessage(
-                            `⚡ Antigravity switched to ${displayName} instantly (no browser login).`,
+                            `Antigravity switched to ${displayName} instantly (no browser login).`,
                         );
                     } else if (syncResult.syncedOfficialPanel) {
                         vscode.window.showInformationMessage(

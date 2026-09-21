@@ -2,6 +2,17 @@
 
 All notable changes to the **Antigravity Account Switcher** extension will be documented in this file.
 
+## [1.4.12] - 2026-09-21
+
+### Added & Improved
+- **Model-Specific Quota Alerts**:
+  - Quota notifications (rate limit exhaustion, low quota warnings, reset alarms) now explicitly specify the affected model family (e.g., `[Claude and GPT]` or `[Gemini]`), eliminating ambiguity when limits are reached.
+  - Enriched quota snapshot bucket normalization with `groupDisplayName` propagated from backend model groups.
+- **Clean & Professional Notification UX**:
+  - Removed `⚡` emoji and unnecessary symbols from user-facing toasts, progress indicators, and QuickPick descriptions for a native, distraction-free IDE experience.
+
+---
+
 ## [1.4.11] - 2026-09-21
 
 ### Added & Improved

@@ -1614,6 +1614,7 @@ interface AntigravityQuotaSummaryEnvelope {
 export interface AntigravityQuotaSummaryBucket {
     bucketId?: string;
     displayName?: string;
+    groupDisplayName?: string;
     description?: string;
 
     /**
@@ -1684,6 +1685,7 @@ function normalizeQuotaSummaryNumber(
 
 function normalizeQuotaSummaryBucket(
     value: unknown,
+    groupDisplayName?: string,
 ): AntigravityQuotaSummaryBucket | undefined {
     if (
         !value ||
@@ -1713,6 +1715,11 @@ function normalizeQuotaSummaryBucket(
         displayName:
             normalizeQuotaSummaryString(
                 bucket.displayName,
+            ),
+
+        groupDisplayName:
+            normalizeQuotaSummaryString(
+                groupDisplayName,
             ),
 
         description:
@@ -1785,7 +1792,10 @@ export async function getAntigravityQuotaSummary(
             )
                 ? response.buckets
                       .map(
-                          normalizeQuotaSummaryBucket,
+                          bucket =>
+                              normalizeQuotaSummaryBucket(
+                                  bucket,
+                              ),
                       )
                       .filter(
                           (
@@ -1802,41 +1812,62 @@ export async function getAntigravityQuotaSummary(
                 response.groups,
             )
                 ? response.groups.map(
-                      group => ({
-                          displayName:
+                      group => {
+                          const groupDisplayName =
                               normalizeQuotaSummaryString(
                                   group.displayName,
-                              ),
+                              );
+                          return {
+                              displayName: groupDisplayName,
 
-                          description:
-                              normalizeQuotaSummaryString(
-                                  group.description,
-                              ),
+                              description:
+                                  normalizeQuotaSummaryString(
+                                      group.description,
+                                  ),
 
-                          buckets:
-                              Array.isArray(
-                                  group.buckets,
-                              )
-                                  ? group.buckets
-                                        .map(
-                                            normalizeQuotaSummaryBucket,
-                                        )
-                                        .filter(
-                                            (
-                                                bucket,
-                                            ): bucket is AntigravityQuotaSummaryBucket =>
-                                                Boolean(
+                              buckets:
+                                  Array.isArray(
+                                      group.buckets,
+                                  )
+                                      ? group.buckets
+                                            .map(
+                                                bucket =>
+                                                    normalizeQuotaSummaryBucket(
+                                                        bucket,
+                                                        groupDisplayName,
+                                                    ),
+                                            )
+                                            .filter(
+                                                (
                                                     bucket,
-                                                ),
-                                        )
-                                  : [],
-                      }),
+                                                ): bucket is AntigravityQuotaSummaryBucket =>
+                                                    Boolean(
+                                                        bucket,
+                                                    ),
+                                            )
+                                      : [],
+                          };
+                      },
                   )
                 : [];
 
         const effectiveBuckets =
             buckets.length > 0
-                ? buckets
+                ? buckets.map(b => {
+                      if (b.groupDisplayName) {
+                          return b;
+                      }
+                      const matchedGroup = groups.find(g =>
+                          g.buckets.some(
+                              gb =>
+                                  (gb.bucketId && gb.bucketId === b.bucketId) ||
+                                  (gb.displayName && gb.displayName === b.displayName),
+                          ),
+                      );
+                      return matchedGroup?.displayName
+                          ? { ...b, groupDisplayName: matchedGroup.displayName }
+                          : b;
+                  })
                 : groups.flatMap(group => group.buckets);
 
         return {
