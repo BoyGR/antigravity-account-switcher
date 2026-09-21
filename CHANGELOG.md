@@ -13,7 +13,6 @@ All notable changes to the **Antigravity Account Switcher** extension will be do
   - Added a warning pill badge (`⚠️ Needs Verification`) on the affected account identity row.
   - Full bilingual localization support across English (EN) and Indonesian (ID).
   - Preserved upstream Connect RPC JSON error details in `invokeConnectJson` for enhanced diagnostics.
-  - Documented operational troubleshooting guide (Issue 5) in `.bgr/docs/03-OPERATIONAL-RUNBOOK.md`.
 
 ---
 
