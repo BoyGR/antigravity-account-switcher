@@ -2,6 +2,17 @@
 
 All notable changes to the **Antigravity Account Switcher** extension will be documented in this file.
 
+## [1.4.11] - 2026-09-21
+
+### Added & Improved
+- **Cross-Platform Support for macOS and Linux (Issue #2, PR #3)**:
+  - Added POSIX `ps -eo pid,command` and `ps -eo pid,ppid,command` process discovery for non-Windows platforms.
+  - Implemented cross-platform listening port discovery in `getAgyListeners` using POSIX `lsof` (`lsof -nP -iTCP -sTCP:LISTEN`) with fallback to `ss -tlnp` on modern Linux systems.
+  - Fully resolved false "Offline" status reporting when running VS Code, Cursor, or Antigravity IDE on macOS and Linux.
+  - Special thanks to `@sid-lakhani` for contributing the initial POSIX process discovery!
+
+---
+
 ## [1.4.10] - 2026-09-21
 
 ### Fixed & Improved

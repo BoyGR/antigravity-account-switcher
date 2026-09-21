@@ -103,7 +103,8 @@ async function detectAgyProcess(): Promise<{
 async function getAgyListeners(
     pid: number
 ): Promise<number[]> {
-    const script = `
+    if (process.platform === 'win32') {
+        const script = `
 Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue |
     Where-Object {
         $_.OwningProcess -eq ${pid}
@@ -113,26 +114,84 @@ Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue |
     ConvertTo-Json -Compress
 `;
 
-    const output = await runPowerShell(script);
+        const output = await runPowerShell(script);
 
-    if (!output) {
-        return [];
+        if (!output) {
+            return [];
+        }
+
+        const listeners =
+            parsePowerShellJson<TcpListenerInfo>(output);
+
+        return [
+            ...new Set(
+                listeners
+                    .map((item) => Number(item.LocalPort))
+                    .filter(
+                        (port) =>
+                            Number.isInteger(port) &&
+                            port > 0
+                    )
+            ),
+        ].sort((a, b) => a - b);
     }
 
-    const listeners =
-        parsePowerShellJson<TcpListenerInfo>(output);
+    // POSIX listener resolution (macOS / Linux)
+    // 1. Try lsof (standard on macOS and most Linux distros)
+    try {
+        const { stdout } = await execFileAsync(
+            'lsof',
+            ['-nP', '-iTCP', '-sTCP:LISTEN', '-a', '-p', String(pid)],
+            { timeout: 4000, maxBuffer: 1024 * 1024 }
+        );
 
-    return [
-        ...new Set(
-            listeners
-                .map((item) => Number(item.LocalPort))
-                .filter(
-                    (port) =>
-                        Number.isInteger(port) &&
-                        port > 0
-                )
-        ),
-    ].sort((a, b) => a - b);
+        const ports: number[] = [];
+        for (const line of stdout.split('\n')) {
+            const match = /(?:[:\]])(\d+)\s+\(LISTEN\)/i.exec(line);
+            if (match) {
+                const port = parseInt(match[1], 10);
+                if (Number.isInteger(port) && port > 0) {
+                    ports.push(port);
+                }
+            }
+        }
+
+        if (ports.length > 0) {
+            return [...new Set(ports)].sort((a, b) => a - b);
+        }
+    } catch {
+        // Fall through to ss if lsof is not available
+    }
+
+    // 2. Try ss (modern Linux systems without lsof)
+    try {
+        const { stdout } = await execFileAsync(
+            'ss',
+            ['-tlnp'],
+            { timeout: 4000, maxBuffer: 1024 * 1024 }
+        );
+
+        const ports: number[] = [];
+        for (const line of stdout.split('\n')) {
+            if (line.includes(`pid=${pid},`) || line.includes(`pid=${pid})`)) {
+                const match = /(?:[:\]])(\d+)\s+/i.exec(line);
+                if (match) {
+                    const port = parseInt(match[1], 10);
+                    if (Number.isInteger(port) && port > 0) {
+                        ports.push(port);
+                    }
+                }
+            }
+        }
+
+        if (ports.length > 0) {
+            return [...new Set(ports)].sort((a, b) => a - b);
+        }
+    } catch {
+        // Ignore and return empty
+    }
+
+    return [];
 }
 
 function requestHttpText(
@@ -447,7 +506,7 @@ if ($processes.Count -eq 0) {
         try {
             const { stdout } = await execFileAsync('ps', ['-eo', 'pid,command'], { timeout: 5000, maxBuffer: 1024 * 1024 });
             const lines = stdout.split('\n');
-            const processes: any[] = [];
+            const processes: AgyProcessInfo[] = [];
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i].trim();
                 const match = line.match(/^(\d+)\s+(.+)$/);

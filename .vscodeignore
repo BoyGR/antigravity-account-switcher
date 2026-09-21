@@ -48,4 +48,5 @@ coverage/**
 .bgr/**
 internal/**
 internal-docs/**
+scratch/**
 PUBLISHING.md
