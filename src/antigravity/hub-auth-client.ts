@@ -423,7 +423,10 @@ function readHasToken(
 }
 
 export async function detectAntigravityBackend(): Promise<AntigravityBackendSession> {
-    const script = `
+    let output = '';
+
+    if (process.platform === 'win32') {
+        const script = `
 $processes = @(
     Get-CimInstance Win32_Process |
         Where-Object {
@@ -439,8 +442,32 @@ if ($processes.Count -eq 0) {
     $processes | ConvertTo-Json -Compress
 }
 `;
-
-    const output = await runPowerShell(script);
+        output = await runPowerShell(script);
+    } else {
+        try {
+            const { stdout } = await execFileAsync('ps', ['-eo', 'pid,command'], { timeout: 5000, maxBuffer: 1024 * 1024 });
+            const lines = stdout.split('\n');
+            const processes: any[] = [];
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                const match = line.match(/^(\d+)\s+(.+)$/);
+                if (match) {
+                    const pid = parseInt(match[1], 10);
+                    const cmd = match[2];
+                    if (cmd.includes('--hub') || cmd.includes('language_server')) {
+                        processes.push({
+                            ProcessId: pid,
+                            Name: cmd.split(' ')[0].split('/').pop() || '',
+                            CommandLine: cmd
+                        });
+                    }
+                }
+            }
+            output = processes.length > 0 ? JSON.stringify(processes) : '';
+        } catch {
+            output = '';
+        }
+    }
 
     if (!output) {
         throw new Error(
