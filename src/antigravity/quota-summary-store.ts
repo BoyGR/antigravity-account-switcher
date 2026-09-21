@@ -236,6 +236,77 @@ export function getAccountRemainingPercent(
 }
 
 /**
+ * Returns a human-friendly quota breakdown per model family (e.g. "Gemini: 100% · Claude: 5%").
+ * If no breakdown is available, falls back to single minimum percentage or undefined.
+ */
+export function getAccountQuotaBreakdown(
+    snapshot?: ManagedAccountUsageSnapshot,
+): string | undefined {
+    if (!snapshot) {
+        return undefined;
+    }
+
+    const modelSummaries: { name: string; percent: number }[] = [];
+
+    if (Array.isArray(snapshot.groups) && snapshot.groups.length > 0) {
+        for (const group of snapshot.groups) {
+            let label = group.displayName?.trim() || "Model";
+            if (/claude/i.test(label)) {
+                label = "Claude";
+            } else if (/gemini/i.test(label)) {
+                label = "Gemini";
+            }
+
+            const activeBuckets = (group.buckets || []).filter(
+                b => typeof b.remainingFraction === "number" && !b.disabled,
+            );
+            if (activeBuckets.length > 0) {
+                let minPct = 100;
+                for (const b of activeBuckets) {
+                    const pct = Math.max(0, Math.min(100, Math.round(b.remainingFraction! * 100)));
+                    if (pct < minPct) {
+                        minPct = pct;
+                    }
+                }
+                modelSummaries.push({ name: label, percent: minPct });
+            }
+        }
+    }
+
+    if (modelSummaries.length === 0) {
+        const buckets = getAllSnapshotBuckets(snapshot);
+        if (buckets.length > 0) {
+            const groupMap = new Map<string, number>();
+            for (const b of buckets) {
+                if (typeof b.remainingFraction === "number" && !b.disabled) {
+                    let label = b.groupDisplayName?.trim() || "Quota";
+                    if (/claude/i.test(label)) {
+                        label = "Claude";
+                    } else if (/gemini/i.test(label)) {
+                        label = "Gemini";
+                    }
+                    const pct = Math.max(0, Math.min(100, Math.round(b.remainingFraction * 100)));
+                    const existing = groupMap.get(label);
+                    if (existing === undefined || pct < existing) {
+                        groupMap.set(label, pct);
+                    }
+                }
+            }
+            for (const [name, percent] of groupMap.entries()) {
+                modelSummaries.push({ name, percent });
+            }
+        }
+    }
+
+    if (modelSummaries.length > 0) {
+        return modelSummaries.map(s => `${s.name}: ${s.percent}%`).join(" · ");
+    }
+
+    const minPct = getAccountRemainingPercent(snapshot);
+    return minPct !== undefined ? `${minPct}% quota` : undefined;
+}
+
+/**
  * Periodically checks saved non-active accounts to see if any quota resetTime has arrived.
  * If resetTime has passed, replenishes the snapshot to full (100%) and clears the reset window,
  * ensuring saved account quota cards stay realistic and up-to-date even without manual switching.

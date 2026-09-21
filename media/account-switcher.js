@@ -2419,7 +2419,7 @@
         } else if (upper.includes("PRO") || isPro) {
             planName = "Google AI Pro";
             planClass = "plan-pro";
-            iconSymbol = "⚡";
+            iconSymbol = "⭐";
         } else if (upper.includes("ENTERPRISE")) {
             planName = "Google AI Enterprise";
             planClass = "plan-pro";

@@ -3,6 +3,7 @@ import * as vscode from "vscode";
 import { getManagedAccounts } from "../antigravity/account-registry";
 import { getAntigravityCurrentAccount } from "../antigravity/hub-auth-client";
 import {
+    getAccountQuotaBreakdown,
     getAccountRemainingPercent,
     getManagedAccountUsageSnapshots,
 } from "../antigravity/quota-summary-store";
@@ -75,11 +76,14 @@ export function registerStatusBarMenuCommand(
                         ? `${acc.label} (${acc.email})`
                         : acc.email;
 
-                    const percent = getAccountRemainingPercent(
-                        usageSnapshots[acc.email.toLowerCase()],
-                    );
-                    const quotaTag =
-                        percent !== undefined ? `$(dashboard) ${percent}% quota` : "";
+                    const snapshot = usageSnapshots[acc.email.toLowerCase()];
+                    const quotaBreakdown = getAccountQuotaBreakdown(snapshot);
+                    const quotaTag = quotaBreakdown
+                        ? `$(dashboard) ${quotaBreakdown}`
+                        : (() => {
+                              const pct = getAccountRemainingPercent(snapshot);
+                              return pct !== undefined ? `$(dashboard) ${pct}% quota` : "";
+                          })();
 
                     const descParts = [
                         isActive ? "Active Account" : undefined,

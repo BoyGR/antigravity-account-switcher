@@ -2,6 +2,17 @@
 
 All notable changes to the **Antigravity Account Switcher** extension will be documented in this file.
 
+## [1.4.13] - 2026-09-21
+
+### Added & Improved
+- **Model-Specific Quota Breakdown in Command Palette**:
+  - Status bar QuickPick menu now displays a clear per-model-family quota breakdown (e.g., `Gemini: 100% · Claude: 5%`) instead of a single ambiguous percentage.
+  - Falls back gracefully to a single percentage if group data is unavailable.
+- **Google AI Pro Plan Badge Icon**:
+  - Updated the Pro plan icon from `⚡` to `⭐` to distinguish it from the Instant Switch badge and harmonize the Google AI plan tier hierarchy: 🌟 Ultra · ⭐ Pro · ✨ Plus · ✦ Free.
+
+---
+
 ## [1.4.12] - 2026-09-21
 
 ### Added & Improved
