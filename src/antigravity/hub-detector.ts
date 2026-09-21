@@ -114,56 +114,99 @@ function parseHubPort(
 export async function detectRunningAgyHub(): Promise<
     AgyProcessInfo | undefined
 > {
-    if (process.platform !== 'win32') {
+    let raw = '';
+
+    if (process.platform === 'win32') {
+        /*
+         * Intentionally avoid PowerShell backtick line
+         * continuations here because this script itself lives
+         * inside a TypeScript template literal.
+         */
+        const ps = [
+            '$processes = @(',
+            '    Get-CimInstance Win32_Process |',
+            "        Where-Object {",
+            "            ($_.Name -ieq 'agy.exe' -and $_.CommandLine -match '(?i)--hub(?:\\s|$)') -or",
+            "            ($_.Name -match '(?i)^language_server_' -and $_.CommandLine -match '(?i)--csrf_token\\s+([a-f0-9\\-]+)')",
+            "        } |",
+            '        Select-Object ProcessId, ParentProcessId, ExecutablePath, CommandLine',
+            ')',
+            '',
+            'if ($processes.Count -eq 0) {',
+            "    '[]'",
+            '}',
+            'else {',
+            '    $processes | ConvertTo-Json -Compress -Depth 4',
+            '}',
+        ].join('\n');
+
+        try {
+            const { stdout } = await execFileAsync(
+                'powershell.exe',
+                [
+                    '-NoLogo',
+                    '-NoProfile',
+                    '-NonInteractive',
+                    '-Command',
+                    ps,
+                ],
+                {
+                    windowsHide: true,
+                    timeout: 5000,
+                    maxBuffer: 1024 * 1024,
+                },
+            );
+
+            raw = stdout.trim();
+        } catch {
+            return undefined;
+        }
+    } else {
+        try {
+            const { stdout } = await execFileAsync(
+                'ps',
+                ['-eo', 'pid,ppid,command'],
+                { timeout: 5000, maxBuffer: 1024 * 1024 }
+            );
+            
+            const lines = stdout.split('\n');
+            const processes: CimProcessRecord[] = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                const match = line.match(/^(\d+)\s+(\d+)\s+(.+)$/);
+                if (match) {
+                    const pid = parseInt(match[1], 10);
+                    const ppid = parseInt(match[2], 10);
+                    const cmd = match[3];
+                    
+                    const isHub = cmd.includes('--hub') || cmd.includes('--hub-port');
+                    const isLsp = cmd.includes('language_server') && cmd.includes('--csrf_token');
+                    
+                    if (isHub || isLsp) {
+                        processes.push({
+                            ProcessId: pid,
+                            ParentProcessId: ppid,
+                            ExecutablePath: cmd.split(' ')[0],
+                            CommandLine: cmd
+                        });
+                    }
+                }
+            }
+            
+            if (processes.length > 0) {
+                raw = JSON.stringify(processes);
+            }
+        } catch {
+            return undefined;
+        }
+    }
+
+    if (!raw) {
         return undefined;
     }
 
-    /*
-     * Intentionally avoid PowerShell backtick line
-     * continuations here because this script itself lives
-     * inside a TypeScript template literal.
-     */
-    const ps = [
-        '$processes = @(',
-        '    Get-CimInstance Win32_Process |',
-        "        Where-Object {",
-        "            ($_.Name -ieq 'agy.exe' -and $_.CommandLine -match '(?i)--hub(?:\\s|$)') -or",
-        "            ($_.Name -match '(?i)^language_server_' -and $_.CommandLine -match '(?i)--csrf_token\\s+([a-f0-9\\-]+)')",
-        "        } |",
-        '        Select-Object ProcessId, ParentProcessId, ExecutablePath, CommandLine',
-        ')',
-        '',
-        'if ($processes.Count -eq 0) {',
-        "    '[]'",
-        '}',
-        'else {',
-        '    $processes | ConvertTo-Json -Compress -Depth 4',
-        '}',
-    ].join('\n');
-
     try {
-        const { stdout } = await execFileAsync(
-            'powershell.exe',
-            [
-                '-NoLogo',
-                '-NoProfile',
-                '-NonInteractive',
-                '-Command',
-                ps,
-            ],
-            {
-                windowsHide: true,
-                timeout: 5000,
-                maxBuffer: 1024 * 1024,
-            },
-        );
-
-        const raw = stdout.trim();
-
-        if (!raw) {
-            return undefined;
-        }
-
         const parsed = JSON.parse(raw) as
             | CimProcessRecord
             | CimProcessRecord[];
@@ -238,8 +281,7 @@ export async function detectRunningAgyHub(): Promise<
             backendType: isLanguageServer ? 'language_server' : 'agy',
             csrfToken,
         };
-    }
-    catch {
+    } catch {
         return undefined;
     }
 }
