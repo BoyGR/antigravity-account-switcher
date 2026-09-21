@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 
 import {
+    AntigravityQuotaSummaryBucket,
     AntigravityQuotaSummarySnapshot,
 } from "./hub-auth-client";
 
@@ -198,14 +199,33 @@ export async function removeManagedAccountUsageSnapshot(
     return true;
 }
 
+export function getAllSnapshotBuckets(
+    snapshot?: Partial<AntigravityQuotaSummarySnapshot>,
+): AntigravityQuotaSummaryBucket[] {
+    if (!snapshot) {
+        return [];
+    }
+    const rootBuckets = Array.isArray(snapshot.buckets) ? snapshot.buckets : [];
+    if (rootBuckets.length > 0) {
+        return rootBuckets;
+    }
+    if (Array.isArray(snapshot.groups)) {
+        return snapshot.groups.flatMap(group =>
+            Array.isArray(group?.buckets) ? group.buckets : [],
+        );
+    }
+    return [];
+}
+
 export function getAccountRemainingPercent(
     snapshot?: ManagedAccountUsageSnapshot,
 ): number | undefined {
-    if (!snapshot || !Array.isArray(snapshot.buckets) || snapshot.buckets.length === 0) {
+    const buckets = getAllSnapshotBuckets(snapshot);
+    if (buckets.length === 0) {
         return undefined;
     }
     let minFraction: number | undefined;
-    for (const b of snapshot.buckets) {
+    for (const b of buckets) {
         if (typeof b.remainingFraction === "number" && !b.disabled) {
             if (minFraction === undefined || b.remainingFraction < minFraction) {
                 minFraction = b.remainingFraction;
@@ -240,12 +260,13 @@ export async function refreshExpiredManagedAccountUsageSnapshots(
         if (email === normalizedActive) {
             continue;
         }
-        if (!snapshot || !Array.isArray(snapshot.buckets) || snapshot.buckets.length === 0) {
+        const candidateBuckets = getAllSnapshotBuckets(snapshot);
+        if (candidateBuckets.length === 0) {
             continue;
         }
 
         let accountChanged = false;
-        const newBuckets = snapshot.buckets.map(bucket => {
+        const newBuckets = candidateBuckets.map(bucket => {
             if (bucket.resetTime) {
                 const resetTs = new Date(bucket.resetTime).getTime();
                 if (Number.isFinite(resetTs) && resetTs <= now) {

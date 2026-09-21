@@ -2,6 +2,18 @@
 
 All notable changes to the **Antigravity Account Switcher** extension will be documented in this file.
 
+## [1.4.10] - 2026-09-21
+
+### Fixed & Improved
+- **Multi-Account Quota Matrix Display (5h & Weekly Windows)**:
+  - Fixed an issue where 5-hour (`5h`) and weekly (`Weekly`) quota metrics were displayed as empty (`-`) with 0% progress bars.
+  - Added automatic bucket flattening from `groups[].buckets` returned by the Language Server when root `buckets` are empty.
+  - Enhanced `getAllSnapshotBuckets` and `getAllQuotaBuckets` utilities to seamlessly aggregate quota buckets across model groups (*Gemini*, *Claude + GPT*).
+  - Ensured saved account snapshots maintain backwards compatibility and calculate remaining quota accurately.
+  - Fixed quota monitor low-quota evaluation and reset timer synchronization for grouped quota buckets.
+
+---
+
 ## [1.4.9] - 2026-09-21
 
 ### Added & Improved

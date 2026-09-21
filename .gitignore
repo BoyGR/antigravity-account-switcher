@@ -16,3 +16,4 @@ out/
 # Internal private workspace (docs, operational artifacts, private notes)
 .bgr/
 internal/
+scratch/

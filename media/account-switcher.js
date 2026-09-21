@@ -1890,14 +1890,36 @@
         );
     }
 
+    function getAllQuotaBuckets(usageOrSnapshot) {
+        if (!usageOrSnapshot) return [];
+        const direct = Array.isArray(usageOrSnapshot.buckets) ? usageOrSnapshot.buckets : [];
+        const fromGroups = Array.isArray(usageOrSnapshot.groups)
+            ? usageOrSnapshot.groups.flatMap(g => Array.isArray(g?.buckets) ? g.buckets : [])
+            : [];
+        if (direct.length > 0 && fromGroups.length > 0) {
+            const seen = new Set();
+            const merged = [];
+            for (const b of [...direct, ...fromGroups]) {
+                const key = b.bucketId || b.displayName || `${b.window}:${b.remainingFraction}:${b.resetTime}`;
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    merged.push(b);
+                }
+            }
+            return merged;
+        }
+        return direct.length > 0 ? direct : fromGroups;
+    }
+
     function getAccountQuotaPercent(account) {
         const email = normalizeEmail(account.email);
         const snapshot = state.usageSnapshots?.[email];
-        if (!snapshot || !Array.isArray(snapshot.buckets) || snapshot.buckets.length === 0) {
+        const buckets = getAllQuotaBuckets(snapshot);
+        if (buckets.length === 0) {
             return undefined;
         }
         let minFraction = undefined;
-        for (const b of snapshot.buckets) {
+        for (const b of buckets) {
             if (typeof b.remainingFraction === "number" && !b.disabled) {
                 if (minFraction === undefined || b.remainingFraction < minFraction) {
                     minFraction = b.remainingFraction;
@@ -4691,9 +4713,10 @@
     function getEarliestResetTs(account, currentEmail, snapshots) {
         const norm = normalizeEmail(account.email);
         const usage = (norm === currentEmail && state.usage) ? state.usage : snapshots[norm];
-        if (!usage?.buckets || !Array.isArray(usage.buckets)) return Infinity;
+        const buckets = getAllQuotaBuckets(usage);
+        if (buckets.length === 0) return Infinity;
         let minTs = Infinity;
-        for (const b of usage.buckets) {
+        for (const b of buckets) {
             if (b.resetTime && !b.disabled) {
                 const ts = new Date(b.resetTime).getTime();
                 if (Number.isFinite(ts) && ts > Date.now() && ts < minTs) {
@@ -4780,25 +4803,31 @@
                 let weeklyPct = null;
                 let weeklyReset = "";
 
-                if (usage?.buckets && Array.isArray(usage.buckets)) {
-                    for (const b of usage.buckets) {
-                        const id = (b.displayName || b.bucketId || "").toLowerCase();
-                        const win = (b.window || b.description || "").toLowerCase();
-                        const is5h = id.includes("5-hour") || id.includes("5h") || win.includes("5 hour") || win.includes("5h");
-                        const isWeekly = id.includes("week") || win.includes("week") || win.includes("7 day");
+                const buckets = getAllQuotaBuckets(usage);
+                for (const b of buckets) {
+                    const id = (b.displayName || b.bucketId || "").toLowerCase();
+                    const win = (b.window || b.description || "").toLowerCase();
+                    const is5h = win === "5h" || id.includes("5-hour") || id.includes("5h") || win.includes("5 hour") || win.includes("5h");
+                    const isWeekly = win === "weekly" || id.includes("week") || win.includes("week") || win.includes("7 day");
 
-                        if (typeof b.remainingFraction === "number" && !b.disabled) {
-                            const effFrac = getEffectiveRemainingFraction(b);
-                            const pct = typeof effFrac === "number" ? Math.max(0, Math.min(100, Math.round(effFrac * 100))) : null;
-                            const resetStr = b.resetTime ? formatResetTime(b.resetTime) : "";
+                    if (typeof b.remainingFraction === "number" && !b.disabled) {
+                        const effFrac = getEffectiveRemainingFraction(b);
+                        const pct = typeof effFrac === "number" ? Math.max(0, Math.min(100, Math.round(effFrac * 100))) : null;
+                        const resetStr = b.resetTime ? formatResetTime(b.resetTime) : "";
 
-                            if (is5h || (fiveHourPct === null && !isWeekly)) {
+                        if (is5h) {
+                            if (fiveHourPct === null || (typeof pct === "number" && pct < fiveHourPct)) {
                                 fiveHourPct = pct;
                                 fiveHourReset = resetStr;
-                            } else if (isWeekly) {
+                            }
+                        } else if (isWeekly) {
+                            if (weeklyPct === null || (typeof pct === "number" && pct < weeklyPct)) {
                                 weeklyPct = pct;
                                 weeklyReset = resetStr;
                             }
+                        } else if (fiveHourPct === null && !isWeekly) {
+                            fiveHourPct = pct;
+                            fiveHourReset = resetStr;
                         }
                     }
                 }

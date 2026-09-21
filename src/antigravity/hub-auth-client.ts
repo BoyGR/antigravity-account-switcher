@@ -1748,6 +1748,11 @@ export async function getAntigravityQuotaSummary(
                   )
                 : [];
 
+        const effectiveBuckets =
+            buckets.length > 0
+                ? buckets
+                : groups.flatMap(group => group.buckets);
+
         return {
             fetchedAt:
                 new Date().toISOString(),
@@ -1757,7 +1762,7 @@ export async function getAntigravityQuotaSummary(
                     response.description,
                 ),
 
-            buckets,
+            buckets: effectiveBuckets,
 
             groups,
         };
