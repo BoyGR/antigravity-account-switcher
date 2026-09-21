@@ -48,7 +48,7 @@
         vaultedEmails: [],
 
         meta: {
-            version: "1.4.8",
+            version: "1.4.9",
             developer: "Boy Gilang Ramadhan (BoyGR)",
             website: "https://boygr.com",
             iconUri: "",
@@ -155,6 +155,21 @@
             clearTimeout(initialSavedTimer);
             initialSavedTimer = null;
         }
+    }
+
+    function isGoogleVerificationRequired(errorMessage) {
+        if (!errorMessage || typeof errorMessage !== "string") {
+            return false;
+        }
+        const lower = errorMessage.toLowerCase();
+        return (
+            lower.includes("retrieveuserquotasummary failed with http 500") ||
+            (lower.includes("500") && lower.includes("quotasummary")) ||
+            lower.includes("further action is required") ||
+            lower.includes("challenge") ||
+            lower.includes("verify your account") ||
+            lower.includes("verification")
+        );
     }
 
     const translations = {
@@ -611,6 +626,33 @@
 
             quotaUnavailableHint:
                 "Antigravity did not return current quota information.",
+
+            verificationRequiredTitle:
+                "Google Verification Required",
+
+            verificationRequiredSubtitle:
+                "Action needed to enable Antigravity quota",
+
+            verificationRequiredDesc:
+                "Google security temporarily restricted quota access for this account. Complete the verification challenge (QR code scan on mobile) in your browser or the official Antigravity extension, then sign in again or check below.",
+
+            verificationStep1:
+                "Open the official Google Antigravity extension and click the 'Verify' button (or sign in again).",
+
+            verificationStep2:
+                "Scan the QR code displayed in your browser with your phone's camera to complete verification.",
+
+            verificationStep3:
+                "Once verified on your phone, click 'Check Again' below.",
+
+            signInAgain:
+                "Sign in again",
+
+            checkAgain:
+                "Check Again",
+
+            needsVerification:
+                "Needs Verification",
 
             quotaHistory:
                 "7-Day Quota Analytics",
@@ -1192,6 +1234,33 @@
 
             quotaUnavailableHint:
                 "Antigravity tidak mengembalikan informasi kuota saat ini.",
+
+            verificationRequiredTitle:
+                "Verifikasi Akun Google Diperlukan",
+
+            verificationRequiredSubtitle:
+                "Tindakan diperlukan untuk mengaktifkan kuota Antigravity",
+
+            verificationRequiredDesc:
+                "Sistem keamanan Google membatasi sementara akses kuota akun ini. Selesaikan tahap verifikasi keamanan (scan QR code di HP) melalui browser atau ekstensi resmi Antigravity, lalu login ulang atau segarkan di bawah.",
+
+            verificationStep1:
+                "Buka ekstensi resmi Google Antigravity dan klik tombol 'Verify' (atau login ulang akun ini).",
+
+            verificationStep2:
+                "Scan kode QR yang muncul di browser menggunakan kamera HP kamu untuk menyelesaikan verifikasi.",
+
+            verificationStep3:
+                "Setelah verifikasi berhasil di HP, klik tombol 'Cek Kembali' di bawah.",
+
+            signInAgain:
+                "Login Ulang",
+
+            checkAgain:
+                "Cek Kembali",
+
+            needsVerification:
+                "Perlu Verifikasi",
 
             quotaHistory:
                 "Analitik Kuota 7 Hari",
@@ -2913,18 +2982,68 @@
                 )
                 : "";
 
+        const isVerifRequired = isGoogleVerificationRequired(state.usageError);
+
         const usageHtml = groups.length > 0
             ? renderSavedUsageSummary(usage)
-            : `
-                <div class="usage-empty secondary-text">
-                    ${
-                        escapeHtml(
-                            state.usageError ||
-                            t("quotaUnavailable")
-                        )
-                    }
-                </div>
-            `;
+            : isVerifRequired
+                ? `
+                    <div class="verification-alert-card" role="alert">
+                        <div class="verification-alert-header">
+                            <span class="verification-alert-icon" aria-hidden="true">⚠️</span>
+                            <div class="verification-alert-titles">
+                                <strong class="verification-alert-title">${escapeHtml(t("verificationRequiredTitle"))}</strong>
+                                <span class="verification-alert-subtitle">${escapeHtml(t("verificationRequiredSubtitle"))}</span>
+                            </div>
+                        </div>
+                        <div class="verification-alert-desc">
+                            ${escapeHtml(t("verificationRequiredDesc"))}
+                        </div>
+                        <div class="verification-alert-steps">
+                            <div class="verification-step-item">
+                                <span class="step-num">1</span>
+                                <span class="step-text">${escapeHtml(t("verificationStep1"))}</span>
+                            </div>
+                            <div class="verification-step-item">
+                                <span class="step-num">2</span>
+                                <span class="step-text">${escapeHtml(t("verificationStep2"))}</span>
+                            </div>
+                            <div class="verification-step-item">
+                                <span class="step-num">3</span>
+                                <span class="step-text">${escapeHtml(t("verificationStep3"))}</span>
+                            </div>
+                        </div>
+                        <div class="verification-alert-actions">
+                            <button
+                                type="button"
+                                class="btn primary-btn compact"
+                                data-action="reauth"
+                                ${isBusy() ? "disabled" : ""}
+                            >
+                                ${icon("refresh")}
+                                <span>${escapeHtml(t("signInAgain"))}</span>
+                            </button>
+                            <button
+                                type="button"
+                                class="btn secondary-btn compact"
+                                data-action="refresh"
+                                ${isBusy() ? "disabled" : ""}
+                            >
+                                <span>${escapeHtml(t("checkAgain"))}</span>
+                            </button>
+                        </div>
+                    </div>
+                `
+                : `
+                    <div class="usage-empty secondary-text">
+                        ${
+                            escapeHtml(
+                                state.usageError ||
+                                t("quotaUnavailable")
+                            )
+                        }
+                    </div>
+                `;
 
         return `
             <div class="usage-section current-usage-section">
@@ -3443,6 +3562,15 @@
 
                                         <div class="saved-badges-row current-badges-row">
                                             ${renderPlanBadge(managed?.plan ? managed : state.current)}
+                                            ${
+                                                isGoogleVerificationRequired(state.usageError)
+                                                    ? `
+                                                        <span class="verification-badge-pill" title="${escapeHtml(t("verificationRequiredSubtitle"))}">
+                                                            ⚠️ ${escapeHtml(t("needsVerification"))}
+                                                        </span>
+                                                    `
+                                                    : ""
+                                            }
 
                                             ${
                                                 state.vaultedEmails?.includes(normalizeEmail(state.current.email))
@@ -3900,6 +4028,15 @@
 
                                     <div class="saved-badges-row">
                                         ${renderPlanBadge(account)}
+                                        ${
+                                            isActive && isGoogleVerificationRequired(state.usageError)
+                                                ? `
+                                                    <span class="verification-badge-pill" title="${escapeHtml(t("verificationRequiredSubtitle"))}">
+                                                        ⚠️ ${escapeHtml(t("needsVerification"))}
+                                                    </span>
+                                                `
+                                                : ""
+                                        }
 
                                         ${
                                             state.vaultedEmails?.includes(normalizeEmail(account.email))

@@ -1610,6 +1610,118 @@ a {
     }
 }
 
+/* ========================================================= */
+/* Google Security Verification Required Alert Card         */
+/* ========================================================= */
+
+.verification-alert-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 8px;
+    padding: 12px;
+    border-radius: var(--ag-radius, 6px);
+    background: color-mix(in srgb, var(--ag-warning, #f59e0b) 9%, var(--ag-surface));
+    border: 1px solid color-mix(in srgb, var(--ag-warning, #f59e0b) 32%, transparent);
+}
+
+.verification-alert-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+}
+
+.verification-alert-icon {
+    font-size: 16px;
+    line-height: 1.2;
+    flex-shrink: 0;
+}
+
+.verification-alert-titles {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.verification-alert-title {
+    font-size: 11.5px;
+    font-weight: 650;
+    color: var(--ag-fg);
+    line-height: 1.3;
+}
+
+.verification-alert-subtitle {
+    font-size: 10px;
+    color: var(--ag-warning, #f59e0b);
+    font-weight: 500;
+}
+
+.verification-alert-desc {
+    font-size: 10.5px;
+    line-height: 1.45;
+    color: var(--ag-muted);
+}
+
+.verification-alert-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 10px;
+    background: color-mix(in srgb, var(--ag-bg) 60%, transparent);
+    border-radius: 5px;
+    border: 1px solid var(--ag-border);
+}
+
+.verification-step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 10px;
+    line-height: 1.35;
+    color: var(--ag-fg);
+}
+
+.verification-step-item .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--ag-warning, #f59e0b);
+    color: #1a1a1a;
+    font-size: 9px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.verification-step-item .step-text {
+    flex: 1;
+}
+
+.verification-alert-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+}
+
+.verification-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-size: 9px;
+    font-weight: 600;
+    background: color-mix(in srgb, var(--ag-warning, #f59e0b) 16%, transparent);
+    color: var(--ag-warning, #f59e0b);
+    border: 1px solid color-mix(in srgb, var(--ag-warning, #f59e0b) 36%, transparent);
+}
+
 
 /* ========================================================= */
 /* Responsive                                                */

@@ -120,13 +120,13 @@ Customize settings via your editor's `settings.json`:
    - **CLI**:
      ```powershell
      # Visual Studio Code
-     code --install-extension antigravity-account-switcher-1.4.8.vsix
+     code --install-extension antigravity-account-switcher-1.4.9.vsix
 
      # Google Antigravity IDE
-     antigravity --install-extension antigravity-account-switcher-1.4.8.vsix
+     antigravity --install-extension antigravity-account-switcher-1.4.9.vsix
 
      # Cursor
-     cursor --install-extension antigravity-account-switcher-1.4.8.vsix
+     cursor --install-extension antigravity-account-switcher-1.4.9.vsix
      ```
 
 ---

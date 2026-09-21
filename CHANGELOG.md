@@ -2,6 +2,21 @@
 
 All notable changes to the **Antigravity Account Switcher** extension will be documented in this file.
 
+## [1.4.9] - 2026-09-21
+
+### Added & Improved
+- **Smart Error Handling for Google Account Verification (IAP Challenge)**:
+  - Intelligently detects Google security challenge errors (`RetrieveUserQuotaSummary failed with HTTP 500`) when adding or switching to new accounts.
+  - Replaces confusing technical 500 error messages with a clear, guided alert card (`verification-alert-card`).
+  - Provides a 3-step actionable walkthrough explaining how to complete the QR code verification on smartphone via the official Antigravity extension.
+  - Added dedicated quick-action buttons: **Sign in again / Login Ulang** and **Check Again / Cek Kembali**.
+  - Added a warning pill badge (`⚠️ Needs Verification`) on the affected account identity row.
+  - Full bilingual localization support across English (EN) and Indonesian (ID).
+  - Preserved upstream Connect RPC JSON error details in `invokeConnectJson` for enhanced diagnostics.
+  - Documented operational troubleshooting guide (Issue 5) in `.bgr/docs/03-OPERATIONAL-RUNBOOK.md`.
+
+---
+
 ## [1.4.8] - 2026-09-20
 
 ### Added & Improved

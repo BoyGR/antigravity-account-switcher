@@ -340,9 +340,19 @@ function invokeConnectJson<T>(
                         statusCode < 200 ||
                         statusCode >= 300
                     ) {
+                        let detail = "";
+                        try {
+                            const parsed = JSON.parse(responseBody);
+                            if (parsed && typeof parsed === "object") {
+                                detail = parsed.message || parsed.error || "";
+                            }
+                        } catch {
+                            // Non-JSON response
+                        }
+                        const detailSuffix = detail ? `: ${detail}` : "";
                         reject(
                             new Error(
-                                `${method} failed with HTTP ${statusCode}.`
+                                `${method} failed with HTTP ${statusCode}.${detailSuffix}`
                             )
                         );
 
