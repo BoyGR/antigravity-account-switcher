@@ -2,6 +2,22 @@
 
 All notable changes to the **Antigravity Account Switcher** extension will be documented in this file.
 
+## [1.4.15] - 2026-09-22
+
+### Fixed & Improved
+- **Current Account State Retention**:
+  - Fixed an issue where deleting an inactive saved account unexpectedly reset the top "Current account" card to "No Account Connected".
+  - Retains known active account state during account removals and across transient backend query errors.
+- **Quota Timeout Fallback & Resilience**:
+  - Catch `RetrieveUserQuotaSummary` request timeouts and gracefully fallback to the local `GetUserStatus` quota matrix.
+  - Reduced `RetrieveUserQuotaSummary` RPC timeout from 10s to 4s, preventing UI freezes when remote quota servers are slow or unresponsive.
+  - Automatically fallback to the cached local usage snapshot if quota queries fail.
+- **"No Account Connected" UI Enhancements**:
+  - Swapped button layout: moved the **Refresh** button to the left and the **Sign In with Google** button to the right.
+  - Adjusted **Sign In with Google** button to match the compact sizing of the Refresh button for a clean, cohesive appearance.
+
+---
+
 ## [1.4.14] - 2026-09-22
 
 ### Fixed & Improved

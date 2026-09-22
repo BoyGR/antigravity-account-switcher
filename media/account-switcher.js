@@ -3510,22 +3510,22 @@
                         <div class="disconnected-actions">
                             <button
                                 type="button"
-                                class="btn primary-btn empty-cta-btn"
-                                data-action="add"
-                                ${isBusy() ? "disabled" : ""}
-                            >
-                                ${icon("plus")}
-                                <span>${escapeHtml(t("signInGoogle"))}</span>
-                            </button>
-
-                            <button
-                                type="button"
                                 class="btn secondary-btn compact"
                                 data-action="refresh"
                                 ${isBusy() ? "disabled" : ""}
                             >
                                 ${icon("refresh")}
                                 <span>${escapeHtml(t("refresh"))}</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn primary-btn compact"
+                                data-action="add"
+                                ${isBusy() ? "disabled" : ""}
+                            >
+                                ${icon("plus")}
+                                <span>${escapeHtml(t("signInGoogle"))}</span>
                             </button>
                         </div>
                     </div>

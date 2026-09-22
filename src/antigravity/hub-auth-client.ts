@@ -490,7 +490,9 @@ function invokeConnectJson<T>(
         const timeoutMs =
             method === "Login"
                 ? 300_000
-                : 10_000;
+                : method === "RetrieveUserQuotaSummary"
+                    ? 4_000
+                    : 10_000;
 
         request.setTimeout(timeoutMs, () => {
             request.destroy(
@@ -2020,14 +2022,10 @@ export async function getAntigravityQuotaSummary(
                     forceRefresh,
                 },
             );
-    } catch (err: unknown) {
-        const errMsg = err instanceof Error ? err.message : String(err);
-        // If RetrieveUserQuotaSummary returns 404 (endpoint not supported on this language_server version),
+    } catch {
+        // If RetrieveUserQuotaSummary returns 404, times out, or fails due to network/endpoint lag,
         // gracefully fallback to constructing the quota matrix from GetUserStatus!
-        if (errMsg.includes("HTTP 404") || errMsg.includes("404")) {
-            return await getAntigravityQuotaSummaryFromUserStatus(session);
-        }
-        throw err;
+        return await getAntigravityQuotaSummaryFromUserStatus(session);
     }
 
     const response =

@@ -590,9 +590,15 @@ export class AntigravityAccountWebviewProvider
                 accountError instanceof Error
                     ? accountError.message
                     : String(accountError);
+
+            // Retain existing active account if already known rather than resetting to disconnected
+            if (this.snapshot.current) {
+                current = this.snapshot.current;
+            }
         }
 
         if (current) {
+            this.snapshot.current = current;
             try {
                 /*
                  * Official server-defined quota summary.
@@ -650,6 +656,14 @@ export class AntigravityAccountWebviewProvider
                     usageReadError instanceof Error
                         ? usageReadError.message
                         : String(usageReadError);
+
+                if (current?.email) {
+                    const normalizedEmail = current.email.trim().toLowerCase();
+                    if (usageSnapshots[normalizedEmail]) {
+                        usage = usageSnapshots[normalizedEmail];
+                        usageError = undefined;
+                    }
+                }
 
                 if (current?.email && usageError) {
                     this.maybePromptVerificationWindow(current.email, usageError);
@@ -846,20 +860,33 @@ export class AntigravityAccountWebviewProvider
     }
 
     private async refreshLocalAccounts(): Promise<void> {
+        let current = this.snapshot.current;
+        if (!current) {
+            try {
+                current = await getAntigravityCurrentAccount();
+            } catch {
+                // Ignore transient lookup failure
+            }
+        }
+
+        let vaultedEmails = this.snapshot.vaultedEmails ?? [];
+        if (this.tokenVault) {
+            vaultedEmails = await this.tokenVault.getVaultedEmails().catch(() => vaultedEmails);
+        }
+
         this.snapshot = {
             ...this.snapshot,
-
+            current,
             accounts:
                 getManagedAccounts(
                     this.context,
                 ),
-
             usageSnapshots:
                 getManagedAccountUsageSnapshots(
                     this.context,
                 ),
-
             quotaHistory: getAllAccountsQuotaHistory(this.context, 7),
+            vaultedEmails,
         };
 
         await this.postState(
