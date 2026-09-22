@@ -3110,7 +3110,9 @@
                 )
                 : "";
 
-        const usageHtml = groups.length > 0
+        const usageUnavailable = groups.length === 0;
+
+        const usageHtml = !usageUnavailable
             ? renderSavedUsageSummary(usage)
             : `
                 <div class="usage-empty secondary-text">
@@ -3121,6 +3123,16 @@
                         )
                     }
                 </div>
+                <button
+                    type="button"
+                    class="btn secondary-btn compact usage-retry-btn"
+                    data-action="refresh"
+                    ${isBusy() ? "disabled" : ""}
+                    title="${escapeHtml(t("refresh"))}"
+                >
+                    ${icon("refresh")}
+                    <span>${escapeHtml(t("refresh"))}</span>
+                </button>
             `;
 
         return `

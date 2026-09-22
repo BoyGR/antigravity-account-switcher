@@ -2,6 +2,21 @@
 
 All notable changes to the **Antigravity Account Switcher** extension will be documented in this file.
 
+## [1.4.16] - 2026-09-23
+
+### Fixed & Improved
+- **Aggregated Quota Exhaustion Toast**:
+  - Multiple exhausted quota buckets (e.g. Gemini Weekly and Claude+GPT Weekly) now produce a single combined error notification instead of separate toasts for each bucket.
+  - The aggregated toast lists all exhausted limits together and still provides a one-click switch to the best available account.
+- **Usage Refresh Button on Load Failure**:
+  - When the usage/quota information for the current account fails to load (e.g. after switching accounts or a network timeout), a compact **Refresh** button now appears below the "Usage unavailable" message.
+  - Clicking the button retriggers the full refresh cycle without needing to find the global refresh button in the header.
+- **Footer Border Full Width Fix**:
+  - Fixed the footer separator line not extending fully to both edges of the panel (it was clipped by the parent container's horizontal padding).
+  - The border-top on the footer now spans edge-to-edge, consistent with other extensions.
+
+---
+
 ## [1.4.15] - 2026-09-22
 
 ### Fixed & Improved

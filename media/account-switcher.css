@@ -2904,6 +2904,12 @@ a {
     font-size: 9px;
 }
 
+.usage-retry-btn {
+    margin-top: 5px;
+    align-self: flex-start;
+    gap: 4px;
+}
+
 .current-usage-section .saved-account-quota-area {
     margin-top: 5px;
     padding-top: 0;
@@ -4828,6 +4834,9 @@ main {
 .saved-account-quota-area {
     box-sizing: border-box;
 
+    display: flex;
+    flex-direction: column;
+
     width: 100%;
     min-width: 0;
 
@@ -5543,7 +5552,10 @@ body {
     gap: 6px !important;
     min-width: 0 !important;
     min-height: 28px !important;
-    padding: 5px 6px 5px 6px !important;
+    /* Break out of .app's 9px horizontal padding so border-top is full-width */
+    margin-left: -9px !important;
+    margin-right: -9px !important;
+    padding: 5px 9px 5px 9px !important;
     border-top: 1px solid var(--ag-border) !important;
     color: var(--ag-muted) !important;
     font-size: 10px !important;
