@@ -3,7 +3,8 @@ import * as http from "node:http";
 import * as https from "node:https";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { isAntigravityIde } from "./hub-detector";
+import * as path from "node:path";
+import { isAntigravityIde, extractExecutablePath, parsePosixCommandLine } from "./hub-detector";
 
 const execFileAsync = promisify(execFile);
 
@@ -32,6 +33,7 @@ interface AgyProcessInfo {
     ProcessId: number;
     CommandLine: string;
     Name?: string;
+    ExecutablePath?: string;
 }
 
 interface TcpListenerInfo {
@@ -285,6 +287,51 @@ function probeHttpsPort(
     });
 }
 
+function probeConnectRpcPort(
+    port: number,
+    csrfToken: string,
+    timeoutMs = 1500
+): Promise<boolean> {
+    return new Promise((resolve) => {
+        const body = "{}";
+        const req = https.request(
+            {
+                hostname: "127.0.0.1",
+                port,
+                path: `/${LANGUAGE_SERVER_SERVICE}/GetUserStatus`,
+                method: "POST",
+                rejectUnauthorized: false,
+                agent: undefined,
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    "Connect-Protocol-Version": "1",
+                    "x-codeium-csrf-token": csrfToken,
+                    "Content-Length": Buffer.byteLength(body),
+                },
+                timeout: timeoutMs,
+            },
+            (res) => {
+                const isMatch = res.statusCode === 200;
+                res.resume();
+                resolve(isMatch);
+            }
+        );
+
+        req.on("timeout", () => {
+            req.destroy();
+            resolve(false);
+        });
+
+        req.on("error", () => {
+            resolve(false);
+        });
+
+        req.write(body);
+        req.end();
+    });
+}
+
 async function detectLanguageServerPort(
     listeners: number[],
     hubPort: number
@@ -481,7 +528,41 @@ function readHasToken(
     );
 }
 
+/**
+ * Cached backend session to avoid repeated PowerShell process scans.
+ * Validated with a quick RPC probe before reuse.
+ */
+let cachedBackendSession: AntigravityBackendSession | undefined;
+let cachedBackendSessionTime = 0;
+const BACKEND_SESSION_CACHE_TTL_MS = 30_000;
+
+/**
+ * Invalidate the cached backend session (e.g. after switching accounts).
+ */
+export function invalidateBackendSessionCache(): void {
+    cachedBackendSession = undefined;
+    cachedBackendSessionTime = 0;
+}
+
 export async function detectAntigravityBackend(): Promise<AntigravityBackendSession> {
+    // Fast path: try cached session with a quick RPC probe
+    if (
+        cachedBackendSession &&
+        Date.now() - cachedBackendSessionTime < BACKEND_SESSION_CACHE_TTL_MS
+    ) {
+        const ok = await probeConnectRpcPort(
+            cachedBackendSession.lsPort,
+            cachedBackendSession.csrfToken,
+            300,
+        );
+        if (ok) {
+            return cachedBackendSession;
+        }
+        // Cache is stale — fall through to full detection
+        cachedBackendSession = undefined;
+        cachedBackendSessionTime = 0;
+    }
+
     let output = '';
 
     if (process.platform === 'win32') {
@@ -490,9 +571,9 @@ $processes = @(
     Get-CimInstance Win32_Process |
         Where-Object {
             ($_.Name -ieq 'agy.exe' -and $_.CommandLine -match '--hub(?:\\s|$)' -and $_.CommandLine -match '--hub-port=(\\d+)') -or
-            ($_.Name -match '^language_server_' -and $_.CommandLine -match '--csrf_token\\s+([a-f0-9\\-]+)')
+            ($_.Name -match '(?i)^language_server(?:\\.exe|_|\\b)' -and $_.CommandLine -match '(?i)--csrf_token\\s+([a-f0-9\\-]+)')
         } |
-        Select-Object ProcessId, Name, CommandLine
+        Select-Object ProcessId, Name, ExecutablePath, CommandLine
 )
 
 if ($processes.Count -eq 0) {
@@ -514,9 +595,11 @@ if ($processes.Count -eq 0) {
                     const pid = parseInt(match[1], 10);
                     const cmd = match[2];
                     if (cmd.includes('--hub') || cmd.includes('language_server')) {
+                        const parsed = parsePosixCommandLine(cmd);
                         processes.push({
                             ProcessId: pid,
-                            Name: cmd.split(' ')[0].split('/').pop() || '',
+                            Name: parsed.name,
+                            ExecutablePath: parsed.executablePath,
                             CommandLine: cmd
                         });
                     }
@@ -541,33 +624,41 @@ if ($processes.Count -eq 0) {
         );
     }
 
-    const inIde = isAntigravityIde();
+    const execPath = process.execPath || '';
+    const appDir = execPath ? path.dirname(execPath) : '';
+
     let selected: AgyProcessInfo | undefined;
 
-    if (inIde) {
-        selected =
-            rawList.find(
-                p => /language_server/i.test(p.Name || p.CommandLine || "") &&
-                     !/--enable_lsp/i.test(p.CommandLine || "")
-            ) ||
-            rawList.find(
-                p => /language_server/i.test(p.Name || p.CommandLine || "")
-            ) ||
-            rawList.find(
-                p => /--hub(?:\s|$)/i.test(p.CommandLine || "")
-            );
-    } else {
-        selected =
-            rawList.find(
-                p => /--hub(?:\s|$)/i.test(p.CommandLine || "")
-            ) ||
-            rawList.find(
-                p => /language_server/i.test(p.Name || p.CommandLine || "") &&
-                     !/--enable_lsp/i.test(p.CommandLine || "")
-            ) ||
-            rawList.find(
-                p => /language_server/i.test(p.Name || p.CommandLine || "")
-            );
+    // 1. Prefer backend hosted inside the current editor's directory (disambiguates multiple concurrent IDEs)
+    if (appDir && !appDir.toLowerCase().endsWith('nodejs')) {
+        selected = rawList.find(p => {
+            const itemPath = extractExecutablePath(p);
+            if (!itemPath) return false;
+            const rel = path.relative(appDir.toLowerCase(), itemPath.toLowerCase());
+            return !rel.startsWith('..') && !path.isAbsolute(rel);
+        });
+    }
+
+    // 2. Fallback heuristic based on whether host environment is Antigravity
+    if (!selected) {
+        const inIde = isAntigravityIde();
+        if (inIde) {
+            selected =
+                rawList.find(
+                    p => /language_server/i.test(p.Name || p.CommandLine || "")
+                ) ||
+                rawList.find(
+                    p => /--hub(?:\s|$)/i.test(p.CommandLine || "")
+                );
+        } else {
+            selected =
+                rawList.find(
+                    p => /--hub(?:\s|$)/i.test(p.CommandLine || "")
+                ) ||
+                rawList.find(
+                    p => /language_server/i.test(p.Name || p.CommandLine || "")
+                );
+        }
     }
 
     if (!selected) {
@@ -592,52 +683,55 @@ if ($processes.Count -eq 0) {
         }
         const csrfToken = csrfMatch[1];
 
-        const listeners = await getAgyListeners(pid);
-        if (listeners.length === 0) {
-            throw new Error(
-                `Antigravity language_server (PID ${pid}) has no listening ports.`
-            );
-        }
-
-        const candidatePorts: number[] = [];
-        for (const port of listeners) {
-            if (await probeHttpsPort(port)) {
-                candidatePorts.push(port);
+        // 1. Direct extraction: if --https_server_port is present in CommandLine, test it first
+        const httpsMatch = /--https_server_port\s+(\d+)/i.exec(
+            selected.CommandLine || ""
+        );
+        let resolvedLsPort: number | undefined;
+        if (httpsMatch) {
+            const parsedPort = Number(httpsMatch[1]);
+            if (Number.isInteger(parsedPort) && parsedPort > 0 && parsedPort <= 65535) {
+                if (await probeConnectRpcPort(parsedPort, csrfToken, 1000)) {
+                    resolvedLsPort = parsedPort;
+                }
             }
         }
 
-        if (candidatePorts.length === 0) {
+        // 2. If not specified in CommandLine or unresponsive, probe all listening ports in parallel (<50ms)
+        if (!resolvedLsPort) {
+            const listeners = await getAgyListeners(pid);
+            if (listeners.length === 0) {
+                throw new Error(
+                    `Antigravity language_server (PID ${pid}) has no listening ports.`
+                );
+            }
+
+            const probeResults = await Promise.all(
+                listeners.map(async (port) => {
+                    const ok = await probeConnectRpcPort(port, csrfToken, 1500);
+                    return ok ? port : null;
+                })
+            );
+
+            resolvedLsPort = probeResults.find((port): port is number => port !== null);
+        }
+
+        if (!resolvedLsPort) {
             throw new Error(
                 "No Antigravity HTTPS Language Server listener was found for language_server process."
             );
         }
 
-        let resolvedLsPort = candidatePorts[0];
-        if (candidatePorts.length > 1) {
-            for (const port of candidatePorts) {
-                try {
-                    const testStatus = await invokeConnectJson<{ userStatus?: unknown }>(
-                        port,
-                        "GetUserStatus",
-                        csrfToken
-                    );
-                    if (testStatus) {
-                        resolvedLsPort = port;
-                        break;
-                    }
-                } catch {
-                    // Continue to next port
-                }
-            }
-        }
-
-        return {
+        const lsSession: AntigravityBackendSession = {
             pid,
             backendType: "language_server",
             hubPort: resolvedLsPort,
             lsPort: resolvedLsPort,
             csrfToken,
         };
+        cachedBackendSession = lsSession;
+        cachedBackendSessionTime = Date.now();
+        return lsSession;
     }
 
     const match = /--hub-port=(\d+)/i.exec(selected.CommandLine);
@@ -669,13 +763,16 @@ if ($processes.Count -eq 0) {
 
     const csrfToken = extractCsrfToken(hub.body);
 
-    return {
+    const agySession: AntigravityBackendSession = {
         pid,
         backendType: "agy",
         hubPort,
         lsPort,
         csrfToken,
     };
+    cachedBackendSession = agySession;
+    cachedBackendSessionTime = Date.now();
+    return agySession;
 }
 
 export async function getAntigravityAuthStatus():
@@ -792,6 +889,42 @@ interface LoginResponse {
 }
 
 /**
+ * Triggers the host editor's Google OAuth sign-in flow.
+ * - In Antigravity IDE (Code OSS fork), uses 'workbench.action.loginWithRedirect'.
+ * - In VS Code with the Google Antigravity extension, uses 'antigravity.login'.
+ */
+export async function executeAntigravityEditorLogin(): Promise<void> {
+    let lastError: unknown;
+    let commands: string[] = [];
+    try {
+        commands = await vscode.commands.getCommands(true);
+    } catch {
+        commands = [];
+    }
+
+    if (commands.includes("antigravity.login")) {
+        try {
+            await vscode.commands.executeCommand("antigravity.login");
+            return;
+        } catch (error) {
+            lastError = error;
+        }
+    }
+
+    try {
+        await vscode.commands.executeCommand("antigravity.login");
+        return;
+    } catch (error) {
+        lastError = error;
+    }
+
+    const message = lastError instanceof Error ? lastError.message : String(lastError);
+    throw new Error(
+        `Unable to trigger Antigravity editor sign-in: ${message}`
+    );
+}
+
+/**
  * Starts Antigravity's own Google sign-in flow.
  *
  * Security properties:
@@ -808,7 +941,7 @@ export async function signInToAntigravity():
     const session = await detectAntigravityBackend();
 
     if (session.backendType === "language_server") {
-        await vscode.commands.executeCommand("antigravity.login");
+        await executeAntigravityEditorLogin();
         return {
             hasValidAuth: true,
             grantedScopes: [],
@@ -882,6 +1015,19 @@ export async function signInToAntigravity():
                       )
                     : [],
         };
+    } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        if (
+            errorMsg.includes("interactive auth is only supported in antigravity-hub mode") ||
+            errorMsg.includes("deprecated and no longer supported")
+        ) {
+            await executeAntigravityEditorLogin();
+            return {
+                hasValidAuth: true,
+                grantedScopes: [],
+            };
+        }
+        throw error;
     } finally {
         csrfToken = "";
     }
@@ -910,7 +1056,7 @@ export async function reauthenticateAntigravity():
     const session = await detectAntigravityBackend();
 
     if (session.backendType === "language_server") {
-        await vscode.commands.executeCommand("antigravity.login");
+        await executeAntigravityEditorLogin();
         return {
             hasValidAuth: true,
             grantedScopes: [],
@@ -984,6 +1130,19 @@ export async function reauthenticateAntigravity():
                       )
                     : [],
         };
+    } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        if (
+            errorMsg.includes("interactive auth is only supported in antigravity-hub mode") ||
+            errorMsg.includes("deprecated and no longer supported")
+        ) {
+            await executeAntigravityEditorLogin();
+            return {
+                hasValidAuth: true,
+                grantedScopes: [],
+            };
+        }
+        throw error;
     } finally {
         csrfToken = "";
     }
@@ -1310,7 +1469,10 @@ interface AntigravityModelOrAliasResponse {
 }
 
 interface AntigravityClientModelConfigResponse {
+    label?: string;
     modelId?: string;
+    tagTitle?: string;
+    tagDescription?: string;
     modelOrAlias?: AntigravityModelOrAliasResponse;
     quotaInfo?: AntigravityQuotaInfoResponse;
 }
@@ -1321,6 +1483,11 @@ interface AntigravityQuotaUserStatusResponse {
     picture?: string;
     avatarUrl?: string;
     photoUrl?: string;
+    userTier?: {
+        id?: string;
+        name?: string;
+        description?: string;
+    };
     [key: string]: unknown;
 
     cascadeModelConfigData?: {
@@ -1751,6 +1918,81 @@ function normalizeQuotaSummaryBucket(
     };
 }
 
+async function getAntigravityQuotaSummaryFromUserStatus(
+    session: AntigravityBackendSession,
+): Promise<AntigravityQuotaSummarySnapshot> {
+    const response = await invokeConnectJson<AntigravityQuotaGetUserStatusResponse>(
+        session.lsPort,
+        "GetUserStatus",
+        session.csrfToken,
+        {},
+    );
+
+    const userStatus = response.userStatus;
+    if (!userStatus) {
+        throw new Error("Antigravity GetUserStatus returned no userStatus.");
+    }
+
+    const configs = Array.isArray(userStatus.cascadeModelConfigData?.clientModelConfigs)
+        ? userStatus.cascadeModelConfigData!.clientModelConfigs!
+        : [];
+
+    const buckets: AntigravityQuotaSummaryBucket[] = [];
+
+    for (let index = 0; index < configs.length; index += 1) {
+        const config = configs[index];
+        if (!config || !config.quotaInfo) {
+            continue;
+        }
+
+        const remainingFraction =
+            typeof config.quotaInfo.remainingFraction === "number" &&
+            Number.isFinite(config.quotaInfo.remainingFraction)
+                ? config.quotaInfo.remainingFraction
+                : undefined;
+
+        const displayName =
+            safeExtractString(config.label) ||
+            safeExtractString(config.modelId) ||
+            `Model ${index + 1}`;
+
+        const descParts: string[] = [];
+        if (config.tagTitle) descParts.push(config.tagTitle);
+        if (config.tagDescription) descParts.push(config.tagDescription);
+
+        buckets.push({
+            bucketId: config.modelId || `model-${index}`,
+            displayName,
+            groupDisplayName: "Model Quota",
+            description: descParts.length > 0 ? descParts.join(" - ") : undefined,
+            remainingFraction,
+            resetTime: normalizeAntigravityTimestamp(config.quotaInfo.resetTime),
+            window: "standard",
+        });
+    }
+
+    const groupDisplayName = "Model Quotas";
+    const groups: AntigravityQuotaSummaryGroup[] = [
+        {
+            displayName: groupDisplayName,
+            description: "Quotas extracted from Language Server GetUserStatus",
+            buckets,
+        },
+    ];
+
+    const description =
+        safeExtractString(userStatus.userTier?.name) ||
+        safeExtractString(userStatus.userTier?.id) ||
+        "Standard Quota";
+
+    return {
+        fetchedAt: new Date().toISOString(),
+        description,
+        buckets,
+        groups,
+    };
+}
+
 export async function getAntigravityQuotaSummary(
     forceRefresh = true,
 ): Promise<AntigravityQuotaSummarySnapshot> {
@@ -1765,26 +2007,35 @@ export async function getAntigravityQuotaSummary(
         }
     }
 
-    const envelope =
-        await invokeConnectJson<
-            AntigravityQuotaSummaryEnvelope
-        >(
-            session.lsPort,
-            "RetrieveUserQuotaSummary",
-            session.csrfToken,
-            {
-                forceRefresh,
-            },
-        );
-
-        const response =
-            envelope.response;
-
-        if (!response) {
-            throw new Error(
-                "Antigravity RetrieveUserQuotaSummary returned no response.",
+    let envelope: AntigravityQuotaSummaryEnvelope | undefined;
+    try {
+        envelope =
+            await invokeConnectJson<
+                AntigravityQuotaSummaryEnvelope
+            >(
+                session.lsPort,
+                "RetrieveUserQuotaSummary",
+                session.csrfToken,
+                {
+                    forceRefresh,
+                },
             );
+    } catch (err: unknown) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        // If RetrieveUserQuotaSummary returns 404 (endpoint not supported on this language_server version),
+        // gracefully fallback to constructing the quota matrix from GetUserStatus!
+        if (errMsg.includes("HTTP 404") || errMsg.includes("404")) {
+            return await getAntigravityQuotaSummaryFromUserStatus(session);
         }
+        throw err;
+    }
+
+    const response =
+        envelope?.response;
+
+    if (!response) {
+        return await getAntigravityQuotaSummaryFromUserStatus(session);
+    }
 
         const buckets =
             Array.isArray(

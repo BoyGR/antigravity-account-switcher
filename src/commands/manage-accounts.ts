@@ -6,7 +6,6 @@ import {
 
 import {
     reauthenticateAndDetectAccount,
-    switchAntigravityAccount,
 } from "../antigravity/account-switcher";
 
 import {
@@ -17,6 +16,12 @@ import {
     saveCurrentAccountMetadata,
     updateManagedAccountLabel,
 } from "../antigravity/account-registry";
+
+import { TokenVaultService } from "../antigravity/token-vault-service";
+import { OAuthService } from "../antigravity/oauth-service";
+import { IdeStateService } from "../antigravity/ide-state-service";
+import { AntigravityAccountWebviewProvider } from "../views/account-webview-provider";
+import { Logger } from "../antigravity/logger";
 
 const COMMAND_ID =
     "boygr.antigravityAccountSwitcher.manageAccounts";
@@ -141,175 +146,184 @@ async function saveDetectedAccount(
 
 export async function addOrSwitchGoogleAccount(
     context: vscode.ExtensionContext,
+    tokenVault?: TokenVaultService,
 ): Promise<void> {
-    const current =
-        await getAntigravityCurrentAccount();
+    let currentEmail = "";
+    try {
+        const current = await getAntigravityCurrentAccount();
+        currentEmail = normalizeEmail(current.email);
+    } catch {
+        // Safe fallback if not signed in yet
+    }
 
-    const confirmation =
-        await vscode.window.showWarningMessage(
-            "Add or switch Antigravity Google account?",
-            {
-                modal:
-                    true,
+    const detailText = currentEmail
+        ? `Currently signed in as: ${currentEmail}\n\nA browser window will open to sign in with Google. You can select any Google account to add.`
+        : "A browser window will open to sign in with Google. You can select any Google account to add.";
 
-                detail:
-                    `Current account: ${current.email}\n\n` +
-                    "Antigravity will open its existing Google authentication flow. " +
-                    "Choose the account you want Antigravity to use.\n\n" +
-                    "After authentication, Antigravity Account Switcher will verify the active account " +
-                    "using GetUserStatus.",
-            },
-            "Open Google Chooser",
-        );
+    const confirmation = await vscode.window.showInformationMessage(
+        "Add Antigravity Google Account",
+        {
+            modal: true,
+            detail: detailText,
+        },
+        "Sign In with Google",
+    );
 
-    if (
-        confirmation !==
-        "Open Google Chooser"
-    ) {
+    if (confirmation !== "Sign In with Google") {
         return;
     }
 
-    const result =
-        await vscode.window.withProgress(
+    try {
+        const result = await vscode.window.withProgress(
             {
-                location:
-                    vscode.ProgressLocation.Notification,
-
-                title:
-                    "Antigravity Google Account",
-
-                cancellable:
-                    false,
+                location: vscode.ProgressLocation.Notification,
+                title: "Antigravity Google Sign-In",
+                cancellable: true,
             },
-            async progress => {
+            async (progress, token) => {
                 progress.report({
-                    message:
-                        "Waiting for Google / Antigravity authentication...",
+                    message: "Waiting for Google sign-in in browser...",
                 });
 
-                return await reauthenticateAndDetectAccount();
+                return await OAuthService.login({ cancellationToken: token });
             },
         );
 
-    const beforeEmail =
-        normalizeEmail(
-            result.before.email,
+        const newEmail = normalizeEmail(result.profile.email);
+        const displayName = result.profile.name;
+        const profilePictureUrl = result.profile.picture;
+
+        // 1. Save metadata into account registry
+        const existing = findManagedAccount(context, newEmail);
+        await saveCurrentAccountMetadata(
+            context,
+            {
+                email: newEmail,
+                displayName,
+                profilePictureUrl,
+            },
+            existing?.label,
         );
 
-    const afterEmail =
-        normalizeEmail(
-            result.after.email,
-        );
-
-    if (beforeEmail === afterEmail) {
-        vscode.window.showInformationMessage(
-            `No account change detected. Antigravity remains signed in as ${result.after.email}.`,
-        );
-
-        if (
-            !findManagedAccount(
+        // 2. Save tokens directly to Token Vault (encrypted SecretStorage + state.vscdb entries)
+        if (tokenVault?.isSupported()) {
+            await tokenVault.saveAccountOAuthTokens(
+                newEmail,
+                {
+                    accessToken: result.tokens.accessToken,
+                    refreshToken: result.tokens.refreshToken,
+                    expiresIn: result.tokens.expiresIn,
+                    idToken: result.tokens.idToken,
+                },
+                profilePictureUrl,
                 context,
-                result.after.email,
-            )
-        ) {
-            await saveDetectedAccount(
-                context,
-                result.after.email,
-                result.after.displayName,
             );
         }
 
-        return;
+        // 3. Immediately refresh views so newly added account appears in Saved Accounts right away
+        await vscode.commands
+            .executeCommand("boygr.antigravityAccountSwitcher.refreshAccountsView")
+            .then(undefined, () => {});
+
+        Logger.info(`Account ${newEmail} successfully registered and vaulted.`);
+
+        // 4. Prompt user if they want to switch now or later (auto-selects Later after 10s)
+        if (currentEmail && newEmail === currentEmail) {
+            vscode.window.showInformationMessage(
+                `Credentials refreshed and saved to vault for ${newEmail}.`,
+            );
+        } else {
+            // Trigger live second-by-second countdown in sidebar webview
+            const displayedInWebview = await AntigravityAccountWebviewProvider.promptSwitchInWebview(newEmail, 10);
+
+            let switchChoice = "Later";
+
+            if (displayedInWebview) {
+                // User sees countdown banner in activity bar directly; no duplicate bottom-right toast needed!
+                // Wait for either the user to click Switch Now in the webview or 10s timeout
+                // Note: clicking Switch Now in webview dispatches boygr.antigravityAccountSwitcher.switchAccount directly
+                let timer: NodeJS.Timeout | undefined;
+                await new Promise<void>(resolve => {
+                    timer = setTimeout(() => resolve(), 10_000);
+                });
+                if (timer) {
+                    clearTimeout(timer);
+                }
+                await AntigravityAccountWebviewProvider.dismissSwitchPromptInWebview().catch(() => {});
+                return;
+            } else {
+                // Webview is not active/visible, fallback to standard notification toast
+                const choicePromise = vscode.window.showInformationMessage(
+                    `Account ${newEmail} added successfully! Switch to this account now? (Auto-later in 10s)`,
+                    "Switch Now",
+                    "Later",
+                );
+                let timer: NodeJS.Timeout | undefined;
+                const timeoutPromise = new Promise<string>(resolve => {
+                    timer = setTimeout(() => resolve("Later"), 10_000);
+                });
+                const rawChoice = await Promise.race([choicePromise, timeoutPromise]).finally(() => {
+                    if (timer) {
+                        clearTimeout(timer);
+                    }
+                });
+                switchChoice = rawChoice || "Later";
+
+                await vscode.commands.executeCommand("notifications.hideToasts").then(undefined, () => {});
+            }
+
+            if (switchChoice === "Switch Now") {
+                Logger.info(`Switching to newly added account: ${newEmail}`);
+                if (IdeStateService.isAntigravityIde()) {
+                    const ideTarget = tokenVault
+                        ? await tokenVault.getIdeState(newEmail)
+                        : null;
+
+                    if (ideTarget?.oauthToken && ideTarget?.userStatus) {
+                        await tokenVault?.applyCredential(newEmail).catch(() => false);
+                        await IdeStateService.performIdeAccountSwitch(context, {
+                            email: newEmail,
+                            oauthToken: ideTarget.oauthToken,
+                            userStatus: ideTarget.userStatus,
+                            profileUrl: profilePictureUrl,
+                        });
+                        return;
+                    }
+                }
+
+                await vscode.commands.executeCommand(
+                    "boygr.antigravityAccountSwitcher.switchAccount",
+                    { email: newEmail },
+                );
+            } else {
+                Logger.info(`Switch prompt auto-dismissed / Later selected for ${newEmail}`);
+                // Later or dismissed or timed out: refresh views again
+                await vscode.commands
+                    .executeCommand("boygr.antigravityAccountSwitcher.refreshAccountsView")
+                    .then(undefined, () => {});
+            }
+        }
+    } catch (error) {
+        if (
+            error instanceof Error &&
+            error.message.includes("cancelled by user")
+        ) {
+            return;
+        }
+        throw error;
     }
-
-    vscode.window.showInformationMessage(
-        `Antigravity switched from ${result.before.email} to ${result.after.email}.`,
-    );
-
-    await saveDetectedAccount(
-        context,
-        result.after.email,
-        result.after.displayName,
-    );
 }
 
 async function switchToAccount(
     context: vscode.ExtensionContext,
     account: ManagedAntigravityAccount,
 ): Promise<void> {
-    const confirmation =
-        await vscode.window.showWarningMessage(
-            `Switch Antigravity to ${accountTitle(account)}?`,
-            {
-                modal:
-                    true,
-
-                detail:
-                    `Target: ${account.email}\n\n` +
-                    "Antigravity will open its Google authentication flow. " +
-                    "Select this exact account in the Google chooser.\n\n" +
-                    "The switch is accepted only when GetUserStatus confirms " +
-                    "the target email.",
-            },
-            "Start Switch",
-        );
-
-    if (
-        confirmation !==
-        "Start Switch"
-    ) {
-        return;
-    }
-
-    const result =
-        await vscode.window.withProgress(
-            {
-                location:
-                    vscode.ProgressLocation.Notification,
-
-                title:
-                    `Switching Antigravity to ${accountTitle(account)}`,
-
-                cancellable:
-                    false,
-            },
-            async progress => {
-                progress.report({
-                    message:
-                        "Waiting for Google / Antigravity authentication...",
-                });
-
-                return await switchAntigravityAccount(
-                    account.email,
-                );
-            },
-        );
-
-    const current =
-        await getAntigravityCurrentAccount();
-
-    await saveCurrentAccountMetadata(
-        context,
-        current,
-        account.label,
-    );
-
-    if (
-        result.verified &&
-        normalizeEmail(result.afterEmail) ===
-            normalizeEmail(account.email)
-    ) {
-        vscode.window.showInformationMessage(
-            result.changed
-                ? `Antigravity switched to ${accountTitle(account)} (${result.afterEmail}).`
-                : `${accountTitle(account)} is already active.`,
-        );
-
-        return;
-    }
-
-    throw new Error(
-        `Account switch could not be verified for ${account.email}.`,
+    await vscode.commands.executeCommand(
+        "boygr.antigravityAccountSwitcher.switchAccount",
+        {
+            email: account.email,
+            label: account.label,
+        },
     );
 }
 
@@ -334,7 +348,7 @@ async function chooseAccountAction(
                 account.email,
 
             detail:
-                "Open Google's account chooser and verify the active Antigravity account.",
+                "Switch to this account (instant if token is saved, or via Google chooser).",
 
             action:
                 "switch",
@@ -504,6 +518,7 @@ async function chooseAccountAction(
 
 async function showAccountManager(
     context: vscode.ExtensionContext,
+    tokenVault?: TokenVaultService,
 ): Promise<void> {
     while (true) {
         const current =
@@ -562,7 +577,7 @@ async function showAccountManager(
                     "save-current",
 
                 label:
-                    "$(add) Save current account",
+                    "$(save) Save current active account",
 
                 description:
                     current.email,
@@ -603,20 +618,8 @@ async function showAccountManager(
             await vscode.window.showQuickPick(
                 items,
                 {
-                    title:
-                        "Antigravity Account Manager",
-
                     placeHolder:
-                        `Current: ${current.email}`,
-
-                    matchOnDescription:
-                        true,
-
-                    matchOnDetail:
-                        true,
-
-                    ignoreFocusOut:
-                        true,
+                        "Manage Antigravity Accounts",
                 },
             );
 
@@ -637,6 +640,7 @@ async function showAccountManager(
         ) {
             await addOrSwitchGoogleAccount(
                 context,
+                tokenVault,
             );
 
             continue;
@@ -704,6 +708,7 @@ async function showAccountManager(
 
 export function registerManageAccountsCommand(
     context: vscode.ExtensionContext,
+    tokenVault?: TokenVaultService,
 ): void {
     const disposable =
         vscode.commands.registerCommand(
@@ -712,6 +717,7 @@ export function registerManageAccountsCommand(
                 try {
                     await showAccountManager(
                         context,
+                        tokenVault,
                     );
 
                     await vscode.commands.executeCommand(

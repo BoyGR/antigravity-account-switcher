@@ -2,6 +2,36 @@
 
 All notable changes to the **Antigravity Account Switcher** extension will be documented in this file.
 
+## [1.4.14] - 2026-09-22
+
+### Fixed & Improved
+- **Seamless Antigravity IDE Account Switching via State DB Injection**:
+  - Implemented standalone detached worker (`ELECTRON_RUN_AS_NODE: '1'`) and bit-exact Protobuf encoder for Antigravity IDE's internal SQLite state database (`state.vscdb`).
+  - Solved in-memory cache overwrites during window reload by gracefully waiting for `Antigravity IDE.exe` process exit, injecting `antigravityUnifiedStateSync.oauthToken` and `antigravityUnifiedStateSync.userStatus` directly into `ItemTable`, and automatically relaunching the editor.
+  - Keeps standard VS Code workflow intact using non-closing Windows Credential Manager / keytar swaps.
+- **Instant Account Switching without Browser Prompts**:
+  - Replaced disruptive process termination (`taskkill /F`) with safe authentication refresh signals (`antigravity.handleAuthRefresh`), eliminating `connection got disposed` and `server crashed unexpectedly` errors.
+  - Strictly prevented unwanted browser OAuth fallback when switching between accounts that are already saved in the Token Vault.
+  - Implemented fast parallel Connect RPC probing, reducing backend listening port detection latency from 10–15s to ~15ms.
+- **macOS Path Handling with Spaces (Fixes Issue #4)**:
+  - Fixed POSIX process command-line parsing failing when application install paths contain spaces (e.g., `/Applications/Antigravity IDE.app`), which previously caused the backend to be falsely detected as "Offline".
+  - Made the `Diagnose` command cross-platform by scanning macOS (`~/Library/Application Support`) and Linux (`~/.config`) global storage locations alongside Windows.
+- **Quota Matrix 404 Fallback (Fixes Issue #5)**:
+  - Added automatic fallback to `GetUserStatus` when `RetrieveUserQuotaSummary` returns HTTP 404 on standalone or specific Language Server builds, preventing empty Quota Matrix displays and error toasts.
+- **Vault Integrity Protection & Self-Healing**:
+  - Implemented automatic JWT decoding and validation (`extractEmailFromCredentialBlob` & `extractEmailFromIdeState`) preventing cross-account token contamination in the Token Vault.
+  - Added self-healing integrity verification on access with auto-purge of invalid records.
+- **Backend Session Caching & Fast Probing**:
+  - Added a 30s TTL session cache for `detectAntigravityBackend` with quick 300ms RPC probes, reducing repeated process inspection latency from 2–3s to ~15ms and resolving persistent "Connecting..." delays.
+- **Aggregated Low Quota Notifications**:
+  - Combined multiple simultaneous low-quota warnings (e.g. 5-hour limit and weekly limit) into a single unified alert toast instead of flooding the screen with separate duplicate notifications.
+- **Activity Bar UI/UX Refinements**:
+  - Single-line horizontal layout for the *Refresh* action button.
+  - Eliminated duplicate bottom-right notification toast when adding a new account, focusing the countdown switch banner solely in the Activity Bar.
+  - Integrated *Clear Token Vault* confirmation into an in-view Activity Bar modal dialog, replacing the default VS Code modal window.
+
+---
+
 ## [1.4.13] - 2026-09-21
 
 ### Added & Improved

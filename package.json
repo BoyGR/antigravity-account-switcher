@@ -2,7 +2,7 @@
     "name": "antigravity-account-switcher",
     "displayName": "Antigravity Account Switcher",
     "description": "Manage and switch Google accounts used by Google Antigravity across Visual Studio Code, Google Antigravity IDE, Cursor, and other VS Code-compatible editors through Antigravity's existing authentication flow.",
-    "version": "1.4.13",
+    "version": "1.4.14",
     "publisher": "boygr",
     "author": {
         "name": "Boy Gilang Ramadhan",
@@ -122,6 +122,12 @@
                 "command": "boygr.antigravityAccountSwitcher.statusBarMenu",
                 "title": "Status Bar Menu",
                 "category": "Antigravity Account Switcher"
+            },
+            {
+                "command": "boygr.antigravityAccountSwitcher.showOutputChannel",
+                "title": "Show Output Channel / Logs",
+                "category": "Antigravity Account Switcher",
+                "icon": "$(output)"
             },
             {
                 "command": "boygr.antigravityAccountSwitcher.exportAccounts",
@@ -362,6 +368,7 @@
     },
     "devDependencies": {
         "@types/node": "^24.0.0",
+        "@types/sql.js": "^1.4.11",
         "@types/vscode": "^1.95.0",
         "@vscode/vsce": "^3.6.0",
         "esbuild": "^0.28.2",
@@ -377,5 +384,8 @@
     "repository": {
         "type": "git",
         "url": "https://github.com/BoyGR/antigravity-account-switcher.git"
+    },
+    "dependencies": {
+        "sql.js": "^1.14.2"
     }
 }

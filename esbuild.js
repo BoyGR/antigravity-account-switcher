@@ -15,7 +15,7 @@ async function main() {
         entryPoints: ["src/extension.ts"],
         bundle: true,
         outfile: "dist/extension.js",
-        external: ["vscode"],
+        external: ["vscode", "sql.js"],
         format: "cjs",
         platform: "node",
         target: "node18",
@@ -45,7 +45,7 @@ async function main() {
         logLevel: "info",
     });
 
-    // 5. Copy media assets
+    // 5. Copy media assets & vendor scripts
     const copyAssets = () => {
         const filesToCopy = ["antigravity.svg", "icon.png", "antigravity.woff"];
         for (const file of filesToCopy) {
@@ -54,6 +54,12 @@ async function main() {
             if (fs.existsSync(src)) {
                 fs.copyFileSync(src, dest);
             }
+        }
+
+        const sqlAsmSrc = path.join(__dirname, "node_modules", "sql.js", "dist", "sql-asm.js");
+        const sqlAsmDest = path.join(__dirname, "dist", "sql-asm.js");
+        if (fs.existsSync(sqlAsmSrc)) {
+            fs.copyFileSync(sqlAsmSrc, sqlAsmDest);
         }
     };
     copyAssets();

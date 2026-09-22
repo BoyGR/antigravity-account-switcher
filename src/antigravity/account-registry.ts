@@ -135,6 +135,30 @@ export async function saveCurrentAccountMetadata(
     return account;
 }
 
+export async function updateManagedAccountPicture(
+    context: vscode.ExtensionContext,
+    email: string,
+    profilePictureUrl: string,
+): Promise<boolean> {
+    const normalized = normalizeEmail(email);
+    if (!normalized || !profilePictureUrl) {
+        return false;
+    }
+
+    const existingState = context.globalState.get<AccountRegistryState>(STORAGE_KEY);
+    if (!existingState || existingState.version !== 1 || !existingState.accounts[normalized]) {
+        return false;
+    }
+
+    if (existingState.accounts[normalized].profilePictureUrl === profilePictureUrl) {
+        return false;
+    }
+
+    existingState.accounts[normalized].profilePictureUrl = profilePictureUrl;
+    await context.globalState.update(STORAGE_KEY, existingState);
+    return true;
+}
+
 export async function removeManagedAccount(
     context: vscode.ExtensionContext,
     email: string,

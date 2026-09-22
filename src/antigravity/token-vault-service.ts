@@ -2,6 +2,8 @@ import * as vscode from "vscode";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 
+import { IdeStateService, ProtobufUtils } from "./ide-state-service";
+
 const execFileAsync = promisify(execFile);
 
 export interface VaultCredentialRecord {
@@ -9,6 +11,11 @@ export interface VaultCredentialRecord {
     blobBase64: string;
     persist: number;
     updatedAt: number;
+    picture?: string;
+    ideState?: {
+        oauthToken?: string;
+        userStatus?: string;
+    };
 }
 
 const VAULT_KEY_PREFIX = "antigravity.vault.token.";
@@ -18,6 +25,86 @@ const TARGET_CREDENTIAL_NAME = "gemini:antigravity";
 function normalizeEmail(email: string): string {
     return email.trim().toLowerCase();
 }
+
+export function extractEmailFromJwt(jwtToken?: string): string | undefined {
+    if (!jwtToken || typeof jwtToken !== "string") {
+        return undefined;
+    }
+    try {
+        const parts = jwtToken.split(".");
+        if (parts.length >= 2) {
+            const base64Url = parts[1];
+            const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+            const payload = Buffer.from(base64, "base64").toString("utf-8");
+            const data = JSON.parse(payload);
+            if (data?.email && typeof data.email === "string") {
+                return normalizeEmail(data.email);
+            }
+        }
+    } catch {
+        // Ignore
+    }
+    return undefined;
+}
+
+export function extractEmailFromCredentialBlob(blobBase64?: string): string | undefined {
+    if (!blobBase64 || typeof blobBase64 !== "string") {
+        return undefined;
+    }
+    try {
+        const jsonText = Buffer.from(blobBase64, "base64").toString("utf-8");
+        const cred = JSON.parse(jsonText);
+        if (cred?.id_token) {
+            const email = extractEmailFromJwt(cred.id_token);
+            if (email) {
+                return email;
+            }
+        }
+        if (cred?.email && typeof cred.email === "string") {
+            return normalizeEmail(cred.email);
+        }
+    } catch {
+        // Ignore
+    }
+    return undefined;
+}
+
+export function extractEmailFromIdeState(ideState?: { oauthToken?: string; userStatus?: string }): string | undefined {
+    if (!ideState) {
+        return undefined;
+    }
+    if (ideState.userStatus) {
+        try {
+            const raw = Buffer.from(ideState.userStatus, "base64").toString("utf-8");
+            const match = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.exec(raw);
+            if (match) {
+                return normalizeEmail(match[0]);
+            }
+        } catch {
+            // Ignore
+        }
+    }
+    if (ideState.oauthToken) {
+        try {
+            const raw = Buffer.from(ideState.oauthToken, "base64").toString("utf-8");
+            const jwtMatch = /eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]*/.exec(raw);
+            if (jwtMatch) {
+                const email = extractEmailFromJwt(jwtMatch[0]);
+                if (email) {
+                    return email;
+                }
+            }
+            const match = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.exec(raw);
+            if (match) {
+                return normalizeEmail(match[0]);
+            }
+        } catch {
+            // Ignore
+        }
+    }
+    return undefined;
+}
+
 
 /**
  * C# definition for Win32 CredReadW and CredWriteW via Advapi32.dll
@@ -216,23 +303,77 @@ if ($success) {
 
     /**
      * Captures the active credential from the system and encrypts it in SecretStorage for the specified email.
+     * Verifies that the internal token identity matches the requested email to prevent cross-contamination.
      */
-    public async captureActiveCredential(email: string): Promise<boolean> {
+    public async captureActiveCredential(
+        email: string,
+        context?: vscode.ExtensionContext,
+    ): Promise<boolean> {
         const normalized = normalizeEmail(email);
         if (!normalized) {
             return false;
         }
 
+        const existingRecord = await this.getCredentialRecord(normalized).catch(() => null);
+
+        // 1. Read and validate system credential (gemini:antigravity)
         const systemCred = await this.readSystemCredential();
-        if (!systemCred) {
+        let validBlobBase64: string | undefined;
+        let userName = "antigravity";
+        let persist = 2;
+
+        if (systemCred?.blobBase64) {
+            const systemEmail = extractEmailFromCredentialBlob(systemCred.blobBase64);
+            // Only capture systemCred if its token payload specifically matches the target email
+            if (systemEmail && systemEmail === normalized) {
+                validBlobBase64 = systemCred.blobBase64;
+                userName = systemCred.userName || "antigravity";
+                persist = systemCred.persist;
+            }
+        }
+
+        // 2. Read and validate IDE state if running in Antigravity IDE
+        let validIdeState: { oauthToken?: string; userStatus?: string } | undefined;
+        if (context && IdeStateService.isAntigravityIde()) {
+            const ideState = (await IdeStateService.captureCurrentIdeState(context)) || undefined;
+            if (ideState) {
+                const ideEmail = extractEmailFromIdeState(ideState);
+                if (ideEmail && ideEmail === normalized) {
+                    validIdeState = ideState;
+                }
+            }
+        }
+
+        // Preserve existing valid vault fields if current live state belongs to another account
+        if (!validBlobBase64 && existingRecord?.blobBase64) {
+            const existingEmail = extractEmailFromCredentialBlob(existingRecord.blobBase64);
+            if (existingEmail === normalized) {
+                validBlobBase64 = existingRecord.blobBase64;
+                userName = existingRecord.userName || "antigravity";
+                persist = existingRecord.persist;
+            }
+        }
+
+        if (!validIdeState && existingRecord?.ideState) {
+            const existingIdeEmail = extractEmailFromIdeState(existingRecord.ideState);
+            if (existingIdeEmail === normalized) {
+                validIdeState = existingRecord.ideState;
+            }
+        }
+
+        // If neither system credential nor IDE state belongs to the requested account,
+        // abort saving to avoid contaminating the vault
+        if (!validBlobBase64 && !validIdeState) {
             return false;
         }
 
         const record: VaultCredentialRecord = {
-            userName: systemCred.userName,
-            blobBase64: systemCred.blobBase64,
-            persist: systemCred.persist,
+            userName,
+            blobBase64: validBlobBase64 || "",
+            persist,
             updatedAt: Date.now(),
+            picture: existingRecord?.picture,
+            ideState: validIdeState,
         };
 
         await this.secrets.store(
@@ -245,10 +386,183 @@ if ($success) {
     }
 
     /**
+     * Directly saves OAuth tokens received from OAuth flow into SecretStorage,
+     * formatting both the Windows Credential blob (gemini:antigravity) and
+     * Protobuf entries (state.vscdb) for Antigravity IDE.
+     */
+    public async saveAccountOAuthTokens(
+        email: string,
+        tokens: {
+            accessToken: string;
+            refreshToken: string;
+            expiresIn: number;
+            idToken?: string;
+        },
+        picture?: string,
+        context?: vscode.ExtensionContext,
+    ): Promise<boolean> {
+        const normalized = normalizeEmail(email);
+        if (!normalized) {
+            return false;
+        }
+
+        const expiryDate = new Date(Date.now() + tokens.expiresIn * 1000).toISOString();
+        const systemCredJson = {
+            token: {
+                access_token: tokens.accessToken,
+                refresh_token: tokens.refreshToken,
+                token_type: "Bearer",
+                expiry: expiryDate,
+            },
+            id_token: tokens.idToken || "",
+        };
+
+        const blobBase64 = Buffer.from(JSON.stringify(systemCredJson), "utf-8").toString("base64");
+
+        const expirySeconds = Math.floor((Date.now() + tokens.expiresIn * 1000) / 1000);
+        const oauthToken = ProtobufUtils.createUnifiedOAuthToken(
+            tokens.accessToken,
+            tokens.refreshToken,
+            expirySeconds,
+            false,
+            tokens.idToken,
+            normalized,
+        );
+        const userStatus = ProtobufUtils.createUnifiedUserStatus(normalized);
+
+        const record: VaultCredentialRecord = {
+            userName: "antigravity",
+            blobBase64,
+            persist: 2,
+            updatedAt: Date.now(),
+            picture: picture || undefined,
+            ideState: {
+                oauthToken,
+                userStatus,
+            },
+        };
+
+        await this.secrets.store(
+            this.getVaultKey(normalized),
+            JSON.stringify(record),
+        );
+
+        await this.addToIndex(normalized);
+        return true;
+    }
+
+    /**
+     * Retrieves the cached picture URL from a vaulted account record.
+     */
+    public async getAccountPicture(email: string): Promise<string | undefined> {
+        const record = await this.getCredentialRecord(email);
+        return record?.picture;
+    }
+
+    /**
      * Alias for captureActiveCredential.
      */
-    public async saveActiveCredential(email: string): Promise<boolean> {
-        return this.captureActiveCredential(email);
+    public async saveActiveCredential(
+        email: string,
+        context?: vscode.ExtensionContext,
+    ): Promise<boolean> {
+        return this.captureActiveCredential(email, context);
+    }
+
+    /**
+     * Retrieves the parsed VaultCredentialRecord for an email.
+     * Includes an anti-corruption integrity check to guarantee the stored tokens belong to this email.
+     */
+    public async getCredentialRecord(
+        email: string,
+    ): Promise<VaultCredentialRecord | null> {
+        const normalized = normalizeEmail(email);
+        if (!normalized) {
+            return null;
+        }
+
+        const storedJson = await this.secrets.get(this.getVaultKey(normalized));
+        if (!storedJson) {
+            return null;
+        }
+
+        try {
+            const record = JSON.parse(storedJson) as VaultCredentialRecord;
+
+            // Anti-corruption check: Ensure internal tokens/identities belong to this email
+            let isCorrupt = false;
+            if (record.blobBase64) {
+                const blobEmail = extractEmailFromCredentialBlob(record.blobBase64);
+                if (blobEmail && blobEmail !== normalized) {
+                    isCorrupt = true;
+                }
+            }
+            if (record.ideState) {
+                const ideEmail = extractEmailFromIdeState(record.ideState);
+                if (ideEmail && ideEmail !== normalized) {
+                    isCorrupt = true;
+                }
+            }
+
+            if (isCorrupt) {
+                // Auto-purge corrupted record to heal the vault
+                await this.secrets.delete(this.getVaultKey(normalized));
+                await this.removeFromIndex(normalized);
+                return null;
+            }
+
+            return record;
+        } catch {
+            return null;
+        }
+    }
+
+    /**
+     * Retrieves or reconstructs the Protobuf state.vscdb entries for Antigravity IDE.
+     */
+    public async getIdeState(
+        email: string,
+    ): Promise<{ oauthToken: string; userStatus: string } | null> {
+        const record = await this.getCredentialRecord(email);
+        if (!record) {
+            return null;
+        }
+
+        if (record.ideState?.oauthToken && record.ideState?.userStatus) {
+            return {
+                oauthToken: record.ideState.oauthToken,
+                userStatus: record.ideState.userStatus,
+            };
+        }
+
+        // Synthesize ideState from blobBase64 if not directly captured
+        if (record.blobBase64) {
+            try {
+                const text = Buffer.from(record.blobBase64, "base64").toString("utf-8");
+                const credJson = JSON.parse(text);
+                const tokenObj = credJson.token;
+                if (tokenObj?.access_token && tokenObj?.refresh_token) {
+                    const expiryDate = tokenObj.expiry
+                        ? new Date(tokenObj.expiry)
+                        : new Date(Date.now() + 3600 * 1000);
+                    const expirySeconds = Math.floor(expiryDate.getTime() / 1000);
+                    const oauthToken = ProtobufUtils.createUnifiedOAuthToken(
+                        tokenObj.access_token,
+                        tokenObj.refresh_token,
+                        expirySeconds,
+                        false,
+                        credJson.id_token,
+                        email,
+                    );
+                    const userStatus = ProtobufUtils.createUnifiedUserStatus(email);
+                    return { oauthToken, userStatus };
+                }
+            } catch {
+                // Ignore parse errors
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -260,29 +574,25 @@ if ($success) {
             return false;
         }
 
-        const storedJson = await this.secrets.get(this.getVaultKey(normalized));
-        if (!storedJson) {
+        const record = await this.getCredentialRecord(normalized);
+        if (!record || !record.blobBase64) {
             return false;
         }
 
-        try {
-            const record = JSON.parse(storedJson) as VaultCredentialRecord;
-            if (!record.blobBase64) {
-                return false;
-            }
-
-            return await this.writeSystemCredential(
-                record.userName || "antigravity",
-                record.blobBase64,
-                record.persist || 2,
-            );
-        } catch {
+        const blobEmail = extractEmailFromCredentialBlob(record.blobBase64);
+        if (blobEmail && blobEmail !== normalized) {
             return false;
         }
+
+        return await this.writeSystemCredential(
+            record.userName || "antigravity",
+            record.blobBase64,
+            record.persist || 2,
+        );
     }
 
     /**
-     * Checks whether an encrypted credential is saved in the vault for the given email.
+     * Checks whether a valid, non-corrupted encrypted credential is saved in the vault for the given email.
      */
     public async hasCredential(email: string): Promise<boolean> {
         const normalized = normalizeEmail(email);
@@ -290,8 +600,12 @@ if ($success) {
             return false;
         }
 
-        const stored = await this.secrets.get(this.getVaultKey(normalized));
-        return typeof stored === "string" && stored.length > 0;
+        const record = await this.getCredentialRecord(normalized);
+        if (!record) {
+            return false;
+        }
+
+        return Boolean(record.blobBase64 || (record.ideState?.oauthToken && record.ideState?.userStatus));
     }
 
     /**

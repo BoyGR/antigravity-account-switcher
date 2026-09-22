@@ -131,6 +131,9 @@
 
         matrixSort:
             "quota",
+
+        clearVaultConfirmOpen:
+            false,
     };
 
 
@@ -741,6 +744,12 @@
             purgeVault:
                 "Clear Token Vault...",
 
+            clearVaultQuestion:
+                "Clear Token Vault?",
+
+            clearVaultExplanation:
+                "Are you sure you want to clear all cached account credentials from Token Vault? Next account switches will require browser login.",
+
             vaultInfo:
                 "Saved in encrypted Token Vault for 1-click seamless switching",
 
@@ -1348,6 +1357,12 @@
 
             purgeVault:
                 "Bersihkan Brankas Token...",
+
+            clearVaultQuestion:
+                "Bersihkan Brankas Token?",
+
+            clearVaultExplanation:
+                "Apakah Anda yakin ingin menghapus semua kredensial akun yang tersimpan di Brankas Token? Pergantian akun berikutnya akan membutuhkan login browser kembali.",
 
             vaultInfo:
                 "Tersimpan di Brankas Token terenkripsi untuk pergantian 1-klik tanpa login browser",
@@ -2028,7 +2043,98 @@
         }
     }
 
+    let switchPromptTimer = null;
+
+    function showSwitchPrompt(email, timeoutSeconds) {
+        if (switchPromptTimer) {
+            clearInterval(switchPromptTimer);
+            switchPromptTimer = null;
+        }
+        ui.switchPrompt = {
+            email: email,
+            remaining: timeoutSeconds || 10,
+        };
+        render();
+
+        switchPromptTimer = setInterval(() => {
+            if (!ui.switchPrompt) {
+                clearInterval(switchPromptTimer);
+                switchPromptTimer = null;
+                return;
+            }
+            ui.switchPrompt.remaining -= 1;
+            if (ui.switchPrompt.remaining <= 0) {
+                clearInterval(switchPromptTimer);
+                switchPromptTimer = null;
+                ui.switchPrompt = null;
+                render();
+                return;
+            }
+            const badge = document.getElementById("switch-prompt-countdown");
+            if (badge) {
+                badge.textContent = `${ui.switchPrompt.remaining}s`;
+            } else {
+                render();
+            }
+        }, 1000);
+    }
+
+    function dismissSwitchPrompt() {
+        if (switchPromptTimer) {
+            clearInterval(switchPromptTimer);
+            switchPromptTimer = null;
+        }
+        if (ui.switchPrompt) {
+            ui.switchPrompt = null;
+            render();
+        }
+    }
+
     function renderFeedback() {
+        if (ui.switchPrompt) {
+            return `
+                <div
+                    class="toast-host"
+                    aria-live="polite"
+                    aria-atomic="true"
+                    style="margin-bottom: 12px;"
+                >
+                    <div
+                        class="toast"
+                        role="alert"
+                        style="background: #1e293b; border: 1px solid #3b82f6; border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.4); width: 100%; box-sizing: border-box;"
+                    >
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 600; font-size: 0.82rem; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                Switch to ${escapeHtml(ui.switchPrompt.email)}?
+                            </span>
+                            <span id="switch-prompt-countdown" style="background: #3b82f6; color: white; padding: 2px 7px; border-radius: 12px; font-size: 0.72rem; font-weight: 700; flex-shrink: 0; margin-left: 6px;">
+                                ${ui.switchPrompt.remaining}s
+                            </span>
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-top: 2px;">
+                            <button
+                                type="button"
+                                class="btn"
+                                data-prompt-switch="${escapeHtml(ui.switchPrompt.email)}"
+                                style="flex: 1; background: #2563eb; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500;"
+                            >
+                                Switch Now
+                            </button>
+                            <button
+                                type="button"
+                                class="btn"
+                                data-prompt-dismiss="true"
+                                style="background: transparent; color: #94a3b8; border: 1px solid #475569; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;"
+                            >
+                                Later
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         if (operation) {
             return `
                 <div
@@ -3004,68 +3110,18 @@
                 )
                 : "";
 
-        const isVerifRequired = isGoogleVerificationRequired(state.usageError);
-
         const usageHtml = groups.length > 0
             ? renderSavedUsageSummary(usage)
-            : isVerifRequired
-                ? `
-                    <div class="verification-alert-card" role="alert">
-                        <div class="verification-alert-header">
-                            <span class="verification-alert-icon" aria-hidden="true">⚠️</span>
-                            <div class="verification-alert-titles">
-                                <strong class="verification-alert-title">${escapeHtml(t("verificationRequiredTitle"))}</strong>
-                                <span class="verification-alert-subtitle">${escapeHtml(t("verificationRequiredSubtitle"))}</span>
-                            </div>
-                        </div>
-                        <div class="verification-alert-desc">
-                            ${escapeHtml(t("verificationRequiredDesc"))}
-                        </div>
-                        <div class="verification-alert-steps">
-                            <div class="verification-step-item">
-                                <span class="step-num">1</span>
-                                <span class="step-text">${escapeHtml(t("verificationStep1"))}</span>
-                            </div>
-                            <div class="verification-step-item">
-                                <span class="step-num">2</span>
-                                <span class="step-text">${escapeHtml(t("verificationStep2"))}</span>
-                            </div>
-                            <div class="verification-step-item">
-                                <span class="step-num">3</span>
-                                <span class="step-text">${escapeHtml(t("verificationStep3"))}</span>
-                            </div>
-                        </div>
-                        <div class="verification-alert-actions">
-                            <button
-                                type="button"
-                                class="btn primary-btn compact"
-                                data-action="reauth"
-                                ${isBusy() ? "disabled" : ""}
-                            >
-                                ${icon("refresh")}
-                                <span>${escapeHtml(t("signInAgain"))}</span>
-                            </button>
-                            <button
-                                type="button"
-                                class="btn secondary-btn compact"
-                                data-action="refresh"
-                                ${isBusy() ? "disabled" : ""}
-                            >
-                                <span>${escapeHtml(t("checkAgain"))}</span>
-                            </button>
-                        </div>
-                    </div>
-                `
-                : `
-                    <div class="usage-empty secondary-text">
-                        ${
-                            escapeHtml(
-                                state.usageError ||
-                                t("quotaUnavailable")
-                            )
-                        }
-                    </div>
-                `;
+            : `
+                <div class="usage-empty secondary-text">
+                    ${
+                        escapeHtml(
+                            state.usageError ||
+                            t("quotaUnavailable")
+                        )
+                    }
+                </div>
+            `;
 
         return `
             <div class="usage-section current-usage-section">
@@ -5663,6 +5719,72 @@
             </div>
         `;
     }
+    function renderClearVaultDialog() {
+        if (!ui.clearVaultConfirmOpen) {
+            return "";
+        }
+
+        const vaultedCount = (state.vaultedEmails || []).length;
+
+        return `
+            <div
+                class="dialog-backdrop"
+                data-action="cancel-clear-vault"
+            >
+                <section
+                    class="confirm-dialog"
+                    role="alertdialog"
+                    aria-modal="true"
+                    aria-labelledby="clear-vault-dialog-title"
+                    aria-describedby="clear-vault-dialog-description"
+                >
+                    <header class="confirm-dialog-header">
+                        <div
+                            class="danger-symbol"
+                            aria-hidden="true"
+                        >
+                            !
+                        </div>
+
+                        <div>
+                            <h2 id="clear-vault-dialog-title">
+                                ${escapeHtml(t("clearVaultQuestion"))}
+                            </h2>
+
+                            <div class="confirm-account-name" style="color: var(--ag-warning, #f59e0b);">
+                                ${vaultedCount > 0 ? `${vaultedCount} cached account credential(s)` : "Encrypted Token Storage"}
+                            </div>
+                        </div>
+                    </header>
+
+                    <p
+                        id="clear-vault-dialog-description"
+                        class="confirm-description"
+                    >
+                        ${escapeHtml(t("clearVaultExplanation"))}
+                    </p>
+
+                    <footer class="confirm-dialog-actions">
+                        <button
+                            type="button"
+                            class="btn"
+                            data-action="cancel-clear-vault"
+                        >
+                            ${escapeHtml(t("cancel"))}
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn destructive"
+                            data-action="confirm-clear-vault"
+                        >
+                            ${escapeHtml(t("clearTokenVault")) || "Clear Token Vault"}
+                        </button>
+                    </footer>
+                </section>
+            </div>
+        `;
+    }
     function renderSwitchDialog() {
         const account =
             ui.switchCandidate;
@@ -5762,6 +5884,7 @@
 
             ${renderSettings()}
             ${renderRemoveDialog()}
+            ${renderClearVaultDialog()}
             ${renderSwitchDialog()}
             ${renderRuntimeModal()}
             ${renderQuotaMatrixModal()}
@@ -6219,6 +6342,23 @@
                 return;
             }
 
+            const promptSwitchBtn = rawTarget.closest("[data-prompt-switch]");
+            if (promptSwitchBtn) {
+                const targetEmail = promptSwitchBtn.dataset.promptSwitch;
+                dismissSwitchPrompt();
+                vscode.postMessage({
+                    type: "switchAccount",
+                    account: { email: targetEmail }
+                });
+                return;
+            }
+
+            const promptDismissBtn = rawTarget.closest("[data-prompt-dismiss]");
+            if (promptDismissBtn) {
+                dismissSwitchPrompt();
+                return;
+            }
+
             const target =
                 rawTarget.closest(
                     "[data-action]"
@@ -6398,9 +6538,8 @@
             }
 
             if (action === "clear-token-vault") {
-                vscode.postMessage({
-                    type: "clearTokenVault",
-                });
+                ui.clearVaultConfirmOpen = true;
+                render();
                 return;
             }
 
@@ -6564,6 +6703,31 @@
                     null;
 
                 render();
+                return;
+            }
+
+            if (
+                action ===
+                    "cancel-clear-vault"
+            ) {
+                if (target.classList.contains("dialog-backdrop") && rawTarget !== target) {
+                    return;
+                }
+
+                ui.clearVaultConfirmOpen = false;
+                render();
+                return;
+            }
+
+            if (
+                action ===
+                    "confirm-clear-vault"
+            ) {
+                ui.clearVaultConfirmOpen = false;
+                render();
+                vscode.postMessage({
+                    type: "clearTokenVault",
+                });
                 return;
             }
 
@@ -6895,6 +7059,16 @@
 
             if (message.type === "playChime") {
                 playChime(message.chime);
+                return;
+            }
+
+            if (message.type === "promptSwitch") {
+                showSwitchPrompt(message.email, message.timeoutSeconds || 10);
+                return;
+            }
+
+            if (message.type === "dismissSwitchPrompt") {
+                dismissSwitchPrompt();
                 return;
             }
 

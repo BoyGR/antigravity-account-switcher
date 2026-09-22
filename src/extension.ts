@@ -22,15 +22,18 @@ import { registerTokenVaultCommands } from "./commands/token-vault-commands";
 import { AntigravityStatusBarManager } from "./status-bar/status-bar-manager";
 import { registerAntigravityAccountWebview } from "./views/account-webview-provider";
 import { TokenVaultService } from "./antigravity/token-vault-service";
+import { Logger } from "./antigravity/logger";
 
 export function activate(
     context: vscode.ExtensionContext,
 ): void {
+    Logger.initialize(context);
+
     const tokenVault = new TokenVaultService(context.secrets);
 
-    registerAddAccountCommand(context);
+    registerAddAccountCommand(context, tokenVault);
     registerAccountContextCommands(context);
-    registerManageAccountsCommand(context);
+    registerManageAccountsCommand(context, tokenVault);
     registerCurrentAccountCommand(context);
     registerSaveCurrentAccountCommand(context);
     registerAuthStatusCommand(context);
@@ -115,10 +118,19 @@ export function activate(
             },
         );
 
+    const showOutputCommand =
+        vscode.commands.registerCommand(
+            "boygr.antigravityAccountSwitcher.showOutputChannel",
+            () => {
+                Logger.show(false);
+            },
+        );
+
     context.subscriptions.push(
         statusBarManager,
         statusBarMenuCommand,
         focusViewCommand,
+        showOutputCommand,
         diagnoseCommand,
         refreshCommand,
         exportAnalyticsCommand,

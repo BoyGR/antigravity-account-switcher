@@ -10,7 +10,9 @@ import {
     updateManagedAccountColorTag,
     updateManagedAccountGroup,
     updateManagedAccountLabel,
+    updateManagedAccountPicture,
 } from "../antigravity/account-registry";
+import { IdeStateService } from "../antigravity/ide-state-service";
 
 import {
     getManagedAccountUsageSnapshots,
@@ -247,6 +249,31 @@ const DEFAULT_PREFERENCES: AccountSwitcherPreferences = {
 export class AntigravityAccountWebviewProvider
     implements vscode.WebviewViewProvider, vscode.Disposable
 {
+    private static currentProvider?: AntigravityAccountWebviewProvider;
+
+    public static async promptSwitchInWebview(
+        email: string,
+        timeoutSeconds = 10,
+    ): Promise<boolean> {
+        if (this.currentProvider?.view) {
+            await this.currentProvider.view.webview.postMessage({
+                type: "promptSwitch",
+                email,
+                timeoutSeconds,
+            });
+            return true;
+        }
+        return false;
+    }
+
+    public static async dismissSwitchPromptInWebview(): Promise<void> {
+        if (this.currentProvider?.view) {
+            await this.currentProvider.view.webview.postMessage({
+                type: "dismissSwitchPrompt",
+            });
+        }
+    }
+
     private view?: vscode.WebviewView;
 
     private retryTimer?: ReturnType<typeof setTimeout>;
@@ -255,7 +282,53 @@ export class AntigravityAccountWebviewProvider
 
     private isProbing = false;
 
+    private lastVerificationPromptTime = 0;
+
+    private lastVerificationPromptEmail = "";
+
     private quotaMonitor?: QuotaMonitorService;
+
+    private maybePromptVerificationWindow(email: string, errorMsg: string): void {
+        const lower = errorMsg.toLowerCase();
+        const isVerif =
+            lower.includes("verification") ||
+            lower.includes("challenge") ||
+            lower.includes("restrict") ||
+            lower.includes("qr code");
+
+        if (!isVerif) {
+            return;
+        }
+
+        const now = Date.now();
+        // Cooldown: 5 minutes between prompts for the same email
+        if (
+            this.lastVerificationPromptEmail === email &&
+            now - this.lastVerificationPromptTime < 5 * 60 * 1000
+        ) {
+            return;
+        }
+
+        this.lastVerificationPromptTime = now;
+        this.lastVerificationPromptEmail = email;
+
+        void (async () => {
+            const action = await vscode.window.showWarningMessage(
+                `Google Verification Required for ${email}: Quota access is restricted and the agent may appear stuck until verified. Complete the verification challenge now.`,
+                "Verify with Google",
+                "Check Status",
+                "Later",
+            );
+
+            if (action === "Verify with Google") {
+                await vscode.commands.executeCommand(
+                    "boygr.antigravityAccountSwitcher.signIn",
+                );
+            } else if (action === "Check Status") {
+                await this.refresh();
+            }
+        })();
+    }
 
     private snapshot: AccountSwitcherSnapshot = {
         accounts: [],
@@ -263,12 +336,13 @@ export class AntigravityAccountWebviewProvider
     };
 
     private readonly retryDelaysMs = [
-        1000,
-        2000,
+        500,
+        1500,
         3000,
         5000,
         8000,
         10000,
+        15000,
     ];
 
     constructor(
@@ -276,6 +350,7 @@ export class AntigravityAccountWebviewProvider
         private readonly statusBarManager?: AntigravityStatusBarManager,
         private readonly tokenVault?: TokenVaultService,
     ) {
+        AntigravityAccountWebviewProvider.currentProvider = this;
         this.snapshot = {
             accounts: getManagedAccounts(this.context),
             usageSnapshots: getManagedAccountUsageSnapshots(this.context),
@@ -575,29 +650,83 @@ export class AntigravityAccountWebviewProvider
                     usageReadError instanceof Error
                         ? usageReadError.message
                         : String(usageReadError);
+
+                if (current?.email && usageError) {
+                    this.maybePromptVerificationWindow(current.email, usageError);
+                }
             }
         }
 
         let vaultedEmails: string[] = [];
         if (this.tokenVault) {
             if (current?.email && this.tokenVault.isSupported()) {
-                await this.tokenVault.saveActiveCredential(current.email).catch(() => false);
+                await this.tokenVault
+                    .saveActiveCredential(current.email, this.context)
+                    .catch(() => false);
             }
             vaultedEmails = await this.tokenVault.getVaultedEmails().catch(() => []);
         }
 
+        let dbAvatars: Record<string, string> = {};
+        if (IdeStateService.isAntigravityIde()) {
+            dbAvatars = await IdeStateService.getStoredAvatars(this.context).catch(() => ({}));
+        }
+
+        // Sync & resolve missing avatars for all saved accounts
+        for (const account of accounts) {
+            const emailLower = account.email.trim().toLowerCase();
+            if (!account.profilePictureUrl) {
+                // 1. Check from Token Vault
+                if (this.tokenVault) {
+                    const vaultedPic = await this.tokenVault.getAccountPicture(emailLower).catch(() => undefined);
+                    if (vaultedPic) {
+                        account.profilePictureUrl = vaultedPic;
+                        await updateManagedAccountPicture(this.context, emailLower, vaultedPic);
+                        continue;
+                    }
+                }
+
+                // 2. Check from state.vscdb (active or stored)
+                if (dbAvatars[emailLower]) {
+                    account.profilePictureUrl = dbAvatars[emailLower];
+                    await updateManagedAccountPicture(this.context, emailLower, dbAvatars[emailLower]);
+                    continue;
+                }
+
+                // 3. If this is active account and state.vscdb has __active__
+                if (current && current.email.trim().toLowerCase() === emailLower && dbAvatars["__active__"]) {
+                    account.profilePictureUrl = dbAvatars["__active__"];
+                    await updateManagedAccountPicture(this.context, emailLower, dbAvatars["__active__"]);
+                    continue;
+                }
+            }
+        }
+
         if (current && !current.profilePictureUrl) {
-            const normalizedCurrent = current.email.trim().toLowerCase();
-            const savedWithPhoto = accounts.find(
-                account =>
-                    account.email.trim().toLowerCase() === normalizedCurrent &&
-                    account.profilePictureUrl
-            );
-            if (savedWithPhoto?.profilePictureUrl) {
+            const emailLower = current.email.trim().toLowerCase();
+            const matching = accounts.find(a => a.email.trim().toLowerCase() === emailLower);
+            if (matching?.profilePictureUrl) {
                 current = {
                     ...current,
-                    profilePictureUrl: savedWithPhoto.profilePictureUrl,
+                    profilePictureUrl: matching.profilePictureUrl,
                 };
+            } else if (dbAvatars["__active__"]) {
+                current = {
+                    ...current,
+                    profilePictureUrl: dbAvatars["__active__"],
+                };
+            } else if (dbAvatars[emailLower]) {
+                current = {
+                    ...current,
+                    profilePictureUrl: dbAvatars[emailLower],
+                };
+            }
+        } else if (current?.email && current.profilePictureUrl) {
+            const emailLower = current.email.trim().toLowerCase();
+            const matching = accounts.find(a => a.email.trim().toLowerCase() === emailLower);
+            if (matching && !matching.profilePictureUrl) {
+                matching.profilePictureUrl = current.profilePictureUrl;
+                await updateManagedAccountPicture(this.context, emailLower, current.profilePictureUrl);
             }
         }
 
@@ -644,6 +773,7 @@ export class AntigravityAccountWebviewProvider
         }
 
         const reachable = this.snapshot.runtime?.health?.reachable;
+        const hasProcess = Boolean(this.snapshot.runtime?.process);
         const isRetrying =
             Boolean(this.retryTimer) ||
             (this.retryIndex > 0 && this.retryIndex < this.retryDelaysMs.length);
@@ -652,7 +782,9 @@ export class AntigravityAccountWebviewProvider
             return "connecting";
         }
 
-        if (reachable) {
+        // Backend process is running — show "disconnected" (with Sign In button)
+        // rather than "offline" which looks more alarming
+        if (reachable || hasProcess) {
             return "disconnected";
         }
 
@@ -954,6 +1086,7 @@ export class AntigravityAccountWebviewProvider
             case "clearTokenVault":
                 await vscode.commands.executeCommand(
                     "boygr.antigravityAccountSwitcher.clearTokenVault",
+                    { skipConfirm: true },
                 );
                 await this.refresh(false);
                 return;

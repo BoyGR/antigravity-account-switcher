@@ -7,6 +7,7 @@ import { getManagedAccounts } from "../antigravity/account-registry";
 import { getAntigravityCurrentAccount } from "../antigravity/hub-auth-client";
 import { syncAntigravityUi } from "../antigravity/ui-sync";
 import { TokenVaultService } from "../antigravity/token-vault-service";
+import { Logger } from "../antigravity/logger";
 
 export const SWITCH_ACCOUNT_COMMAND_ID =
     "boygr.antigravityAccountSwitcher.switchAccount";
@@ -128,6 +129,8 @@ export function registerSwitchAccountCommand(
                         }
                     }
 
+                    Logger.info(`Switching account to: ${displayName} (canInstantSwitch: ${canInstantSwitch})`);
+
                     const result = await vscode.window.withProgress(
                         {
                             location: vscode.ProgressLocation.Notification,
@@ -142,23 +145,39 @@ export function registerSwitchAccountCommand(
                                 {
                                     tokenVault,
                                     enableInstantSwitch,
+                                    extensionContext: context,
                                 },
                             );
                         },
                     );
 
                     if (!result.verified) {
+                        Logger.error(`Account switch to ${targetEmail} could not be verified.`);
                         throw new Error(
                             `The account switch to ${targetEmail} could not be verified.`,
                         );
                     }
 
+                    Logger.info(`Account switch verified. Syncing UI... (changed: ${result.changed}, swappedInstantly: ${result.swappedInstantly})`);
                     const syncResult = await syncAntigravityUi();
 
                     if (!result.changed) {
                         vscode.window.showInformationMessage(
                             `${displayName} is already the active Antigravity account.`,
                         );
+                    } else if (result.requiresReload) {
+                        const choice =
+                            await vscode.window.showInformationMessage(
+                                `Antigravity switched to ${displayName}. Reload window now to activate the account?`,
+                                "Reload Window",
+                                "Later",
+                            );
+
+                        if (choice === "Reload Window") {
+                            await vscode.commands.executeCommand(
+                                "workbench.action.reloadWindow",
+                            );
+                        }
                     } else if (result.swappedInstantly) {
                         vscode.window.showInformationMessage(
                             `Antigravity switched to ${displayName} instantly (no browser login).`,
@@ -186,6 +205,8 @@ export function registerSwitchAccountCommand(
                         error instanceof Error
                             ? error.message
                             : String(error);
+
+                    Logger.error(`Error during account switch: ${message}`, error);
 
                     vscode.window.showErrorMessage(
                         `Antigravity Account Switcher: ${message}`,

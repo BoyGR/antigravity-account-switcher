@@ -6833,6 +6833,23 @@ body {
     gap: 8px;
 }
 
+.connecting-actions .btn,
+.current-state-panel.empty-disconnected .disconnected-actions .btn {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    white-space: nowrap !important;
+}
+
+.connecting-actions .btn .ui-icon,
+.current-state-panel.empty-disconnected .disconnected-actions .btn .ui-icon {
+    display: inline-block !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+}
+
 .connection-state.error-state .status-dot.error {
     background: var(--ag-error, #ef4444);
     box-shadow: 0 0 4px color-mix(in srgb, var(--ag-error, #ef4444) 45%, transparent);

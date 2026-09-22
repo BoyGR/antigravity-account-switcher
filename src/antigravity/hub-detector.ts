@@ -83,6 +83,47 @@ export function detectOfficialExtension(): AntigravityExtensionInfo {
     };
 }
 
+export function parsePosixCommandLine(cmd: string): { executablePath: string; name: string } {
+    const trimmed = cmd.trim();
+    // 1. Match quoted executable if present
+    const quotedMatch = trimmed.match(/^"([^"]+)"/);
+    if (quotedMatch) {
+        const executablePath = quotedMatch[1].trim();
+        return { executablePath, name: path.basename(executablePath) };
+    }
+    // 2. Try matching language_server or agy binary path specifically
+    const binaryMatch = trimmed.match(/^(.*?\b(?:language_server[^\s]*|agy[^\s]*))/i);
+    if (binaryMatch) {
+        const executablePath = binaryMatch[1].trim();
+        return { executablePath, name: path.basename(executablePath) };
+    }
+    // 3. Try matching up to first option flag (--flag or -f)
+    const flagMatch = trimmed.match(/^(.*?)(?=\s-|$)/);
+    if (flagMatch) {
+        const executablePath = flagMatch[1].trim();
+        return { executablePath, name: path.basename(executablePath) };
+    }
+    const executablePath = trimmed.split(' ')[0] || '';
+    return { executablePath, name: path.basename(executablePath) };
+}
+
+export function extractExecutablePath(item: { ExecutablePath?: string; CommandLine?: string }): string {
+    if (item.ExecutablePath) {
+        // If ExecutablePath was previously parsed, ensure it isn't just a partial split
+        const exec = item.ExecutablePath;
+        if (!exec.includes(' ') && item.CommandLine && item.CommandLine.includes(' ')) {
+            const parsed = parsePosixCommandLine(item.CommandLine);
+            if (parsed.executablePath.length > exec.length) {
+                return parsed.executablePath;
+            }
+        }
+        return exec;
+    }
+    const cmd = item.CommandLine || '';
+    const parsed = parsePosixCommandLine(cmd);
+    return parsed.executablePath;
+}
+
 function parseHubPort(
     commandLine?: string,
 ): number | undefined {
@@ -90,25 +131,23 @@ function parseHubPort(
         return undefined;
     }
 
-    const match = commandLine.match(
-        /--hub-port=(\d+)/i,
-    );
-
-    if (!match) {
-        return undefined;
+    const hubMatch = commandLine.match(/--hub-port=(\d+)/i);
+    if (hubMatch) {
+        const port = Number(hubMatch[1]);
+        if (Number.isInteger(port) && port > 0 && port <= 65535) {
+            return port;
+        }
     }
 
-    const port = Number(match[1]);
-
-    if (
-        !Number.isInteger(port) ||
-        port <= 0 ||
-        port > 65535
-    ) {
-        return undefined;
+    const httpsMatch = commandLine.match(/--https_server_port\s+(\d+)/i);
+    if (httpsMatch) {
+        const port = Number(httpsMatch[1]);
+        if (Number.isInteger(port) && port > 0 && port <= 65535) {
+            return port;
+        }
     }
 
-    return port;
+    return undefined;
 }
 
 export async function detectRunningAgyHub(): Promise<
@@ -127,7 +166,7 @@ export async function detectRunningAgyHub(): Promise<
             '    Get-CimInstance Win32_Process |',
             "        Where-Object {",
             "            ($_.Name -ieq 'agy.exe' -and $_.CommandLine -match '(?i)--hub(?:\\s|$)') -or",
-            "            ($_.Name -match '(?i)^language_server_' -and $_.CommandLine -match '(?i)--csrf_token\\s+([a-f0-9\\-]+)')",
+            "            ($_.Name -match '(?i)^language_server(?:\\.exe|_|\\b)' -and $_.CommandLine -match '(?i)--csrf_token\\s+([a-f0-9\\-]+)')",
             "        } |",
             '        Select-Object ProcessId, ParentProcessId, ExecutablePath, CommandLine',
             ')',
@@ -184,10 +223,11 @@ export async function detectRunningAgyHub(): Promise<
                     const isLsp = cmd.includes('language_server') && cmd.includes('--csrf_token');
                     
                     if (isHub || isLsp) {
+                        const parsed = parsePosixCommandLine(cmd);
                         processes.push({
                             ProcessId: pid,
                             ParentProcessId: ppid,
-                            ExecutablePath: cmd.split(' ')[0],
+                            ExecutablePath: parsed.executablePath,
                             CommandLine: cmd
                         });
                     }
@@ -215,37 +255,43 @@ export async function detectRunningAgyHub(): Promise<
             ? parsed
             : [parsed];
 
-        const inIde = isAntigravityIde();
+        const execPath = process.execPath || '';
+        const appDir = execPath ? path.dirname(execPath) : '';
+
         let record: CimProcessRecord | undefined;
 
-        if (inIde) {
-            // In Antigravity IDE, prefer main language_server (not --enable_lsp)
-            record =
-                records.find(
-                    (item) =>
-                        /language_server/i.test(item.CommandLine ?? '') &&
-                        !/--enable_lsp/i.test(item.CommandLine ?? ''),
-                ) ||
-                records.find((item) =>
-                    /language_server/i.test(item.CommandLine ?? ''),
-                ) ||
-                records.find((item) =>
-                    /--hub(?:\s|$)/i.test(item.CommandLine ?? ''),
-                );
-        } else {
-            // In VS Code, prefer agy.exe
-            record =
-                records.find((item) =>
-                    /--hub(?:\s|$)/i.test(item.CommandLine ?? ''),
-                ) ||
-                records.find(
-                    (item) =>
-                        /language_server/i.test(item.CommandLine ?? '') &&
-                        !/--enable_lsp/i.test(item.CommandLine ?? ''),
-                ) ||
-                records.find((item) =>
-                    /language_server/i.test(item.CommandLine ?? ''),
-                );
+        // 1. Prefer backend hosted inside the current editor's directory (disambiguates multiple concurrent IDEs)
+        if (appDir && !appDir.toLowerCase().endsWith('nodejs')) {
+            record = records.find(item => {
+                const itemPath = extractExecutablePath(item);
+                if (!itemPath) return false;
+                const rel = path.relative(appDir.toLowerCase(), itemPath.toLowerCase());
+                return !rel.startsWith('..') && !path.isAbsolute(rel);
+            });
+        }
+
+        // 2. Fallback heuristic based on whether host environment is Antigravity
+        if (!record) {
+            const inIde = isAntigravityIde();
+            if (inIde) {
+                // In Antigravity / Antigravity IDE, prefer language_server
+                record =
+                    records.find((item) =>
+                        /language_server/i.test(item.CommandLine ?? ''),
+                    ) ||
+                    records.find((item) =>
+                        /--hub(?:\s|$)/i.test(item.CommandLine ?? ''),
+                    );
+            } else {
+                // In VS Code, prefer agy.exe
+                record =
+                    records.find((item) =>
+                        /--hub(?:\s|$)/i.test(item.CommandLine ?? ''),
+                    ) ||
+                    records.find((item) =>
+                        /language_server/i.test(item.CommandLine ?? ''),
+                    );
+            }
         }
 
         if (!record?.ProcessId) {

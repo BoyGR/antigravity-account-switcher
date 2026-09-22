@@ -32,12 +32,10 @@ export async function syncAntigravityUi(options?: {
             try {
                 const commands = await vscode.commands.getCommands(true);
                 const candidateCommands = [
-                    "antigravity.restartLanguageServer",
+                    "antigravity.handleAuthRefresh",
                     "antigravity.reconnect",
-                    "antigravity.restartHub",
-                    "antigravity.restartServer",
-                    "antigravity.connectHub",
                     "antigravity.triggerUpdate",
+                    "antigravity.connectHub",
                 ];
 
                 for (const cmd of candidateCommands) {

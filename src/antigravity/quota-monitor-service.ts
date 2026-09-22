@@ -153,6 +153,16 @@ export class QuotaMonitorService implements vscode.Disposable {
         email: string,
         buckets: AntigravityQuotaSummaryBucket[],
     ): Promise<void> {
+        interface LowBucketItem {
+            bucket: AntigravityQuotaSummaryBucket;
+            bucketIdentifier: string;
+            windowLabel: string;
+            remainingPercent: number;
+            dedupKey: string;
+        }
+
+        const newLowBuckets: LowBucketItem[] = [];
+
         for (const bucket of buckets) {
             if (typeof bucket.remainingFraction !== "number" || bucket.disabled) {
                 continue;
@@ -186,99 +196,136 @@ export class QuotaMonitorService implements vscode.Disposable {
                 }
             } else if (remainingPercent <= this.config.thresholdPercent) {
                 if (!this.notifiedDeduplicationKeys.has(dedupKey)) {
-                    this.notifiedDeduplicationKeys.add(dedupKey);
-
                     const windowLabel = bucket.window || bucket.description || "Window";
-                    const isSmartFallbackEnabled = this.config.smartQuotaFallback !== false;
-
-                    let bestCandidate: { email: string; label?: string; percent: number } | undefined;
-                    if (isSmartFallbackEnabled) {
-                        const savedAccounts = getManagedAccounts(this.context);
-                        const usageSnapshots = getManagedAccountUsageSnapshots(this.context);
-                        const otherAccounts = savedAccounts.filter(
-                            acc => acc.email.toLowerCase() !== email.toLowerCase(),
-                        );
-
-                        let maxPercent = -1;
-                        for (const candidate of otherAccounts) {
-                            const candidatePercent = getAccountRemainingPercent(
-                                usageSnapshots[candidate.email.toLowerCase()],
-                            );
-                            if (typeof candidatePercent === "number" && candidatePercent > remainingPercent) {
-                                if (candidatePercent > maxPercent) {
-                                    maxPercent = candidatePercent;
-                                    bestCandidate = {
-                                        email: candidate.email,
-                                        label: candidate.label,
-                                        percent: candidatePercent,
-                                    };
-                                }
-                            }
-                        }
-                    }
-
-                    if (this.config.enableQuotaAudio !== false && this.onAudioChime) {
-                        void this.onAudioChime("warning");
-                    }
-
-                    if (bestCandidate) {
-                        const candidateName = bestCandidate.label || bestCandidate.email;
-                        const alertMsg = `Antigravity Quota Low: ${bucketIdentifier} (${windowLabel}) is at ${remainingPercent}%. Switch to ${candidateName} (${bestCandidate.percent}% quota)?`;
-                        const switchBtn = `Switch to ${candidateName}`;
-
-                        void vscode.window
-                            .showWarningMessage(
-                                alertMsg,
-                                switchBtn,
-                                "Choose Another",
-                                "Dismiss",
-                            )
-                            .then(selection => {
-                                if (selection === switchBtn) {
-                                    void vscode.commands.executeCommand(
-                                        "boygr.antigravityAccountSwitcher.switchAccount",
-                                        {
-                                            email: bestCandidate!.email,
-                                            label: bestCandidate!.label,
-                                        },
-                                    );
-                                } else if (selection === "Choose Another") {
-                                    void vscode.commands.executeCommand(
-                                        "boygr.antigravityAccountSwitcher.switchAccount",
-                                    );
-                                }
-                            });
-                    } else {
-                        const alertMsg = `Antigravity Quota Alert: ${bucketIdentifier} (${windowLabel}) is low (${remainingPercent}% remaining).`;
-
-                        void vscode.window
-                            .showWarningMessage(
-                                alertMsg,
-                                "Switch Account",
-                                "View Details",
-                                "Dismiss",
-                            )
-                            .then(selection => {
-                                if (selection === "Switch Account") {
-                                    void vscode.commands.executeCommand(
-                                        "boygr.antigravityAccountSwitcher.switchAccount",
-                                    );
-                                } else if (selection === "View Details") {
-                                    void vscode.commands.executeCommand(
-                                        "boygr.antigravityAccountSwitcher.accountsView.focus",
-                                    );
-                                }
-                            });
-                    }
-
-                    if (bucket.resetTime) {
-                        this.scheduleResetAlarm(email, bucketIdentifier, bucket.resetTime);
-                    }
+                    newLowBuckets.push({
+                        bucket,
+                        bucketIdentifier,
+                        windowLabel,
+                        remainingPercent,
+                        dedupKey,
+                    });
                 }
             } else {
                 // If quota is above threshold, clear previous deduplication key for this bucket
                 this.notifiedDeduplicationKeys.delete(dedupKey);
             }
+        }
+
+        if (newLowBuckets.length === 0) {
+            return;
+        }
+
+        // Mark all low buckets as notified
+        for (const item of newLowBuckets) {
+            this.notifiedDeduplicationKeys.add(item.dedupKey);
+            if (item.bucket.resetTime) {
+                this.scheduleResetAlarm(email, item.bucketIdentifier, item.bucket.resetTime);
+            }
+        }
+
+        // Play warning chime once
+        if (this.config.enableQuotaAudio !== false && this.onAudioChime) {
+            void this.onAudioChime("warning");
+        }
+
+        // Check for best alternative account fallback
+        const isSmartFallbackEnabled = this.config.smartQuotaFallback !== false;
+        const lowestRemainingPercent = Math.min(...newLowBuckets.map(b => b.remainingPercent));
+
+        let bestCandidate: { email: string; label?: string; percent: number } | undefined;
+        if (isSmartFallbackEnabled) {
+            const savedAccounts = getManagedAccounts(this.context);
+            const usageSnapshots = getManagedAccountUsageSnapshots(this.context);
+            const otherAccounts = savedAccounts.filter(
+                acc => acc.email.toLowerCase() !== email.toLowerCase(),
+            );
+
+            let maxPercent = -1;
+            for (const candidate of otherAccounts) {
+                const candidatePercent = getAccountRemainingPercent(
+                    usageSnapshots[candidate.email.toLowerCase()],
+                );
+                if (typeof candidatePercent === "number" && candidatePercent > lowestRemainingPercent) {
+                    if (candidatePercent > maxPercent) {
+                        maxPercent = candidatePercent;
+                        bestCandidate = {
+                            email: candidate.email,
+                            label: candidate.label,
+                            percent: candidatePercent,
+                        };
+                    }
+                }
+            }
+        }
+
+        // Build single aggregated message
+        let alertMsg = "";
+        if (newLowBuckets.length === 1) {
+            const single = newLowBuckets[0];
+            if (bestCandidate) {
+                const candidateName = bestCandidate.label || bestCandidate.email;
+                alertMsg = `Antigravity Quota Low: ${single.bucketIdentifier} (${single.windowLabel}) is at ${single.remainingPercent}%. Switch to ${candidateName} (${bestCandidate.percent}% quota)?`;
+            } else {
+                alertMsg = `Antigravity Quota Alert: ${single.bucketIdentifier} (${single.windowLabel}) is low (${single.remainingPercent}% remaining).`;
+            }
+        } else {
+            // Multiple buckets low (e.g. 5h at 1% and weekly at 9%)
+            const detailsList = newLowBuckets
+                .map(b => `${b.bucketIdentifier}: ${b.remainingPercent}%`)
+                .join(", ");
+            if (bestCandidate) {
+                const candidateName = bestCandidate.label || bestCandidate.email;
+                alertMsg = `Antigravity Quota Low: Multiple limits are low (${detailsList}). Switch to ${candidateName} (${bestCandidate.percent}% quota)?`;
+            } else {
+                alertMsg = `Antigravity Quota Alert: Multiple limits are low (${detailsList}).`;
+            }
+        }
+
+        if (bestCandidate) {
+            const candidateName = bestCandidate.label || bestCandidate.email;
+            const switchBtn = `Switch to ${candidateName}`;
+
+            void vscode.window
+                .showWarningMessage(
+                    alertMsg,
+                    switchBtn,
+                    "Choose Another",
+                    "Dismiss",
+                )
+                .then(selection => {
+                    if (selection === switchBtn) {
+                        void vscode.commands.executeCommand(
+                            "boygr.antigravityAccountSwitcher.switchAccount",
+                            {
+                                email: bestCandidate!.email,
+                                label: bestCandidate!.label,
+                            },
+                        );
+                    } else if (selection === "Choose Another") {
+                        void vscode.commands.executeCommand(
+                            "boygr.antigravityAccountSwitcher.switchAccount",
+                        );
+                    }
+                });
+        } else {
+            void vscode.window
+                .showWarningMessage(
+                    alertMsg,
+                    "Switch Account",
+                    "View Details",
+                    "Dismiss",
+                )
+                .then(selection => {
+                    if (selection === "Switch Account") {
+                        void vscode.commands.executeCommand(
+                            "boygr.antigravityAccountSwitcher.switchAccount",
+                        );
+                    } else if (selection === "View Details") {
+                        void vscode.commands.executeCommand(
+                            "boygr.antigravityAccountSwitcher.accountsView.focus",
+                        );
+                    }
+                });
         }
     }
 
