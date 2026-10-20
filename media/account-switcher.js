@@ -6793,11 +6793,21 @@
                     account &&
                     !isBusy()
                 ) {
-                    ui.switchCandidate =
-                        account;
-                    render();
+                    ui.quotaMatrixOpen = false;
+                    setOperation({
+                        type: "switch",
+                        email:
+                            account.email,
+                    });
+
+                    vscode.postMessage({
+                        type:
+                            "switchAccount",
+                        account,
+                    });
                 }
 
+                render();
                 return;
             }
 

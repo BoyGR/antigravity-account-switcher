@@ -15,6 +15,7 @@ export const SWITCH_ACCOUNT_COMMAND_ID =
 export interface SwitchAccountCommandArgument {
     email: string;
     label?: string;
+    skipConfirm?: boolean;
 }
 
 function getDisplayName(
@@ -110,7 +111,7 @@ export function registerSwitchAccountCommand(
                         tokenVault?.isSupported() === true;
 
                     // If NOT instant switch, inform user that official browser chooser will open
-                    if (!canInstantSwitch) {
+                    if (!canInstantSwitch && !targetAccount.skipConfirm) {
                         const confirmation =
                             await vscode.window.showWarningMessage(
                                 `Switch Antigravity account to ${displayName}?`,
@@ -146,6 +147,7 @@ export function registerSwitchAccountCommand(
                                     tokenVault,
                                     enableInstantSwitch,
                                     extensionContext: context,
+                                    skipConfirm: targetAccount.skipConfirm,
                                 },
                             );
                         },

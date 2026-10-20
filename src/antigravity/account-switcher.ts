@@ -38,6 +38,7 @@ export interface SwitchAccountOptions {
     enableInstantSwitch?: boolean;
     cancellationToken?: vscode.CancellationToken;
     extensionContext?: vscode.ExtensionContext;
+    skipConfirm?: boolean;
 }
 
 function normalizeEmail(email: string): string {
@@ -251,26 +252,17 @@ export async function switchAntigravityAccount(
             // A. If running in Antigravity IDE, perform state.vscdb injection + detached restart
             if (IdeStateService.isAntigravityIde() && options?.extensionContext) {
                 const ideTarget = await options.tokenVault.getIdeState(target);
+                const credRecord = await options.tokenVault.getCredentialRecord(target);
+                let tokenJson: string | undefined;
+                if (credRecord?.blobBase64) {
+                    try {
+                        tokenJson = Buffer.from(credRecord.blobBase64, "base64").toString("utf-8");
+                    } catch {}
+                }
+
                 if (ideTarget?.oauthToken && ideTarget?.userStatus) {
                     // Update OS Credential Manager as well for consistency with CLI / external tools
                     await options.tokenVault.applyCredential(target).catch(() => false);
-
-                    const confirm = await vscode.window.showInformationMessage(
-                        `Switch Antigravity IDE to ${target}? The editor window will briefly restart to apply the account.`,
-                        { modal: true },
-                        "Switch & Restart",
-                    );
-
-                    if (confirm !== "Switch & Restart") {
-                        return {
-                            targetEmail: target,
-                            beforeEmail,
-                            afterEmail: beforeEmail,
-                            changed: false,
-                            verified: false,
-                            swappedInstantly: false,
-                        };
-                    }
 
                     const targetPic =
                         (await options.tokenVault.getAccountPicture(target).catch(() => undefined)) ||
@@ -283,6 +275,7 @@ export async function switchAntigravityAccount(
                             oauthToken: ideTarget.oauthToken,
                             userStatus: ideTarget.userStatus,
                             profileUrl: targetPic,
+                            tokenJson,
                         },
                     );
 

@@ -17,7 +17,7 @@ It adds a dedicated sidebar view to track active quotas (5-hour and weekly limit
 ### Compatibility
 - **Editors**: Visual Studio Code, Google Antigravity Standalone IDE, Cursor, and other VS Code-compatible editors.
 - **Antigravity Extension**: Official Google Antigravity extension `1.3.0+`, AGY backend `1.2.2+`.
-- **Platforms**: Windows (with local Token Vault), macOS, Linux.
+- **Platforms**: Windows, macOS, and Linux.
 
 ---
 
@@ -25,8 +25,10 @@ It adds a dedicated sidebar view to track active quotas (5-hour and weekly limit
 
 ### Account Management & Switching
 - **Saved Accounts**: Store multiple Google accounts with custom labels, color tags, and group categories (`Work`, `Personal`, etc.).
-- **Safe Switching**: Confirmation dialog before switching prevents accidental account changes.
-- **Token Vault (Windows)**: Swaps credentials locally via native Windows Credential Manager / DPAPI, switching sessions without opening browser login windows each time.
+- **Safe Switching**: Optional confirmation dialog before switching prevents accidental account changes, or instant 1-click rotation.
+- **Cross-Platform Token Vault & Auto-Reopen**:
+  - **macOS & Windows Support**: Swaps credentials locally via native Token Vault (`~/.gemini/jetski-standalone-oauth-token` on macOS/Linux and Windows Credential Manager on Windows) without repeating browser authentication.
+  - **Seamless Auto-Reopen**: In Antigravity Standalone IDE, the editor gracefully closes and automatically relaunches within 1–2 seconds with the target account active and state fully synchronized.
 - **Active Account Protection**: Prevents deleting the currently active account until signed out.
 
 ### Quota Tracking & Alerts

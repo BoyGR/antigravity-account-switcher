@@ -2,6 +2,18 @@
 
 All notable changes to the **Antigravity Account Switcher** extension will be documented in this file.
 
+## [1.4.17] - 2026-10-05
+
+### Added & Improved
+- **Cross-Platform Token Vault & Automated Reopen (macOS & Windows)**:
+  - Added full macOS and Linux support for the local Token Vault via `~/.gemini/jetski-standalone-oauth-token` in addition to Windows Credential Manager.
+  - Added seamless automated reopen for Antigravity Standalone IDE on macOS: the editor gracefully closes and automatically relaunches within 1–2 seconds with the target account active.
+  - Isolated main Electron GUI process monitoring on macOS, detecting window exit in < 400ms without timeouts or force-killing helper processes.
+  - Deployed reliable detached background relauncher using macOS bundle identifier (`open -n -b com.google.antigravity-ide`) with workspace preservation.
+  - Added 1-click direct account switching from sidebar cards without redundant confirmation dialogs.
+
+---
+
 ## [1.4.16] - 2026-09-23
 
 ### Fixed & Improved

@@ -1,6 +1,9 @@
 import * as vscode from "vscode";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import * as os from "node:os";
 
 import { IdeStateService, ProtobufUtils } from "./ide-state-service";
 
@@ -73,30 +76,27 @@ export function extractEmailFromIdeState(ideState?: { oauthToken?: string; userS
     if (!ideState) {
         return undefined;
     }
-    if (ideState.userStatus) {
+    for (const field of [ideState.userStatus, ideState.oauthToken]) {
+        if (!field) continue;
         try {
-            const raw = Buffer.from(ideState.userStatus, "base64").toString("utf-8");
+            const raw = Buffer.from(field, "base64").toString("utf-8");
             const match = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.exec(raw);
             if (match) {
                 return normalizeEmail(match[0]);
             }
-        } catch {
-            // Ignore
-        }
-    }
-    if (ideState.oauthToken) {
-        try {
-            const raw = Buffer.from(ideState.oauthToken, "base64").toString("utf-8");
-            const jwtMatch = /eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]*/.exec(raw);
-            if (jwtMatch) {
-                const email = extractEmailFromJwt(jwtMatch[0]);
-                if (email) {
-                    return email;
+            const b64Matches = raw.match(/[a-zA-Z0-9+/=]{16,}/g);
+            if (b64Matches) {
+                for (const candidate of b64Matches) {
+                    try {
+                        const decoded = Buffer.from(candidate, "base64").toString("utf-8");
+                        const m = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.exec(decoded);
+                        if (m) {
+                            return normalizeEmail(m[0]);
+                        }
+                    } catch {
+                        // Ignore
+                    }
                 }
-            }
-            const match = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.exec(raw);
-            if (match) {
-                return normalizeEmail(match[0]);
             }
         } catch {
             // Ignore
@@ -152,10 +152,10 @@ export class TokenVaultService {
     }
 
     /**
-     * Token swapping currently supports Windows (Windows Credential Manager).
+     * Token swapping supports Windows, macOS, and Linux.
      */
     public isSupported(): boolean {
-        return process.platform === "win32";
+        return true;
     }
 
     private getVaultKey(email: string): string {
@@ -191,6 +191,24 @@ export class TokenVaultService {
         blobBase64: string;
         persist: number;
     } | null> {
+        if (process.platform === "darwin" || process.platform === "linux") {
+            const tokenPath = path.join(os.homedir(), ".gemini", "jetski-standalone-oauth-token");
+            if (fs.existsSync(tokenPath)) {
+                try {
+                    const content = fs.readFileSync(tokenPath, "utf-8");
+                    const blobBase64 = Buffer.from(content, "utf-8").toString("base64");
+                    return {
+                        userName: "antigravity",
+                        blobBase64,
+                        persist: 2,
+                    };
+                } catch {
+                    // Ignore
+                }
+            }
+            return null;
+        }
+
         if (!this.isSupported()) {
             return null;
         }
@@ -255,6 +273,27 @@ if ([WinCredVaultInterop]::CredRead('${TARGET_CREDENTIAL_NAME}', 1, 0, [ref]$ptr
         blobBase64: string,
         persist = 2,
     ): Promise<boolean> {
+        if (process.platform === "darwin" || process.platform === "linux") {
+            const tokenPath = path.join(os.homedir(), ".gemini", "jetski-standalone-oauth-token");
+            try {
+                fs.mkdirSync(path.dirname(tokenPath), { recursive: true });
+                let jsonStr = Buffer.from(blobBase64, "base64").toString("utf-8");
+                try {
+                    const obj = JSON.parse(jsonStr);
+                    if (!obj.auth_method) {
+                        obj.auth_method = "consumer";
+                    }
+                    jsonStr = JSON.stringify(obj, null, 2);
+                } catch {
+                    // Ignore
+                }
+                fs.writeFileSync(tokenPath, jsonStr, { encoding: "utf-8", mode: 0o600 });
+                return true;
+            } catch {
+                return false;
+            }
+        }
+
         if (!this.isSupported()) {
             return false;
         }
@@ -540,18 +579,21 @@ if ($success) {
             try {
                 const text = Buffer.from(record.blobBase64, "base64").toString("utf-8");
                 const credJson = JSON.parse(text);
-                const tokenObj = credJson.token;
-                if (tokenObj?.access_token && tokenObj?.refresh_token) {
+                const tokenObj = credJson.token || credJson;
+                const accessToken = tokenObj?.access_token || tokenObj?.accessToken;
+                const refreshToken = tokenObj?.refresh_token || tokenObj?.refreshToken;
+                const idToken = credJson.id_token || credJson.idToken || tokenObj?.id_token || tokenObj?.idToken;
+                if (accessToken && refreshToken) {
                     const expiryDate = tokenObj.expiry
                         ? new Date(tokenObj.expiry)
                         : new Date(Date.now() + 3600 * 1000);
                     const expirySeconds = Math.floor(expiryDate.getTime() / 1000);
                     const oauthToken = ProtobufUtils.createUnifiedOAuthToken(
-                        tokenObj.access_token,
-                        tokenObj.refresh_token,
+                        accessToken,
+                        refreshToken,
                         expirySeconds,
                         false,
-                        credJson.id_token,
+                        idToken,
                         email,
                     );
                     const userStatus = ProtobufUtils.createUnifiedUserStatus(email);

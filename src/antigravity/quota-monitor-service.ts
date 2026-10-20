@@ -386,6 +386,7 @@ export class QuotaMonitorService implements vscode.Disposable {
                     {
                         email: bestCandidate.email,
                         label: bestCandidate.label,
+                        skipConfirm: true,
                     },
                 );
                 const candidateName = bestCandidate.label || bestCandidate.email;
@@ -504,6 +505,7 @@ export class QuotaMonitorService implements vscode.Disposable {
                         {
                             email: bestCandidate.email,
                             label: bestCandidate.label,
+                            skipConfirm: true,
                         },
                     );
                     const candidateName = bestCandidate.label || bestCandidate.email;
