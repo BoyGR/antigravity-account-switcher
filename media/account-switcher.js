@@ -3888,6 +3888,21 @@
             snapshotGroup(
                 snapshot,
                 name =>
+                    name.includes("gemini") &&
+                    name.includes("model")
+            ) ||
+            snapshotGroup(
+                snapshot,
+                name =>
+                    name.includes("gemini") &&
+                    Boolean(snapshotBucket(
+                        (snapshot?.groups || []).find(g => String(g.displayName || "").toLowerCase() === name),
+                        "5h"
+                    ))
+            ) ||
+            snapshotGroup(
+                snapshot,
+                name =>
                     name.includes(
                         "gemini"
                     )
@@ -4870,8 +4885,32 @@
                 let fiveHourReset = "";
                 let weeklyPct = null;
                 let weeklyReset = "";
+                const extraModelQuotas = [];
 
-                const buckets = getAllQuotaBuckets(usage);
+                const rawGroups = Array.isArray(usage?.groups) ? usage.groups : [];
+                const isPrimaryGroup = (g) => {
+                    const name = String(g?.displayName || "").toLowerCase();
+                    if (/gemini\s+models|claude|gpt|model\s+quotas?/.test(name)) {
+                        return true;
+                    }
+                    const gBuckets = Array.isArray(g?.buckets) ? g.buckets : [];
+                    const has5h = gBuckets.some(b => {
+                        const win = (b.window || b.description || "").toLowerCase();
+                        return win === "5h" || win.includes("5 hour") || win.includes("5h");
+                    });
+                    const hasWeekly = gBuckets.some(b => {
+                        const win = (b.window || b.description || "").toLowerCase();
+                        return win === "weekly" || win.includes("week") || win.includes("7 day");
+                    });
+                    return has5h && hasWeekly;
+                };
+
+                const primaryGroups = rawGroups.filter(isPrimaryGroup);
+                const extraGroups = primaryGroups.length > 0 ? rawGroups.filter(g => !isPrimaryGroup(g)) : [];
+                const buckets = primaryGroups.length > 0
+                    ? primaryGroups.flatMap(g => Array.isArray(g?.buckets) ? g.buckets : [])
+                    : getAllQuotaBuckets(usage);
+
                 for (const b of buckets) {
                     const id = (b.displayName || b.bucketId || "").toLowerCase();
                     const win = (b.window || b.description || "").toLowerCase();
@@ -4896,6 +4935,20 @@
                         } else if (fiveHourPct === null && !isWeekly) {
                             fiveHourPct = pct;
                             fiveHourReset = resetStr;
+                        }
+                    }
+                }
+
+                for (const eg of extraGroups) {
+                    const gName = eg?.displayName || "";
+                    const gBuckets = Array.isArray(eg?.buckets) ? eg.buckets : [];
+                    for (const b of gBuckets) {
+                        if (typeof b.remainingFraction === "number" && !b.disabled) {
+                            const effFrac = getEffectiveRemainingFraction(b);
+                            const pct = typeof effFrac === "number" ? Math.max(0, Math.min(100, Math.round(effFrac * 100))) : null;
+                            const resetStr = b.resetTime ? formatResetTime(b.resetTime) : "";
+                            const label = gName || b.displayName || b.bucketId || "Model";
+                            extraModelQuotas.push({ label, pct, resetStr });
                         }
                     }
                 }
@@ -4983,6 +5036,17 @@
                                 ${weeklyReset ? `<span class="matrix-reset-sub" title="${escapeHtml(weeklyReset)}">${escapeHtml(weeklyReset)}</span>` : ""}
                             </div>
                         </div>
+                        ${extraModelQuotas.length > 0 ? `
+                            <div class="matrix-extra-quotas">
+                                ${extraModelQuotas.map(eq => `
+                                    <div class="matrix-extra-quota-item" title="${escapeHtml(`${eq.label}: ${typeof eq.pct === "number" ? `${eq.pct}%` : "-"}${eq.resetStr ? ` (${eq.resetStr})` : ""}`)}">
+                                        <span class="matrix-extra-quota-name">${escapeHtml(eq.label)}:</span>
+                                        <strong class="matrix-extra-quota-pct ${toneClass(eq.pct)}">${typeof eq.pct === "number" ? `${eq.pct}%` : "-"}</strong>
+                                        ${eq.resetStr ? `<span class="matrix-extra-quota-reset">${escapeHtml(eq.resetStr)}</span>` : ""}
+                                    </div>
+                                `).join("")}
+                            </div>
+                        ` : ""}
                     </div>
                 `;
             }).join("");

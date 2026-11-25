@@ -427,6 +427,20 @@ async function waitForIdeExit(timeoutMs) {
   return false;
 }
 
+function gracefulCloseRemainingPids() {
+  const pids = getOtherIdePids();
+  for (const pid of pids) {
+    try {
+      if (process.platform === 'win32') {
+        // Send WM_CLOSE without /F so Electron and SQLite WAL can flush cleanly
+        execSync('taskkill /PID ' + pid, { stdio: 'ignore', windowsHide: true });
+      } else {
+        process.kill(pid, 'SIGTERM');
+      }
+    } catch {}
+  }
+}
+
 function forceKillRemainingPids() {
   const pids = getOtherIdePids();
   for (const pid of pids) {
@@ -440,23 +454,47 @@ function forceKillRemainingPids() {
   }
 }
 
+async function waitForWalCheckpoint(targetDbPath, timeoutMs) {
+  const walPath = targetDbPath + '-wal';
+  const shmPath = targetDbPath + '-shm';
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    if (!fs.existsSync(walPath) && !fs.existsSync(shmPath)) {
+      return true;
+    }
+    await new Promise(r => setTimeout(r, 300));
+  }
+  return false;
+}
+
 async function run() {
-  // Phase 1: Wait up to 6s for Antigravity IDE to flush memory to disk and exit
-  const exited = await waitForIdeExit(6000);
+  // Phase 1a: Wait up to 12s for Antigravity IDE to flush SQLite WAL & conversation history and exit naturally
+  let exited = await waitForIdeExit(12000);
+
+  // Phase 1b: If still running, request graceful shutdown (WM_CLOSE / SIGTERM) and wait another 8s
   if (!exited) {
-    forceKillRemainingPids();
+    gracefulCloseRemainingPids();
+    exited = await waitForIdeExit(8000);
   }
 
-  // Phase 2: Wait 1.5s for OS to release file locks
-  await new Promise(r => setTimeout(r, 1500));
+  // Phase 1c: Last resort force kill only if processes are still hung after 20s of graceful shutdown
+  if (!exited) {
+    forceKillRemainingPids();
+    await waitForIdeExit(3000);
+  }
 
-  // Phase 3: Update SQLite state.vscdb
+  // Phase 2: Wait for OS to release file locks and SQLite WAL files to checkpoint
+  await new Promise(r => setTimeout(r, 1500));
+  await waitForWalCheckpoint(dbPath, 3000);
+
+  // Phase 3: Update SQLite state.vscdb safely (backup + atomic temp write)
   const initSqlJs = require(sqlAsmPath);
   const SQL = await initSqlJs();
   const buffer = fs.readFileSync(dbPath);
   const db = new SQL.Database(buffer);
 
   try {
+    try { fs.copyFileSync(dbPath, dbPath + '.bak'); } catch {}
     for (const { key, value } of rows) {
       if (value === null) {
         db.run('DELETE FROM ItemTable WHERE key = ?', [key]);
@@ -465,7 +503,9 @@ async function run() {
       }
     }
     const out = db.export();
-    fs.writeFileSync(dbPath, Buffer.from(out));
+    const tmpPath = dbPath + '.tmp';
+    fs.writeFileSync(tmpPath, Buffer.from(out));
+    fs.renameSync(tmpPath, dbPath);
   } finally {
     db.close();
   }
@@ -604,8 +644,13 @@ run().catch(() => process.exit(1));
         });
         child.unref();
 
-        // Close window to trigger Antigravity IDE's graceful state flush and exit
-        await vscode.commands.executeCommand("workbench.action.closeWindow");
+        // Quit app gracefully (closes all windows & flushes SQLite WAL / conversation state)
+        const availableCommands = await vscode.commands.getCommands(true);
+        if (availableCommands.includes("workbench.action.quit")) {
+            await vscode.commands.executeCommand("workbench.action.quit");
+        } else {
+            await vscode.commands.executeCommand("workbench.action.closeWindow");
+        }
         return true;
     }
 }

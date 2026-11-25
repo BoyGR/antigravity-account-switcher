@@ -256,7 +256,7 @@ export async function switchAntigravityAccount(
                     await options.tokenVault.applyCredential(target).catch(() => false);
 
                     const confirm = await vscode.window.showInformationMessage(
-                        `Switch Antigravity IDE to ${target}? The editor window will briefly restart to apply the account.`,
+                        `Switch Antigravity IDE to ${target}?\n\nPlease ensure no AI chat response is actively generating. Antigravity IDE will close gracefully to preserve conversation history, then restart with the new account.`,
                         { modal: true },
                         "Switch & Restart",
                     );
@@ -315,16 +315,30 @@ export async function switchAntigravityAccount(
                 // Ignore
             }
 
-            // In standard VS Code, terminate backend process so official extension respawns it with new credential
+            // In standard VS Code, terminate backend process gracefully first so it can flush SQLite WAL
             const processInfo = await detectRunningAgyHub();
             if (processInfo?.pid) {
                 if (process.platform === "win32") {
-                    await execFileAsync("taskkill", [
+                    const gracefulOk = await execFileAsync("taskkill", [
                         "/PID",
                         String(processInfo.pid),
                         "/T",
-                        "/F",
-                    ]).catch(() => undefined);
+                    ]).then(() => true).catch(() => false);
+
+                    if (gracefulOk) {
+                        await delay(1500);
+                    }
+
+                    // Escalate to /F only if process is still alive
+                    const stillRunning = await detectRunningAgyHub().catch(() => undefined);
+                    if (stillRunning?.pid === processInfo.pid) {
+                        await execFileAsync("taskkill", [
+                            "/PID",
+                            String(processInfo.pid),
+                            "/T",
+                            "/F",
+                        ]).catch(() => undefined);
+                    }
                 } else {
                     try {
                         process.kill(processInfo.pid, "SIGTERM");

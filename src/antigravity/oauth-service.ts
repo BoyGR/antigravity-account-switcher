@@ -291,6 +291,19 @@ export class OAuthService {
      * Runs the complete Google OAuth flow via local browser redirect.
      */
     public static async login(options?: OAuthLoginOptions): Promise<OAuthLoginResult> {
+        const proceed = await vscode.window.showWarningMessage(
+            "Direct Google Sign-In Notice (ToS Risk)\n\n" +
+            "Some users have reported that signing in through third-party Google OAuth flows can trigger Google Antigravity Terms of Service (ToS) flags on their accounts.\n\n" +
+            "For a safer approach, we recommend signing in directly via the official Antigravity IDE/extension and letting this extension detect your local session instead.\n\n" +
+            "Do you still want to continue with Direct Google Sign-In?",
+            { modal: true },
+            "Continue Anyway",
+        );
+
+        if (proceed !== "Continue Anyway") {
+            throw new Error("OAuth sign-in cancelled by user.");
+        }
+
         const server = new OAuthServer();
 
         try {

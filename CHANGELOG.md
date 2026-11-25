@@ -2,6 +2,24 @@
 
 All notable changes to the **Antigravity Account Switcher** extension will be documented in this file.
 
+## [1.4.17] - 2026-11-25
+
+### Fixed & Improved
+- **Graceful IDE Shutdown & Conversation History Preservation (#7)**:
+  - Switched Antigravity IDE account-switch teardown to use `workbench.action.quit` (falling back to `workbench.action.closeWindow`) so all open IDE windows close cleanly.
+  - Replaced immediate forceful termination with a 3-stage graceful shutdown: wait up to 12s for natural exit, then send a graceful close signal (`taskkill /PID` without `/F` on Windows / `SIGTERM` on macOS & Linux) and wait 8s, escalating to force kill only as a last resort after 20s.
+  - Added SQLite WAL checkpoint waiting, `.bak` backup, and atomic temp-file writes when updating `state.vscdb`, plus an active-chat reminder in the switch confirmation modal.
+- **Accurate Weekly Reset & Model-Specific Quota Separation (#8)**:
+  - Separated primary model family groups (`Gemini Models`, `Claude and GPT models`) from standalone per-model limits (such as `Gemini 4 Argon`) in the Multi-Account Quota Matrix so a single-model cap no longer overrides the main `Weekly:` progress bar and reset timer.
+  - Extra model-specific limits are now displayed clearly in a compact secondary row beneath the main `5h` / `Weekly` grid.
+- **Direct Google Sign-In ToS Warning Notice (#10)**:
+  - Added a prominent warning notice at the top of `README.md` (and Marketplace listing) regarding reported Terms of Service (ToS) risks when using third-party Direct Google OAuth Sign-In, recommending local session detection from the official Antigravity IDE/extension instead.
+  - Added an explicit confirmation dialog before launching Direct Google OAuth Sign-In inside the extension.
+- **Daemon Hub Metadata Fallback for CSRF Token & Language Server Port (#9)**:
+  - Merged community fix by `@puppywang` adding fallback reading of `csrfToken` and `httpsPort` from `~/.gemini/antigravity/daemon/hub_<hubPort>.json` for newer Google Antigravity builds where the HTML bootstrap page no longer embeds the token.
+
+---
+
 ## [1.4.16] - 2026-09-23
 
 ### Fixed & Improved
