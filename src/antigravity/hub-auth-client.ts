@@ -1,6 +1,8 @@
 import * as vscode from "vscode";
 import * as http from "node:http";
 import * as https from "node:https";
+import * as fs from "node:fs";
+import * as os from "node:os";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import * as path from "node:path";
@@ -336,6 +338,25 @@ async function detectLanguageServerPort(
     listeners: number[],
     hubPort: number
 ): Promise<number> {
+    try {
+        const home = os.homedir();
+        const candidateDirs = [
+            path.join(home, ".gemini", "antigravity", "daemon"),
+            path.join(home, ".gemini", "daemon"),
+        ];
+        for (const dir of candidateDirs) {
+            const file = path.join(dir, `hub_${hubPort}.json`);
+            if (fs.existsSync(file)) {
+                const data = JSON.parse(fs.readFileSync(file, "utf-8"));
+                if (data?.httpsPort && listeners.includes(data.httpsPort)) {
+                    return data.httpsPort;
+                }
+            }
+        }
+    } catch (_) {
+        // Fallback to active HTTPS probing
+    }
+
     const candidates: number[] = [];
 
     for (const port of listeners) {
@@ -366,7 +387,9 @@ async function detectLanguageServerPort(
 }
 
 function extractCsrfToken(
-    html: string
+    html: string,
+    hubPort?: number,
+    pid?: number
 ): string {
     const patterns = [
         /csrfToken"\s*:\s*"([^"]+)"/i,
@@ -376,10 +399,77 @@ function extractCsrfToken(
     for (const pattern of patterns) {
         const match = pattern.exec(html);
 
-        if (match?.[1]) {
-            return match[1];
+        if (match?.[1] && match[1].trim()) {
+            return match[1].trim();
         }
     }
+
+    // In modern Antigravity versions, the web bootstrap page has csrfToken: ""
+    // and stores credentials in ~/.gemini/antigravity/daemon/hub_<hubPort>.json
+    try {
+        const home = os.homedir();
+        const candidateDirs = [
+            path.join(home, ".gemini", "antigravity", "daemon"),
+            path.join(home, ".gemini", "daemon"),
+        ];
+
+        try {
+            const geminiDir = path.join(home, ".gemini");
+            if (fs.existsSync(geminiDir)) {
+                for (const sub of fs.readdirSync(geminiDir)) {
+                    const d = path.join(geminiDir, sub, "daemon");
+                    if (!candidateDirs.includes(d) && fs.existsSync(d)) {
+                        candidateDirs.push(d);
+                    }
+                }
+            }
+        } catch (_) {}
+
+        if (hubPort) {
+            for (const dir of candidateDirs) {
+                const targetFile = path.join(dir, `hub_${hubPort}.json`);
+                if (fs.existsSync(targetFile)) {
+                    const data = JSON.parse(fs.readFileSync(targetFile, "utf-8"));
+                    if (data?.csrfToken) {
+                        return data.csrfToken;
+                    }
+                }
+            }
+        }
+
+        let bestToken = "";
+        let bestMtime = 0;
+        for (const dir of candidateDirs) {
+            if (!fs.existsSync(dir)) {
+                continue;
+            }
+            for (const file of fs.readdirSync(dir)) {
+                if (file.startsWith("hub_") && file.endsWith(".json")) {
+                    const fp = path.join(dir, file);
+                    try {
+                        const stat = fs.statSync(fp);
+                        const data = JSON.parse(fs.readFileSync(fp, "utf-8"));
+                        if (data?.csrfToken) {
+                            if (pid && data.pid === pid) {
+                                return data.csrfToken;
+                            }
+                            if (hubPort && data.httpPort === hubPort) {
+                                return data.csrfToken;
+                            }
+                            if (stat.mtimeMs > bestMtime) {
+                                bestMtime = stat.mtimeMs;
+                                bestToken = data.csrfToken;
+                            }
+                        }
+                    } catch (_) {}
+                }
+            }
+        }
+
+        if (bestToken) {
+            return bestToken;
+        }
+    } catch (_) {}
 
     throw new Error(
         "Antigravity Hub bootstrap did not contain a CSRF token."
@@ -763,7 +853,7 @@ if ($processes.Count -eq 0) {
         );
     }
 
-    const csrfToken = extractCsrfToken(hub.body);
+    const csrfToken = extractCsrfToken(hub.body, hubPort, pid);
 
     const agySession: AntigravityBackendSession = {
         pid,
@@ -979,7 +1069,7 @@ export async function signInToAntigravity():
     }
 
     let csrfToken =
-        extractCsrfToken(hub.body);
+        extractCsrfToken(hub.body, session.hubPort, session.pid);
 
     try {
         const response =
@@ -1094,7 +1184,7 @@ export async function reauthenticateAntigravity():
     }
 
     let csrfToken =
-        extractCsrfToken(hub.body);
+        extractCsrfToken(hub.body, session.hubPort, session.pid);
 
     try {
         const response =
@@ -1207,7 +1297,7 @@ export async function signOutFromAntigravity():
     }
 
     let csrfToken =
-        extractCsrfToken(hub.body);
+        extractCsrfToken(hub.body, session.hubPort, session.pid);
 
     try {
         await invokeConnectJson<Record<string, never>>(
