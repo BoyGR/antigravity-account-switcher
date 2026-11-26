@@ -273,26 +273,24 @@ export class QuotaMonitorService implements vscode.Disposable {
             }
         }
 
-        // Build single aggregated message
+        // Build single concise aggregated message
         let alertMsg = "";
         if (newLowBuckets.length === 1) {
             const single = newLowBuckets[0];
+            const cleanName = this.cleanBucketLabel(single.bucketIdentifier);
             if (bestCandidate) {
                 const candidateName = bestCandidate.label || bestCandidate.email;
-                alertMsg = `Antigravity Quota Low: ${single.bucketIdentifier} (${single.windowLabel}) is at ${single.remainingPercent}%. Switch to ${candidateName} (${bestCandidate.percent}% quota)?`;
+                alertMsg = `Antigravity Quota Low: ${cleanName} (${single.windowLabel}) is at ${single.remainingPercent}%. Switch to ${candidateName} (${bestCandidate.percent}% quota)?`;
             } else {
-                alertMsg = `Antigravity Quota Alert: ${single.bucketIdentifier} (${single.windowLabel}) is low (${single.remainingPercent}% remaining).`;
+                alertMsg = `Antigravity Quota Alert: ${cleanName} (${single.windowLabel}) is low (${single.remainingPercent}% remaining).`;
             }
         } else {
-            // Multiple buckets low (e.g. 5h at 1% and weekly at 9%)
-            const detailsList = newLowBuckets
-                .map(b => `${b.bucketIdentifier}: ${b.remainingPercent}%`)
-                .join(", ");
+            const summary = this.formatLowBucketsSummary(newLowBuckets);
             if (bestCandidate) {
                 const candidateName = bestCandidate.label || bestCandidate.email;
-                alertMsg = `Antigravity Quota Low: Multiple limits are low (${detailsList}). Switch to ${candidateName} (${bestCandidate.percent}% quota)?`;
+                alertMsg = `Antigravity Quota Low: ${summary}. Switch to ${candidateName} (${bestCandidate.percent}% quota)?`;
             } else {
-                alertMsg = `Antigravity Quota Alert: Multiple limits are low (${detailsList}).`;
+                alertMsg = `Antigravity Quota Alert: ${summary}.`;
             }
         }
 
@@ -342,6 +340,62 @@ export class QuotaMonitorService implements vscode.Disposable {
                     }
                 });
         }
+    }
+
+    private cleanBucketLabel(bucketIdentifier: string): string {
+        return bucketIdentifier.replace(/^\[Model Quotas?\]\s*/i, "").trim();
+    }
+
+    private formatLowBucketsSummary(
+        buckets: Array<{
+            bucketIdentifier: string;
+            remainingPercent: number;
+        }>,
+    ): string {
+        const sorted = [...buckets].sort((a, b) => a.remainingPercent - b.remainingPercent);
+        const maxShown = 2;
+        const remainingCount = sorted.length - maxShown;
+        const allSamePercent = sorted.every(b => b.remainingPercent === sorted[0].remainingPercent);
+
+        if (sorted.length <= maxShown) {
+            const details = sorted
+                .map(b => `${this.cleanBucketLabel(b.bucketIdentifier)}: ${b.remainingPercent}%`)
+                .join(", ");
+            return `Multiple limits are low (${details})`;
+        }
+
+        const shown = sorted.slice(0, maxShown);
+        if (allSamePercent) {
+            const names = shown.map(b => this.cleanBucketLabel(b.bucketIdentifier)).join(", ");
+            return `${sorted.length} limits are low at ${sorted[0].remainingPercent}% (${names}, +${remainingCount} more)`;
+        }
+
+        const details = shown
+            .map(b => `${this.cleanBucketLabel(b.bucketIdentifier)}: ${b.remainingPercent}%`)
+            .join(", ");
+        return `${sorted.length} limits are low (${details}, +${remainingCount} more)`;
+    }
+
+    private formatExhaustedBucketsSummary(
+        buckets: Array<{
+            bucketIdentifier: string;
+            windowLabel: string;
+        }>,
+    ): string {
+        const maxShown = 2;
+        if (buckets.length <= maxShown) {
+            const details = buckets
+                .map(b => `${this.cleanBucketLabel(b.bucketIdentifier)} (${b.windowLabel})`)
+                .join(", ");
+            return `Multiple limits exhausted — ${details}`;
+        }
+
+        const shown = buckets
+            .slice(0, maxShown)
+            .map(b => this.cleanBucketLabel(b.bucketIdentifier))
+            .join(", ");
+        const remainingCount = buckets.length - maxShown;
+        return `${buckets.length} limits exhausted (${shown}, +${remainingCount} more)`;
     }
 
     private async handleAggregatedExhaustion(
@@ -399,25 +453,24 @@ export class QuotaMonitorService implements vscode.Disposable {
             }
         }
 
-        // Build a single aggregated alert message
+        // Build a single concise aggregated alert message
         let alertMsg: string;
         if (exhaustedBuckets.length === 1) {
             const { bucketIdentifier, windowLabel } = exhaustedBuckets[0];
+            const cleanName = this.cleanBucketLabel(bucketIdentifier);
             if (bestCandidate) {
                 const candidateName = bestCandidate.label || bestCandidate.email;
-                alertMsg = `Antigravity Rate Limit: ${bucketIdentifier} (${windowLabel}) is exhausted (0%) for ${email}! Switch to ${candidateName} (${bestCandidate.percent}% available)?`;
+                alertMsg = `Antigravity Rate Limit: ${cleanName} (${windowLabel}) is exhausted (0%) for ${email}! Switch to ${candidateName} (${bestCandidate.percent}% available)?`;
             } else {
-                alertMsg = `Antigravity Rate Limit: ${bucketIdentifier} (${windowLabel}) is exhausted (0% remaining).`;
+                alertMsg = `Antigravity Rate Limit: ${cleanName} (${windowLabel}) is exhausted (0% remaining).`;
             }
         } else {
-            const detailsList = exhaustedBuckets
-                .map(b => `${b.bucketIdentifier} (${b.windowLabel})`)
-                .join(", ");
+            const summary = this.formatExhaustedBucketsSummary(exhaustedBuckets);
             if (bestCandidate) {
                 const candidateName = bestCandidate.label || bestCandidate.email;
-                alertMsg = `Antigravity Rate Limit: Multiple limits exhausted — ${detailsList} for ${email}! Switch to ${candidateName} (${bestCandidate.percent}% available)?`;
+                alertMsg = `Antigravity Rate Limit: ${summary} for ${email}! Switch to ${candidateName} (${bestCandidate.percent}% available)?`;
             } else {
-                alertMsg = `Antigravity Rate Limit: Multiple limits exhausted — ${detailsList} (0% remaining).`;
+                alertMsg = `Antigravity Rate Limit: ${summary} (0% remaining).`;
             }
         }
 

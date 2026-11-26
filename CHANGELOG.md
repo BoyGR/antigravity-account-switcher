@@ -2,6 +2,16 @@
 
 All notable changes to the **Antigravity Account Switcher** extension will be documented in this file.
 
+## [1.4.18] - 2026-11-26
+
+### Fixed & Improved
+- **Concise Quota Alert Notifications**:
+  - Replaced long walls of text in low-quota and exhausted-quota toasts when many per-model limits trigger at once with a compact summary (showing the top 2 limits plus `+N more`, stripping redundant `[Model Quota]` prefixes, and collapsing identical percentages).
+- **README Layout Polish**:
+  - Moved the *Important Notice Regarding Google Sign-In & Terms of Service (ToS)* warning block directly above the **License** section for cleaner top-of-page presentation.
+
+---
+
 ## [1.4.17] - 2026-11-25
 
 ### Fixed & Improved

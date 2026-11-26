@@ -4,14 +4,7 @@
   <img src="media/icon.png" width="128" height="128" alt="Antigravity Account Switcher Logo" />
 </p>
 
-Manage, monitor, and switch Google accounts used by Google Antigravity across VS Code, Antigravity IDE, and Cursor.
-
-> [!WARNING]
-> **Important Notice Regarding Google Sign-In & Terms of Service (ToS)**
->
-> Some users have reported that authenticating via the extension's built-in **Direct Google OAuth Sign-In** can trigger Google's anti-abuse checks and result in Antigravity access being restricted for a Terms of Service violation.
->
-> **Safer recommended usage:** Sign in directly using the official **Google Antigravity IDE / official extension**, and use this extension primarily to monitor quotas and manage sessions detected locally. Please avoid using the built-in Direct Google Sign-In flow unless you understand and accept the risk.
+Manage, monitor, and switch Google accounts used by Google Antigravity across VS Code, Antigravity IDE, and other compatible editors.
 
 ---
 
@@ -150,6 +143,15 @@ npm run compile
 # Package production VSIX
 npm run package:vsix
 ```
+
+---
+
+> [!WARNING]
+> **Important Notice Regarding Google Sign-In & Terms of Service (ToS)**
+>
+> Some users have reported that authenticating via the extension's built-in **Direct Google OAuth Sign-In** can trigger Google's anti-abuse checks and result in Antigravity access being restricted for a Terms of Service violation.
+>
+> **Safer recommended usage:** Sign in directly using the official **Google Antigravity IDE / official extension**, and use this extension primarily to monitor quotas and manage sessions detected locally. Please avoid using the built-in Direct Google Sign-In flow unless you understand and accept the risk.
 
 ---
 
